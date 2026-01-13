@@ -27,6 +27,31 @@ Ce script va :
 
 📖 **Guide détaillé** : [FIX_ERRORS.md](FIX_ERRORS.md)
 
+## 🌐 Accès via IP Locale (Réseau Local)
+
+**Vous voulez accéder à NovaClub depuis votre téléphone ou un autre appareil ?**
+
+Si vous accédez via une IP locale (ex: `192.168.1.8`) au lieu de `localhost`, exécutez :
+
+**Linux/Mac** :
+```bash
+./configure-ip.sh
+```
+
+**Windows** :
+```cmd
+configure-ip.bat
+```
+
+Ce script va :
+- Détecter automatiquement votre IP
+- Configurer les CORS
+- Redémarrer les services
+
+**Ensuite, accédez via** : `http://VOTRE_IP:3000` depuis n'importe quel appareil sur votre réseau WiFi
+
+📖 **Guide complet** : [FIX_ERRORS.md](FIX_ERRORS.md#-configuration-ip-locale)
+
 ## Architecture
 
 - **Backend**: FastAPI + PostgreSQL + Redis

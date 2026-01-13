@@ -15,9 +15,29 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 ### 2. ❌ Erreur CORS
 ```
 Access-Control-Allow-Origin header is present on the requested resource
+Cross-Origin Request Blocked
 ```
 
-**Cause** : Le backend n'a pas encore redémarré avec les bonnes dépendances
+**Causes possibles** :
+1. Le backend n'a pas encore redémarré avec les bonnes dépendances
+2. **Vous utilisez une IP locale différente** (ex: 192.168.1.8 au lieu de localhost)
+
+**Solution rapide si vous accédez via une IP locale** :
+
+```bash
+# Linux/Mac
+./configure-ip.sh
+
+# Windows
+configure-ip.bat
+```
+
+Ce script va :
+- Détecter automatiquement votre IP locale
+- Configurer les CORS dans docker-compose.yml
+- Redémarrer les services
+
+**Ou manuellement** : Voir section "Configuration IP Locale" ci-dessous
 
 ---
 
@@ -201,3 +221,163 @@ python -c "from passlib.context import CryptContext; pwd_context = CryptContext(
 3. ✅ Tester l'inscription
 
 Après ces étapes, tout devrait fonctionner parfaitement !
+
+---
+
+## 🌐 Configuration IP Locale
+
+### Problème : Accès via IP locale (ex: 192.168.1.8)
+
+Si vous accédez à l'application via votre IP locale au lieu de localhost, vous devez configurer les CORS.
+
+**Symptômes** :
+- Erreur CORS dans la console du navigateur
+- "Cross-Origin Request Blocked"
+- L'application fonctionne sur localhost mais pas sur l'IP
+
+### Solution Automatique (Recommandé)
+
+**Linux/Mac** :
+```bash
+./configure-ip.sh
+```
+
+**Windows** :
+```cmd
+configure-ip.bat
+```
+
+Le script va :
+1. Détecter votre IP locale automatiquement
+2. Mettre à jour `docker-compose.yml`
+3. Rebuild le backend
+4. Redémarrer tous les services
+
+### Solution Manuelle
+
+#### Étape 1 : Trouver votre IP locale
+
+**Linux** :
+```bash
+ip addr show
+# ou
+hostname -I
+```
+
+**Mac** :
+```bash
+ifconfig | grep 'inet '
+```
+
+**Windows** :
+```cmd
+ipconfig
+```
+
+Cherchez votre IP (généralement 192.168.x.x ou 10.0.x.x)
+
+#### Étape 2 : Modifier docker-compose.yml
+
+Ouvrez `docker-compose.yml` et remplacez `192.168.1.8` par votre IP :
+
+```yaml
+backend:
+  environment:
+    ALLOWED_ORIGINS: http://VOTRE_IP:3000,http://localhost:3000,http://127.0.0.1:3000
+
+pwa:
+  environment:
+    VITE_API_URL: http://VOTRE_IP:8000
+```
+
+**Exemple avec IP 192.168.1.15** :
+```yaml
+backend:
+  environment:
+    ALLOWED_ORIGINS: http://192.168.1.15:3000,http://localhost:3000,http://127.0.0.1:3000
+
+pwa:
+  environment:
+    VITE_API_URL: http://192.168.1.15:8000
+```
+
+#### Étape 3 : Redémarrer les services
+
+```bash
+docker-compose down
+docker-compose build backend
+docker-compose up -d
+```
+
+#### Étape 4 : Accéder via votre IP
+
+- **PWA** : http://VOTRE_IP:3000
+- **API** : http://VOTRE_IP:8000
+- **Adminer** : http://VOTRE_IP:8080
+
+### Accès depuis d'autres appareils
+
+Une fois configuré, vous pouvez accéder à NovaClub depuis :
+- 📱 Votre téléphone (sur le même WiFi)
+- 💻 Autres ordinateurs du réseau local
+- 📟 Tablettes
+
+**Important** : Tous les appareils doivent être sur le même réseau WiFi/local.
+
+### Vérification
+
+**Test 1 : Backend accepte l'IP**
+```bash
+# Remplacez VOTRE_IP par votre IP
+curl http://VOTRE_IP:8000/health
+```
+
+**Résultat attendu** :
+```json
+{"status": "healthy"}
+```
+
+**Test 2 : PWA accessible**
+
+Ouvrez dans votre navigateur : `http://VOTRE_IP:3000`
+
+**Test 3 : Pas d'erreur CORS**
+
+1. Ouvrir la console du navigateur (F12)
+2. Onglet "Console"
+3. Aucune erreur CORS ne doit apparaître
+
+### Plusieurs IPs
+
+Si vous voulez accepter plusieurs IPs (ex: bureau + maison) :
+
+```yaml
+backend:
+  environment:
+    ALLOWED_ORIGINS: http://192.168.1.8:3000,http://192.168.0.15:3000,http://localhost:3000
+```
+
+### Troubleshooting
+
+**Erreur : "Network Error"**
+- Vérifiez que votre firewall autorise les ports 3000, 8000, 8080
+- Sous Linux : `sudo ufw allow 3000` (si ufw activé)
+
+**Erreur : "Connection refused"**
+- Vérifiez que Docker bind sur 0.0.0.0 (déjà configuré)
+- Testez : `netstat -tulpn | grep -E '3000|8000'`
+
+**L'IP a changé**
+- Relancez `./configure-ip.sh` (ou `.bat`)
+- Ou modifiez manuellement `docker-compose.yml`
+
+### Configuration Production
+
+Pour la production, utilisez un nom de domaine au lieu d'une IP :
+
+```yaml
+ALLOWED_ORIGINS: https://novaclub.votredomaine.com,https://www.votredomaine.com
+VITE_API_URL: https://api.votredomaine.com
+```
+
+Voir [docs/DEPLOIEMENT_PRODUCTION.md](docs/DEPLOIEMENT_PRODUCTION.md) pour plus de détails.
