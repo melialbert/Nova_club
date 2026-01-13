@@ -89,17 +89,44 @@ docker-compose logs -f backend
 docker-compose logs -f pwa
 ```
 
-### Arrêter les services
+### Arrêter les services (CONSERVE TOUT)
 
 ```bash
+# Arrêter sans supprimer (RECOMMANDÉ pour usage quotidien)
+docker-compose stop
+
+# Redémarrer rapidement (garde tout en mémoire)
+docker-compose start
+
+# Redémarrer après modification du code
+docker-compose restart
+```
+
+**✅ Vos données et dépendances sont conservées !**
+
+### Arrêter et supprimer les conteneurs (CONSERVE les données)
+
+```bash
+# Supprimer les conteneurs mais garder les volumes
 docker-compose down
+
+# Les données PostgreSQL, Redis et les dépendances sont CONSERVÉES
+# Prochain démarrage : docker-compose up -d
 ```
 
-### Supprimer les données et tout réinitialiser
+### Reset complet (⚠️ SUPPRIME TOUTES LES DONNÉES)
 
 ```bash
+# Supprimer TOUT y compris la base de données
 docker-compose down -v
+
+# ⚠️ Vous perdrez TOUS les membres, paiements, etc.
+# À utiliser uniquement pour repartir de zéro
 ```
+
+### Gestion Avancée des Volumes
+
+Voir la documentation complète : [docs/GESTION_VOLUMES.md](docs/GESTION_VOLUMES.md)
 
 ## Installation sur les PC de Clubs
 
