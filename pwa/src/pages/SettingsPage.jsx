@@ -25,21 +25,9 @@ function SettingsPage() {
   const loadSettings = async () => {
     try {
       setLoading(true);
-      let clubData;
 
-      if (navigator.onLine) {
-        clubData = await apiCall('/clubs/my-club');
-
-        await addToStore('settings', { ...clubData, id: 'club_settings' });
-      } else {
-        clubData = await getFromStore('settings', 'club_settings');
-
-        if (!clubData) {
-          error('Mode hors ligne : Aucune donnée disponible');
-          setLoading(false);
-          return;
-        }
-      }
+      const clubData = await apiCall('/clubs/my-club');
+      await addToStore('settings', { ...clubData, id: 'club_settings' });
 
       setClubSettings(clubData);
       setFormData({
@@ -50,8 +38,26 @@ function SettingsPage() {
       });
       setLogoPreview(clubData.logo || clubData.logo_url);
     } catch (err) {
-      console.error('Erreur lors du chargement:', err);
-      error('Erreur lors du chargement des paramètres');
+      try {
+        const clubData = await getFromStore('settings', 'club_settings');
+
+        if (!clubData) {
+          error('Mode hors ligne : Aucune donnée disponible');
+          return;
+        }
+
+        setClubSettings(clubData);
+        setFormData({
+          club_name: clubData.club_name || clubData.name || '',
+          city: clubData.city || '',
+          slogan: clubData.slogan || '',
+          logo: clubData.logo || clubData.logo_url || ''
+        });
+        setLogoPreview(clubData.logo || clubData.logo_url);
+      } catch (offlineErr) {
+        console.error('Erreur lors du chargement:', err);
+        error('Erreur lors du chargement des paramètres');
+      }
     } finally {
       setLoading(false);
     }
@@ -89,7 +95,7 @@ function SettingsPage() {
         logo_url: formData.logo
       };
 
-      if (navigator.onLine) {
+      try {
         const updatedClub = await apiCall('/clubs/my-club', {
           method: 'PUT',
           body: JSON.stringify(updateData)
@@ -98,18 +104,22 @@ function SettingsPage() {
         setClubSettings(updatedClub);
         await addToStore('settings', { ...updatedClub, id: 'club_settings' });
         success('Paramètres mis à jour avec succès');
-      } else {
-        const updatedClub = {
-          ...clubSettings,
-          ...updateData,
-          club_name: formData.club_name,
-          id: 'club_settings'
-        };
+      } catch (err) {
+        if (err.message.includes('Mode hors ligne')) {
+          const updatedClub = {
+            ...clubSettings,
+            ...updateData,
+            club_name: formData.club_name,
+            id: 'club_settings'
+          };
 
-        await addToStore('settings', updatedClub);
-        await queueChange('settings', 'club_settings', updatedClub);
-        setClubSettings(updatedClub);
-        success('Paramètres mis à jour (sera synchronisé)');
+          await addToStore('settings', updatedClub);
+          await queueChange('settings', 'club_settings', updatedClub);
+          setClubSettings(updatedClub);
+          success('Paramètres mis à jour (sera synchronisé)');
+        } else {
+          throw err;
+        }
       }
     } catch (err) {
       console.error('Erreur lors de la sauvegarde:', err);

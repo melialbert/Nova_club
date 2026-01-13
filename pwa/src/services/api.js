@@ -37,16 +37,6 @@ const clearAuthData = async () => {
 };
 
 export const apiCall = async (endpoint, options = {}) => {
-  if (!navigator.onLine) {
-    const storeName = endpoint.split('/')[1];
-
-    if (options.method === 'GET' || !options.method) {
-      return await getAllFromStore(storeName);
-    }
-
-    throw new Error('Mode hors ligne : Cette action nécessite une connexion internet');
-  }
-
   const token = getAuthToken();
 
   const headers = {
@@ -78,65 +68,86 @@ export const apiCall = async (endpoint, options = {}) => {
 
     return await response.json();
   } catch (error) {
-    if (error.message.includes('Failed to fetch') || error.message.includes('Network')) {
-      throw new Error('Erreur réseau : Vérifiez votre connexion internet');
+    if (error.message.includes('Failed to fetch') || error.message.includes('fetch')) {
+      const storeName = endpoint.split('/')[1];
+
+      if (options.method === 'GET' || !options.method) {
+        try {
+          return await getAllFromStore(storeName);
+        } catch {
+          throw new Error('Mode hors ligne : Aucune donnée disponible');
+        }
+      }
+
+      throw new Error('Mode hors ligne : Cette action nécessite une connexion internet');
     }
     throw error;
   }
 };
 
 export const login = async (email, password) => {
-  if (!navigator.onLine) {
-    const authData = await getAuthData();
+  try {
+    const response = await apiCall('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
 
-    if (!authData || authData.email !== email || authData.password !== password) {
-      throw new Error('Mode hors ligne : Identifiants incorrects ou première connexion impossible sans internet');
+    setAuthToken(response.access_token);
+    return response;
+  } catch (error) {
+    if (error.message.includes('Erreur réseau') || error.message.includes('Failed to fetch')) {
+      const authData = await getAuthData();
+
+      if (!authData || authData.email !== email || authData.password !== password) {
+        throw new Error('Mode hors ligne : Identifiants incorrects ou première connexion impossible sans internet');
+      }
+
+      setAuthToken('offline_token');
+      return { user: authData.user, access_token: 'offline_token' };
     }
 
-    setAuthToken('offline_token');
-    return { user: authData.user, access_token: 'offline_token' };
+    throw error;
   }
-
-  const response = await apiCall('/auth/login', {
-    method: 'POST',
-    body: JSON.stringify({ email, password }),
-  });
-
-  setAuthToken(response.access_token);
-  return response;
 };
 
 export const register = async (data) => {
-  if (!navigator.onLine) {
-    throw new Error('Mode hors ligne : L\'inscription nécessite une connexion internet');
+  try {
+    const response = await apiCall('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+
+    setAuthToken(response.access_token);
+    return response;
+  } catch (error) {
+    if (error.message.includes('Mode hors ligne') || error.message.includes('Erreur réseau') || error.message.includes('Failed to fetch')) {
+      throw new Error('Mode hors ligne : L\'inscription nécessite une connexion internet');
+    }
+    throw error;
   }
-
-  const response = await apiCall('/auth/register', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-
-  setAuthToken(response.access_token);
-  return response;
 };
 
 export const getCurrentUser = async () => {
-  if (!navigator.onLine) {
+  try {
+    const user = await apiCall('/auth/me');
+
     const authData = await getAuthData();
-    if (!authData) {
-      throw new Error('Mode hors ligne : Aucune donnée d\'authentification disponible');
+    if (authData) {
+      await saveAuthData(authData.email, authData.password, user);
     }
-    return authData.user;
+
+    return user;
+  } catch (error) {
+    if (error.message.includes('Mode hors ligne') || error.message.includes('Erreur réseau') || error.message.includes('Failed to fetch')) {
+      const authData = await getAuthData();
+      if (!authData) {
+        throw new Error('Mode hors ligne : Aucune donnée d\'authentification disponible');
+      }
+      return authData.user;
+    }
+
+    throw error;
   }
-
-  const user = await apiCall('/auth/me');
-
-  const authData = await getAuthData();
-  if (authData) {
-    await saveAuthData(authData.email, authData.password, user);
-  }
-
-  return user;
 };
 
 export const logout = async () => {

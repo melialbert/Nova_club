@@ -44,14 +44,14 @@ function LoginPage() {
       const response = await login(email, password);
       const user = await getCurrentUser();
 
-      if (navigator.onLine) {
-        await saveAuthData(email, password, user);
-      }
+      await saveAuthData(email, password, user);
 
       setUser(user);
 
-      if (navigator.onLine) {
+      try {
         startSync();
+      } catch (syncError) {
+        console.log('Sync error (offline mode):', syncError);
       }
 
       toast.success(`Bienvenue ${user.first_name} !`);
