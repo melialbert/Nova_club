@@ -1,0 +1,169 @@
+import { Link, useLocation } from 'react-router-dom';
+
+function Layout({ children, onLogout }) {
+  const location = useLocation();
+
+  const isActive = (path) => location.pathname === path;
+
+  const menuItems = [
+    { path: '/', label: 'Tableau de bord', icon: '📊' },
+    { path: '/members', label: 'Adhérents', icon: '👥' },
+    { path: '/attendances', label: 'Présences', icon: '📋' },
+    { path: '/payments', label: 'Paiements', icon: '💳' },
+    { path: '/licenses', label: 'Licences', icon: '🎫' },
+    { path: '/employees', label: 'Employés', icon: '👔' },
+    { path: '/accounting', label: 'Comptabilité', icon: '💰' },
+    { path: '/settings', label: 'Paramètres', icon: '⚙️' },
+  ];
+
+  return (
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      <aside style={{
+        width: '280px',
+        backgroundColor: '#1e293b',
+        color: 'white',
+        display: 'flex',
+        flexDirection: 'column',
+        boxShadow: '2px 0 12px rgba(0,0,0,0.1)'
+      }}>
+        <div style={{
+          padding: '32px 24px',
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            fontSize: '28px',
+            fontWeight: '700',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            Club Manager
+          </div>
+          <div style={{
+            fontSize: '13px',
+            color: '#94a3b8',
+            marginTop: '4px'
+          }}>
+            Version Desktop
+          </div>
+        </div>
+
+        <nav style={{
+          flex: 1,
+          padding: '24px 16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          overflowY: 'auto'
+        }}>
+          {menuItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '14px 16px',
+                borderRadius: '10px',
+                textDecoration: 'none',
+                color: isActive(item.path) ? 'white' : '#cbd5e1',
+                backgroundColor: isActive(item.path) ? '#3b82f6' : 'transparent',
+                fontWeight: isActive(item.path) ? '600' : '500',
+                fontSize: '15px',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive(item.path)) {
+                  e.target.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+                  e.target.style.color = 'white';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive(item.path)) {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.color = '#cbd5e1';
+                }
+              }}
+            >
+              <span style={{ fontSize: '20px' }}>{item.icon}</span>
+              <span>{item.label}</span>
+            </Link>
+          ))}
+        </nav>
+
+        <div style={{
+          padding: '20px',
+          borderTop: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <button
+            onClick={onLogout}
+            style={{
+              width: '100%',
+              padding: '12px',
+              backgroundColor: 'transparent',
+              border: '1px solid rgba(248, 113, 113, 0.3)',
+              borderRadius: '10px',
+              color: '#f87171',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = 'rgba(248, 113, 113, 0.1)';
+              e.target.style.borderColor = '#f87171';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.borderColor = 'rgba(248, 113, 113, 0.3)';
+            }}
+          >
+            <span>🚪</span>
+            <span>Déconnexion</span>
+          </button>
+        </div>
+      </aside>
+
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        backgroundColor: '#f8fafc'
+      }}>
+        <header style={{
+          backgroundColor: 'white',
+          borderBottom: '1px solid #e2e8f0',
+          padding: '20px 32px',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+        }}>
+          <h1 style={{
+            fontSize: '24px',
+            fontWeight: '700',
+            color: '#0f172a',
+            margin: 0
+          }}>
+            {menuItems.find(item => item.path === location.pathname)?.label || 'Club Manager'}
+          </h1>
+        </header>
+
+        <main style={{
+          flex: 1,
+          overflow: 'auto',
+          padding: '32px'
+        }}>
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default Layout;

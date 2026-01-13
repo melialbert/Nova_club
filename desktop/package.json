@@ -1,0 +1,57 @@
+{
+  "name": "club-management-desktop",
+  "version": "1.0.0",
+  "description": "Application de bureau pour la gestion de club de judo",
+  "main": "src/electron/main.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "nodemon src/backend/server.js",
+    "dev:frontend": "vite",
+    "electron": "electron .",
+    "electron:dev": "concurrently \"npm run dev:backend\" \"wait-on http://localhost:5174 && electron .\"",
+    "build": "vite build",
+    "build:win": "npm run build && electron-builder --win",
+    "build:all": "npm run build && electron-builder -mwl"
+  },
+  "build": {
+    "appId": "com.clubmanagement.app",
+    "productName": "Club Management",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "src/electron/**/*",
+      "src/backend/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "public/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "better-sqlite3": "^9.2.2",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "vite": "^5.0.8",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.2",
+    "wait-on": "^7.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.21.1"
+  }
+}
