@@ -9,19 +9,9 @@ function SettingsPage() {
   const [logoPreview, setLogoPreview] = useState(null);
   const [formData, setFormData] = useState({
     club_name: '',
-    address: '',
     city: '',
-    postal_code: '',
-    phone: '',
-    email: '',
-    website: '',
-    logo: '',
-    description: '',
-    facebook: '',
-    instagram: '',
-    president: '',
-    treasurer: '',
-    secretary: ''
+    slogan: '',
+    logo: ''
   });
 
   const { success, error } = useToast();
@@ -199,11 +189,11 @@ function SettingsPage() {
           <div className="card" style={{ marginBottom: '24px' }}>
             <div className="card-header">
               <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
-                Informations générales
+                Informations du club
               </h2>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gap: '20px' }}>
               <div className="form-group">
                 <label>Nom du club *</label>
                 <input
@@ -217,156 +207,25 @@ function SettingsPage() {
               </div>
 
               <div className="form-group">
-                <label>Email *</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="contact@club.com"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Téléphone *</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                  placeholder="+33 1 23 45 67 89"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Site web</label>
-                <input
-                  type="url"
-                  name="website"
-                  value={formData.website}
-                  onChange={handleChange}
-                  placeholder="https://www.club.com"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Adresse</label>
-                <input
-                  type="text"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  placeholder="123 rue de la paix"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Ville</label>
+                <label>Ville *</label>
                 <input
                   type="text"
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
+                  required
                   placeholder="Paris"
                 />
               </div>
 
               <div className="form-group">
-                <label>Code postal</label>
+                <label>Slogan</label>
                 <input
                   type="text"
-                  name="postal_code"
-                  value={formData.postal_code}
+                  name="slogan"
+                  value={formData.slogan}
                   onChange={handleChange}
-                  placeholder="75001"
-                />
-              </div>
-            </div>
-
-            <div className="form-group" style={{ marginTop: '20px' }}>
-              <label>Description du club</label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows="4"
-                placeholder="Présentation du club, historique, valeurs..."
-              ></textarea>
-            </div>
-          </div>
-
-          <div className="card" style={{ marginBottom: '24px' }}>
-            <div className="card-header">
-              <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
-                Réseaux sociaux
-              </h2>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-              <div className="form-group">
-                <label>Facebook</label>
-                <input
-                  type="url"
-                  name="facebook"
-                  value={formData.facebook}
-                  onChange={handleChange}
-                  placeholder="https://facebook.com/votreclub"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Instagram</label>
-                <input
-                  type="url"
-                  name="instagram"
-                  value={formData.instagram}
-                  onChange={handleChange}
-                  placeholder="https://instagram.com/votreclub"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="card" style={{ marginBottom: '24px' }}>
-            <div className="card-header">
-              <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
-                Bureau directeur
-              </h2>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-              <div className="form-group">
-                <label>Président</label>
-                <input
-                  type="text"
-                  name="president"
-                  value={formData.president}
-                  onChange={handleChange}
-                  placeholder="Nom du président"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Trésorier</label>
-                <input
-                  type="text"
-                  name="treasurer"
-                  value={formData.treasurer}
-                  onChange={handleChange}
-                  placeholder="Nom du trésorier"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Secrétaire</label>
-                <input
-                  type="text"
-                  name="secretary"
-                  value={formData.secretary}
-                  onChange={handleChange}
-                  placeholder="Nom du secrétaire"
+                  placeholder="Le slogan de votre club"
                 />
               </div>
             </div>

@@ -6,9 +6,8 @@ class Club(BaseModel):
     __tablename__ = "clubs"
 
     name = Column(String(200), nullable=False)
-    address = Column(Text, nullable=True)
-    phone = Column(String(20), nullable=True)
-    email = Column(String(100), nullable=True)
+    city = Column(String(100), nullable=True)
+    slogan = Column(String(500), nullable=True)
     logo_url = Column(String(500), nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
 
