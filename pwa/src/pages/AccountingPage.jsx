@@ -102,10 +102,29 @@ function AccountingPage() {
       .filter(t => t.type === 'expense')
       .reduce((sum, t) => sum + parseFloat(t.amount), 0);
 
+    const kimonoSales = filtered
+      .filter(t => t.type === 'income' &&
+                   t.category === 'equipment_sale' &&
+                   t.description &&
+                   t.description.toLowerCase().includes('kimono'))
+      .reduce((total, t) => {
+        const match = t.description.match(/\(x(\d+)\)/);
+        return total + (match ? parseInt(match[1]) : 1);
+      }, 0);
+
+    const kimonoRevenue = filtered
+      .filter(t => t.type === 'income' &&
+                   t.category === 'equipment_sale' &&
+                   t.description &&
+                   t.description.toLowerCase().includes('kimono'))
+      .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+
     return {
       income,
       expenses,
-      balance: income - expenses
+      balance: income - expenses,
+      kimonoSales,
+      kimonoRevenue
     };
   };
 
@@ -200,6 +219,21 @@ function AccountingPage() {
                 </div>
               </div>
               <div style={{ fontSize: '32px', opacity: 0.8 }}>💼</div>
+            </div>
+          </div>
+
+          <div className="card" style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', color: 'white', border: 'none' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <div style={{ fontSize: '14px', opacity: 0.9, marginBottom: '8px' }}>Kimonos vendus</div>
+                <div style={{ fontSize: '28px', fontWeight: '700' }}>
+                  {summary.kimonoSales} unité{summary.kimonoSales > 1 ? 's' : ''}
+                </div>
+                <div style={{ fontSize: '13px', opacity: 0.8, marginTop: '4px' }}>
+                  {summary.kimonoRevenue.toLocaleString()} FCFA
+                </div>
+              </div>
+              <div style={{ fontSize: '32px', opacity: 0.8 }}>👔</div>
             </div>
           </div>
         </div>
