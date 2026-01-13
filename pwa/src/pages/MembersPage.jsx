@@ -41,6 +41,18 @@ function MembersPage() {
     setMembers(data);
   };
 
+  const calculateAge = (dateOfBirth) => {
+    if (!dateOfBirth) return '';
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -281,6 +293,21 @@ function MembersPage() {
                 <div className="form-group">
                   <label>Date de naissance *</label>
                   <input type="date" name="date_of_birth" value={formData.date_of_birth} onChange={handleChange} required />
+                </div>
+                <div className="form-group">
+                  <label>Âge</label>
+                  <input
+                    type="text"
+                    value={formData.date_of_birth ? `${calculateAge(formData.date_of_birth)} ans` : ''}
+                    readOnly
+                    style={{
+                      backgroundColor: '#f8fafc',
+                      cursor: 'not-allowed',
+                      color: '#475569',
+                      fontWeight: '600'
+                    }}
+                    placeholder="Calculé automatiquement"
+                  />
                 </div>
                 <div className="form-group">
                   <label>Sexe</label>
