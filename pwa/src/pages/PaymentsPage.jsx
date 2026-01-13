@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react';
-import { getAllFromStore, addToStore } from '../db';
+import { getAllFromStore, addToStore, deleteFromStore } from '../db';
 import { queueChange } from '../services/syncService';
 import { usePaymentStore, useMemberStore, useTransactionStore } from '../utils/store';
 import { useToast } from '../utils/useToast';
 import Layout from '../components/Layout';
 
 function PaymentsPage() {
-  const { payments, setPayments, addPayment } = usePaymentStore();
+  const { payments, setPayments, addPayment, removePayment } = usePaymentStore();
   const { members, setMembers } = useMemberStore();
   const { addTransaction } = useTransactionStore();
-  const { success } = useToast();
+  const { success, error } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [clubSettings, setClubSettings] = useState(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState(null);
   const [formData, setFormData] = useState({
     member_id: '',
     amount: '',
@@ -135,6 +137,26 @@ function PaymentsPage() {
     monthly_fee: payments.filter(p => p.payment_type === 'monthly_fee').length,
     registration: payments.filter(p => p.payment_type === 'registration').length,
     equipment: payments.filter(p => p.payment_type === 'equipment').length,
+  };
+
+  const handleViewDetails = (payment) => {
+    setSelectedPayment(payment);
+    setShowDetailsModal(true);
+  };
+
+  const handleDelete = async (payment) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer ce paiement de ${parseFloat(payment.amount).toLocaleString()} FCFA ?`)) {
+      return;
+    }
+
+    try {
+      await deleteFromStore('payments', payment.id);
+      await queueChange('payments', payment.id, null);
+      removePayment(payment.id);
+      success('Paiement supprimé avec succès');
+    } catch (err) {
+      error('Erreur lors de la suppression du paiement');
+    }
   };
 
   const printInvoice = (payment) => {
@@ -717,6 +739,7 @@ function PaymentsPage() {
                               🖨️
                             </button>
                             <button
+                              onClick={() => handleViewDetails(payment)}
                               style={{
                                 padding: '6px 12px',
                                 borderRadius: '6px',
@@ -739,6 +762,7 @@ function PaymentsPage() {
                               👁️
                             </button>
                             <button
+                              onClick={() => handleDelete(payment)}
                               style={{
                                 padding: '6px 12px',
                                 borderRadius: '6px',
@@ -789,6 +813,201 @@ function PaymentsPage() {
           )}
         </div>
       </div>
+
+      {showDetailsModal && selectedPayment && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}
+          onClick={() => setShowDetailsModal(false)}
+        >
+          <div
+            className="card"
+            style={{
+              maxWidth: '600px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              margin: 0
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="card-header" style={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
+              <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
+                💳 Détails du paiement
+              </h2>
+            </div>
+
+            <div style={{ padding: '24px' }}>
+              <div style={{ display: 'grid', gap: '24px' }}>
+                <div>
+                  <label style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Adhérent
+                  </label>
+                  <div style={{ marginTop: '8px', fontSize: '16px', fontWeight: '600', color: '#0f172a' }}>
+                    {(() => {
+                      const member = members.find(m => m.id === selectedPayment.member_id);
+                      return member ? `${member.first_name} ${member.last_name}` : 'Inconnu';
+                    })()}
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                  <div>
+                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Montant
+                    </label>
+                    <div style={{ marginTop: '8px', fontSize: '24px', fontWeight: '700', color: '#10b981' }}>
+                      {parseFloat(selectedPayment.amount).toLocaleString()} FCFA
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Date
+                    </label>
+                    <div style={{ marginTop: '8px', fontSize: '16px', fontWeight: '600', color: '#0f172a' }}>
+                      {new Date(selectedPayment.payment_date).toLocaleDateString('fr-FR', {
+                        day: '2-digit',
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                  <div>
+                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Type
+                    </label>
+                    <div style={{ marginTop: '8px' }}>
+                      <span className="badge badge-blue">
+                        {getPaymentTypeLabel(selectedPayment.payment_type)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Méthode
+                    </label>
+                    <div style={{ marginTop: '8px', fontSize: '16px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span>{getPaymentMethodIcon(selectedPayment.payment_method)}</span>
+                      <span>{getPaymentMethodLabel(selectedPayment.payment_method)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Mois concerné
+                  </label>
+                  <div style={{ marginTop: '8px', fontSize: '16px', color: '#0f172a' }}>
+                    {selectedPayment.month_year ? (
+                      <span className="badge badge-yellow">
+                        {new Date(selectedPayment.month_year + '-01').toLocaleDateString('fr-FR', {
+                          month: 'long',
+                          year: 'numeric'
+                        })}
+                      </span>
+                    ) : (
+                      <span style={{ color: '#94a3b8' }}>Non spécifié</span>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    Statut
+                  </label>
+                  <div style={{ marginTop: '8px' }}>
+                    <span className={`status-badge status-${selectedPayment.status}`}>
+                      {selectedPayment.status === 'paid' ? 'Payé' : selectedPayment.status === 'pending' ? 'En attente' : 'Annulé'}
+                    </span>
+                  </div>
+                </div>
+
+                {selectedPayment.notes && (
+                  <div>
+                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Notes
+                    </label>
+                    <div style={{
+                      marginTop: '8px',
+                      padding: '16px',
+                      backgroundColor: '#f8fafc',
+                      borderRadius: '8px',
+                      border: '1px solid #e2e8f0',
+                      fontSize: '15px',
+                      color: '#475569',
+                      lineHeight: '1.6'
+                    }}>
+                      {selectedPayment.notes}
+                    </div>
+                  </div>
+                )}
+
+                <div style={{
+                  paddingTop: '16px',
+                  borderTop: '1px solid #e2e8f0',
+                  fontSize: '13px',
+                  color: '#94a3b8'
+                }}>
+                  Enregistré le {new Date(selectedPayment.created_at).toLocaleDateString('fr-FR', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px' }}>
+                <button
+                  onClick={() => {
+                    printInvoice(selectedPayment);
+                    setShowDetailsModal(false);
+                  }}
+                  className="btn btn-success"
+                >
+                  <span>🖨️</span>
+                  <span>Imprimer la facture</span>
+                </button>
+                <button
+                  onClick={() => setShowDetailsModal(false)}
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: 'transparent',
+                    border: '2px solid #e2e8f0',
+                    borderRadius: '8px',
+                    color: '#64748b',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.borderColor = '#cbd5e1'}
+                  onMouseLeave={(e) => e.target.style.borderColor = '#e2e8f0'}
+                >
+                  Fermer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }

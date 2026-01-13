@@ -26,6 +26,9 @@ export const usePaymentStore = create((set) => ({
   payments: [],
   setPayments: (payments) => set({ payments }),
   addPayment: (payment) => set((state) => ({ payments: [...state.payments, payment] })),
+  removePayment: (id) => set((state) => ({
+    payments: state.payments.filter(p => p.id !== id)
+  })),
 }));
 
 export const useTransactionStore = create((set) => ({
