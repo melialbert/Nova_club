@@ -11,6 +11,7 @@ function Layout({ children }) {
   const menuItems = [
     { path: '/dashboard', label: 'Tableau de bord', icon: '📊' },
     { path: '/members', label: 'Adhérents', icon: '👥' },
+    { path: '/attendances', label: 'Présences', icon: '📋' },
     { path: '/payments', label: 'Paiements', icon: '💳' },
   ];
 

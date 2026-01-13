@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { getAllFromStore, addToStore } from '../db';
+import { getAllFromStore, addToStore, updateInStore, deleteFromStore } from '../db';
 import { queueChange } from '../services/syncService';
 import { useMemberStore } from '../utils/store';
 import Layout from '../components/Layout';
 
 function MembersPage() {
-  const { members, setMembers, addMember } = useMemberStore();
+  const { members, setMembers, addMember, updateMember, removeMember } = useMemberStore();
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingMember, setEditingMember] = useState(null);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -39,17 +40,76 @@ function MembersPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newMember = {
-      id: crypto.randomUUID(),
-      ...formData,
-      club_id: 'current_club_id',
-      created_at: new Date().toISOString()
-    };
+    if (editingMember) {
+      const updatedMember = {
+        ...editingMember,
+        ...formData,
+        updated_at: new Date().toISOString()
+      };
 
-    await addToStore('members', newMember);
-    await queueChange('members', newMember.id, newMember);
-    addMember(newMember);
+      await updateInStore('members', updatedMember);
+      await queueChange('members', updatedMember.id, updatedMember);
+      updateMember(updatedMember);
+      setEditingMember(null);
+    } else {
+      const newMember = {
+        id: crypto.randomUUID(),
+        ...formData,
+        club_id: 'current_club_id',
+        created_at: new Date().toISOString()
+      };
 
+      await addToStore('members', newMember);
+      await queueChange('members', newMember.id, newMember);
+      addMember(newMember);
+    }
+
+    setFormData({
+      first_name: '',
+      last_name: '',
+      date_of_birth: '',
+      gender: 'male',
+      phone: '',
+      email: '',
+      category: 'benjamin',
+      discipline: 'judo',
+      belt_level: 'white',
+      status: 'active',
+      monthly_fee: '',
+      registration_date: new Date().toISOString().split('T')[0]
+    });
+    setShowForm(false);
+  };
+
+  const handleEdit = (member) => {
+    setEditingMember(member);
+    setFormData({
+      first_name: member.first_name,
+      last_name: member.last_name,
+      date_of_birth: member.date_of_birth,
+      gender: member.gender,
+      phone: member.phone || '',
+      email: member.email || '',
+      category: member.category,
+      discipline: member.discipline,
+      belt_level: member.belt_level,
+      status: member.status,
+      monthly_fee: member.monthly_fee,
+      registration_date: member.registration_date
+    });
+    setShowForm(true);
+  };
+
+  const handleDelete = async (member) => {
+    if (window.confirm(`Êtes-vous sûr de vouloir supprimer ${member.first_name} ${member.last_name} ?`)) {
+      await deleteFromStore('members', member.id);
+      await queueChange('members', member.id, null);
+      removeMember(member.id);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMember(null);
     setFormData({
       first_name: '',
       last_name: '',
@@ -108,7 +168,13 @@ function MembersPage() {
           </div>
           <button
             className="btn btn-primary"
-            onClick={() => setShowForm(!showForm)}
+            onClick={() => {
+              if (showForm) {
+                handleCancelEdit();
+              } else {
+                setShowForm(true);
+              }
+            }}
           >
             <span>{showForm ? '✕' : '+'}</span>
             <span>{showForm ? 'Annuler' : 'Nouvel adhérent'}</span>
@@ -119,7 +185,7 @@ function MembersPage() {
           <div className="card fade-in" style={{ marginBottom: '24px' }}>
             <div className="card-header">
               <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
-                👤 Ajouter un adhérent
+                {editingMember ? '✏️ Modifier un adhérent' : '👤 Ajouter un adhérent'}
               </h2>
             </div>
             <form onSubmit={handleSubmit}>
@@ -184,9 +250,9 @@ function MembersPage() {
               <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
                 <button type="submit" className="btn btn-success">
                   <span>✓</span>
-                  <span>Enregistrer</span>
+                  <span>{editingMember ? 'Mettre à jour' : 'Enregistrer'}</span>
                 </button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowForm(false)}>
+                <button type="button" className="btn btn-secondary" onClick={handleCancelEdit}>
                   Annuler
                 </button>
               </div>
@@ -284,6 +350,7 @@ function MembersPage() {
                       <td>
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <button
+                            onClick={() => handleEdit(member)}
                             style={{
                               padding: '6px 12px',
                               borderRadius: '6px',
@@ -301,10 +368,12 @@ function MembersPage() {
                               e.target.style.backgroundColor = 'white';
                               e.target.style.borderColor = '#e2e8f0';
                             }}
+                            title="Modifier"
                           >
                             ✏️
                           </button>
                           <button
+                            onClick={() => handleDelete(member)}
                             style={{
                               padding: '6px 12px',
                               borderRadius: '6px',
@@ -322,6 +391,7 @@ function MembersPage() {
                               e.target.style.backgroundColor = 'white';
                               e.target.style.borderColor = '#e2e8f0';
                             }}
+                            title="Supprimer"
                           >
                             🗑️
                           </button>

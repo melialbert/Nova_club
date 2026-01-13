@@ -92,6 +92,12 @@ export const addToStore = async (storeName, data) => {
   return await db.put(storeName, data);
 };
 
+export const updateInStore = async (storeName, data) => {
+  const db = await getDB();
+  data.updated_at = new Date().toISOString();
+  return await db.put(storeName, data);
+};
+
 export const deleteFromStore = async (storeName, id) => {
   const db = await getDB();
   return await db.delete(storeName, id);

@@ -42,8 +42,8 @@ body {
 }
 
 .card-title {
-  fontSize: 20px;
-  fontWeight: 700;
+  font-size: 20px;
+  font-weight: 700;
   color: #0f172a;
   margin: 0;
 }

@@ -11,8 +11,11 @@ export const useMemberStore = create((set) => ({
   members: [],
   setMembers: (members) => set({ members }),
   addMember: (member) => set((state) => ({ members: [...state.members, member] })),
-  updateMember: (id, data) => set((state) => ({
-    members: state.members.map(m => m.id === id ? { ...m, ...data } : m)
+  updateMember: (updatedMember) => set((state) => ({
+    members: state.members.map(m => m.id === updatedMember.id ? updatedMember : m)
+  })),
+  removeMember: (id) => set((state) => ({
+    members: state.members.filter(m => m.id !== id)
   })),
   deleteMember: (id) => set((state) => ({
     members: state.members.filter(m => m.id !== id)
