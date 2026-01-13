@@ -453,16 +453,24 @@ function PaymentsPage() {
       </html>
     `;
 
-    invoiceWindow.document.write(invoiceContent);
-    invoiceWindow.document.close();
+    try {
+      invoiceWindow.document.write(invoiceContent);
+      invoiceWindow.document.close();
 
-    invoiceWindow.onload = () => {
       setTimeout(() => {
-        invoiceWindow.print();
-      }, 250);
-    };
-
-    success('Facture générée avec succès');
+        try {
+          invoiceWindow.print();
+          success('Facture générée avec succès');
+        } catch (printError) {
+          console.error('Erreur lors de l\'impression:', printError);
+          error('Erreur lors du lancement de l\'impression');
+        }
+      }, 500);
+    } catch (err) {
+      console.error('Erreur lors de la génération de la facture:', err);
+      error('Erreur lors de la génération de la facture');
+      invoiceWindow.close();
+    }
   };
 
   return (
