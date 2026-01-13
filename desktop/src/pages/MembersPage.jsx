@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
-import Layout from '../components/Layout';
 
 function MembersPage() {
   const [members, setMembers] = useState([]);
@@ -223,8 +222,7 @@ function MembersPage() {
   );
 
   return (
-    <Layout>
-      <div className="fade-in">
+    <div className="fade-in">
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -657,7 +655,6 @@ function MembersPage() {
           )}
         </div>
       </div>
-    </Layout>
   );
 }
 
