@@ -5,7 +5,7 @@ from app.db.base import get_db
 from app.core.security import verify_password, get_password_hash, create_access_token
 from app.core.config import settings
 from app.core.deps import get_current_user
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.models.club import Club
 from app.schemas.auth import Token, LoginRequest, RegisterRequest
 from datetime import date
@@ -45,7 +45,7 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
         first_name=request.first_name,
         last_name=request.last_name,
         phone=request.phone,
-        role="admin",
+        role=UserRole.ADMIN,
         is_active=True
     )
     db.add(new_user)
@@ -59,7 +59,7 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
         data={
             "sub": new_user.id,
             "club_id": new_user.club_id,
-            "role": new_user.role
+            "role": new_user.role.value if isinstance(new_user.role, UserRole) else new_user.role
         },
         expires_delta=access_token_expires
     )
@@ -104,7 +104,7 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
         data={
             "sub": user.id,
             "club_id": user.club_id,
-            "role": user.role
+            "role": user.role.value if isinstance(user.role, UserRole) else user.role
         },
         expires_delta=access_token_expires
     )
@@ -118,6 +118,6 @@ def get_current_user_info(current_user: User = Depends(get_current_user)):
         "email": current_user.email,
         "first_name": current_user.first_name,
         "last_name": current_user.last_name,
-        "role": current_user.role,
+        "role": current_user.role.value if isinstance(current_user.role, UserRole) else current_user.role,
         "club_id": current_user.club_id
     }

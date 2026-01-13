@@ -19,7 +19,7 @@ function Layout({ children }) {
     { path: '/settings', label: 'Paramètres', icon: '⚙️', roles: ['ADMIN'] },
   ];
 
-  const menuItems = allMenuItems.filter(item => item.roles.includes(user?.role));
+  const menuItems = allMenuItems.filter(item => item.roles.includes(user?.role?.toUpperCase()));
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>

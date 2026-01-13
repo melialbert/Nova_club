@@ -13,7 +13,7 @@ function EmployeesPage() {
     last_name: '',
     email: '',
     phone: '',
-    role: 'secretary',
+    role: 'SECRETARY',
     password: ''
   });
 
@@ -21,7 +21,7 @@ function EmployeesPage() {
   const { success, error } = useToast();
 
   useEffect(() => {
-    if (user?.role !== 'admin') {
+    if (user?.role?.toUpperCase() !== 'ADMIN') {
       return;
     }
     loadEmployees();
@@ -100,7 +100,7 @@ function EmployeesPage() {
       last_name: '',
       email: '',
       phone: '',
-      role: 'secretary',
+      role: 'SECRETARY',
       password: ''
     });
   };
@@ -110,7 +110,7 @@ function EmployeesPage() {
     setShowModal(true);
   };
 
-  if (user?.role !== 'admin') {
+  if (user?.role?.toUpperCase() !== 'ADMIN') {
     return (
       <Layout>
         <div style={{ textAlign: 'center', padding: '48px 24px' }}>
@@ -183,10 +183,10 @@ function EmployeesPage() {
                         borderRadius: '6px',
                         fontSize: '13px',
                         fontWeight: '600',
-                        backgroundColor: employee.role === 'admin' ? '#dbeafe' : employee.role === 'secretary' ? '#fef3c7' : '#dcfce7',
-                        color: employee.role === 'admin' ? '#1e40af' : employee.role === 'secretary' ? '#92400e' : '#166534'
+                        backgroundColor: employee.role?.toUpperCase() === 'ADMIN' ? '#dbeafe' : employee.role?.toUpperCase() === 'SECRETARY' ? '#fef3c7' : '#dcfce7',
+                        color: employee.role?.toUpperCase() === 'ADMIN' ? '#1e40af' : employee.role?.toUpperCase() === 'SECRETARY' ? '#92400e' : '#166534'
                       }}>
-                        {employee.role === 'admin' ? 'Admin' : employee.role === 'secretary' ? 'Secrétaire' : 'Coach'}
+                        {employee.role?.toUpperCase() === 'ADMIN' ? 'Admin' : employee.role?.toUpperCase() === 'SECRETARY' ? 'Secrétaire' : 'Coach'}
                       </span>
                     </td>
                     <td style={{ padding: '16px' }}>
@@ -209,7 +209,7 @@ function EmployeesPage() {
                         >
                           Modifier
                         </button>
-                        {employee.role !== 'admin' && (
+                        {employee.role?.toUpperCase() !== 'ADMIN' && (
                           <button
                             onClick={() => handleDelete(employee.id)}
                             style={{
@@ -326,8 +326,8 @@ function EmployeesPage() {
                   <label>Rôle *</label>
                   <select
                     name="role"
-                    value={formData.role}
-                    onChange={handleChange}
+                    value={formData.role?.toUpperCase()}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                     required
                     style={{
                       width: '100%',
@@ -339,9 +339,9 @@ function EmployeesPage() {
                       backgroundColor: 'white'
                     }}
                   >
-                    <option value="secretary">Secrétaire</option>
-                    <option value="coach">Coach</option>
-                    <option value="admin">Admin</option>
+                    <option value="SECRETARY">Secrétaire</option>
+                    <option value="COACH">Coach</option>
+                    <option value="ADMIN">Admin</option>
                   </select>
                 </div>
 

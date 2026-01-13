@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.db.base import get_db
 from app.core.security import get_password_hash
 from app.core.deps import get_current_user
-from app.models.user import User
+from app.models.user import User, UserRole
 from pydantic import BaseModel, EmailStr
 
 router = APIRouter()
@@ -28,7 +28,8 @@ def get_employees(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.role != "admin":
+    user_role = current_user.role.value if isinstance(current_user.role, UserRole) else current_user.role
+    if user_role != "ADMIN":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admins can view employees"
@@ -44,7 +45,7 @@ def get_employees(
         "last_name": emp.last_name,
         "email": emp.email,
         "phone": emp.phone,
-        "role": emp.role,
+        "role": emp.role.value if isinstance(emp.role, UserRole) else emp.role,
         "is_active": emp.is_active
     } for emp in employees]
 
@@ -54,7 +55,8 @@ def create_employee(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.role != "admin":
+    user_role = current_user.role.value if isinstance(current_user.role, UserRole) else current_user.role
+    if user_role != "ADMIN":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admins can create employees"
@@ -67,7 +69,7 @@ def create_employee(
             detail="Email already registered"
         )
 
-    if employee.role not in ["admin", "secretary", "coach"]:
+    if employee.role.upper() not in ["ADMIN", "SECRETARY", "COACH"]:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid role"
@@ -82,7 +84,7 @@ def create_employee(
         first_name=employee.first_name,
         last_name=employee.last_name,
         phone=employee.phone,
-        role=employee.role,
+        role=UserRole[employee.role.upper()],
         is_active=True
     )
 
@@ -96,7 +98,7 @@ def create_employee(
         "last_name": new_employee.last_name,
         "email": new_employee.email,
         "phone": new_employee.phone,
-        "role": new_employee.role,
+        "role": new_employee.role.value if isinstance(new_employee.role, UserRole) else new_employee.role,
         "is_active": new_employee.is_active
     }
 
@@ -107,7 +109,8 @@ def update_employee(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.role != "admin":
+    user_role = current_user.role.value if isinstance(current_user.role, UserRole) else current_user.role
+    if user_role != "ADMIN":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admins can update employees"
@@ -142,12 +145,12 @@ def update_employee(
     if employee.phone is not None:
         existing_employee.phone = employee.phone
     if employee.role is not None:
-        if employee.role not in ["admin", "secretary", "coach"]:
+        if employee.role.upper() not in ["ADMIN", "SECRETARY", "COACH"]:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid role"
             )
-        existing_employee.role = employee.role
+        existing_employee.role = UserRole[employee.role.upper()]
 
     db.commit()
     db.refresh(existing_employee)
@@ -158,7 +161,7 @@ def update_employee(
         "last_name": existing_employee.last_name,
         "email": existing_employee.email,
         "phone": existing_employee.phone,
-        "role": existing_employee.role,
+        "role": existing_employee.role.value if isinstance(existing_employee.role, UserRole) else existing_employee.role,
         "is_active": existing_employee.is_active
     }
 
@@ -168,7 +171,8 @@ def delete_employee(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    if current_user.role != "admin":
+    user_role = current_user.role.value if isinstance(current_user.role, UserRole) else current_user.role
+    if user_role != "ADMIN":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Only admins can delete employees"
@@ -185,7 +189,8 @@ def delete_employee(
             detail="Employee not found"
         )
 
-    if employee.role == "admin":
+    emp_role = employee.role.value if isinstance(employee.role, UserRole) else employee.role
+    if emp_role == "ADMIN":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Cannot delete admin users"
