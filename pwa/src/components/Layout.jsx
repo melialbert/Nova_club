@@ -9,14 +9,14 @@ function Layout({ children }) {
   const isActive = (path) => location.pathname === path;
 
   const allMenuItems = [
-    { path: '/dashboard', label: 'Tableau de bord', icon: '📊', roles: ['admin', 'secretary', 'coach'] },
-    { path: '/members', label: 'Adhérents', icon: '👥', roles: ['admin', 'secretary', 'coach'] },
-    { path: '/licenses', label: 'Licences', icon: '🎫', roles: ['admin', 'secretary'] },
-    { path: '/attendances', label: 'Présences', icon: '📋', roles: ['admin', 'secretary', 'coach'] },
-    { path: '/payments', label: 'Paiements', icon: '💳', roles: ['admin', 'secretary'] },
-    { path: '/accounting', label: 'Comptabilité', icon: '💰', roles: ['admin', 'secretary'] },
-    { path: '/employees', label: 'Employés', icon: '👔', roles: ['admin'] },
-    { path: '/settings', label: 'Paramètres', icon: '⚙️', roles: ['admin'] },
+    { path: '/dashboard', label: 'Tableau de bord', icon: '📊', roles: ['ADMIN', 'SECRETARY', 'COACH'] },
+    { path: '/members', label: 'Adhérents', icon: '👥', roles: ['ADMIN', 'SECRETARY', 'COACH'] },
+    { path: '/licenses', label: 'Licences', icon: '🎫', roles: ['ADMIN', 'SECRETARY'] },
+    { path: '/attendances', label: 'Présences', icon: '📋', roles: ['ADMIN', 'SECRETARY', 'COACH'] },
+    { path: '/payments', label: 'Paiements', icon: '💳', roles: ['ADMIN', 'SECRETARY'] },
+    { path: '/accounting', label: 'Comptabilité', icon: '💰', roles: ['ADMIN', 'SECRETARY'] },
+    { path: '/employees', label: 'Employés', icon: '👔', roles: ['ADMIN'] },
+    { path: '/settings', label: 'Paramètres', icon: '⚙️', roles: ['ADMIN'] },
   ];
 
   const menuItems = allMenuItems.filter(item => item.roles.includes(user?.role));
@@ -162,7 +162,7 @@ function Layout({ children }) {
               marginTop: '8px',
               fontWeight: '600'
             }}>
-              {user?.role === 'admin' ? 'Administrateur' : 'Coach'}
+              {user?.role === 'ADMIN' ? 'Administrateur' : user?.role === 'SECRETARY' ? 'Secrétaire' : 'Coach'}
             </div>
           </div>
 
