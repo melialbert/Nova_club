@@ -38,6 +38,10 @@ echo.
 echo Documentation API:
 echo    http://localhost:8000/docs
 echo.
+echo Adminer (Base de donnees):
+echo    http://localhost:8080
+echo    Serveur: postgres ^| User: novaclub ^| Pass: novaclub123 ^| DB: novaclub_db
+echo.
 echo ======================================
 echo.
 echo Commandes utiles:

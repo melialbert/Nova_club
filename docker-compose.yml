@@ -15,7 +15,7 @@ services:
     networks:
       - novaclub-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U novaclub"]
+      test: ["CMD-SHELL", "pg_isready -U novaclub -d novaclub_db"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -75,6 +75,17 @@ services:
     networks:
       - novaclub-network
     command: npm run dev -- --host 0.0.0.0
+
+  adminer:
+    image: adminer:latest
+    container_name: novaclub-adminer
+    ports:
+      - "8080:8080"
+    networks:
+      - novaclub-network
+    depends_on:
+      - postgres
+    restart: always
 
 networks:
   novaclub-network:

@@ -68,6 +68,12 @@ Système de gestion offline-first multi-clubs pour l'Afrique avec connectivité 
    - API Backend: http://192.168.1.8:8000
    - Documentation API: http://192.168.1.8:8000/docs
    - PWA Web: http://192.168.1.8:3000
+   - Adminer (Base de données): http://192.168.1.8:8080
+     - Système: PostgreSQL
+     - Serveur: postgres
+     - Utilisateur: novaclub
+     - Mot de passe: novaclub123
+     - Base de données: novaclub_db
 
 ### Vérifier que tout fonctionne
 
