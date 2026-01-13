@@ -1,7 +1,16 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 
 function Layout({ children, onLogout }) {
   const location = useLocation();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
 
   const isActive = (path) => location.pathname === path;
 
@@ -24,29 +33,50 @@ function Layout({ children, onLogout }) {
         color: 'white',
         display: 'flex',
         flexDirection: 'column',
-        boxShadow: '2px 0 12px rgba(0,0,0,0.1)'
+        boxShadow: '2px 0 12px rgba(0,0,0,0.1)',
+        position: 'fixed',
+        height: '100vh',
+        left: 0,
+        top: 0,
+        zIndex: 100
       }}>
         <div style={{
           padding: '32px 24px',
           borderBottom: '1px solid rgba(255,255,255,0.1)',
           textAlign: 'center'
         }}>
+          <img
+            src="/logo-club.png"
+            alt="NovaClub"
+            style={{
+              maxWidth: '120px',
+              height: 'auto',
+              marginBottom: '12px'
+            }}
+            onError={(e) => {
+              e.target.style.display = 'none';
+              const textLogo = e.target.nextElementSibling;
+              if (textLogo) textLogo.style.display = 'block';
+            }}
+          />
           <div style={{
             fontSize: '28px',
             fontWeight: '700',
             background: 'linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            backgroundClip: 'text',
+            letterSpacing: '-0.5px',
+            display: 'none'
           }}>
-            Club Manager
+            NovaClub
           </div>
           <div style={{
             fontSize: '13px',
             color: '#94a3b8',
             marginTop: '4px'
           }}>
-            Version Desktop
+            Gestion de club
           </div>
         </div>
 
@@ -55,8 +85,7 @@ function Layout({ children, onLogout }) {
           padding: '24px 16px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px',
-          overflowY: 'auto'
+          gap: '8px'
         }}>
           {menuItems.map((item) => (
             <Link
@@ -73,7 +102,9 @@ function Layout({ children, onLogout }) {
                 backgroundColor: isActive(item.path) ? '#3b82f6' : 'transparent',
                 fontWeight: isActive(item.path) ? '600' : '500',
                 fontSize: '15px',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                position: 'relative',
+                overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
                 if (!isActive(item.path)) {
@@ -90,6 +121,16 @@ function Layout({ children, onLogout }) {
             >
               <span style={{ fontSize: '20px' }}>{item.icon}</span>
               <span>{item.label}</span>
+              {isActive(item.path) && (
+                <div style={{
+                  position: 'absolute',
+                  right: '8px',
+                  width: '4px',
+                  height: '4px',
+                  borderRadius: '50%',
+                  backgroundColor: '#60a5fa'
+                }} />
+              )}
             </Link>
           ))}
         </nav>
@@ -98,6 +139,39 @@ function Layout({ children, onLogout }) {
           padding: '20px',
           borderTop: '1px solid rgba(255,255,255,0.1)'
         }}>
+          {user && (
+            <div style={{
+              padding: '16px',
+              backgroundColor: 'rgba(59, 130, 246, 0.1)',
+              borderRadius: '12px',
+              marginBottom: '16px',
+              border: '1px solid rgba(59, 130, 246, 0.2)'
+            }}>
+              <div style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: 'white',
+                marginBottom: '4px'
+              }}>
+                {user.first_name} {user.last_name}
+              </div>
+              <div style={{
+                fontSize: '12px',
+                color: '#94a3b8'
+              }}>
+                {user.email}
+              </div>
+              <div style={{
+                fontSize: '11px',
+                color: '#3b82f6',
+                marginTop: '8px',
+                fontWeight: '600'
+              }}>
+                {user.role === 'ADMIN' ? 'Administrateur' : user.role === 'SECRETARY' ? 'Secrétaire' : 'Coach'}
+              </div>
+            </div>
+          )}
+
           <button
             onClick={onLogout}
             style={{
@@ -133,6 +207,7 @@ function Layout({ children, onLogout }) {
 
       <div style={{
         flex: 1,
+        marginLeft: '280px',
         display: 'flex',
         flexDirection: 'column',
         height: '100vh',
@@ -144,14 +219,48 @@ function Layout({ children, onLogout }) {
           padding: '20px 32px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
         }}>
-          <h1 style={{
-            fontSize: '24px',
-            fontWeight: '700',
-            color: '#0f172a',
-            margin: 0
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
           }}>
-            {menuItems.find(item => item.path === location.pathname)?.label || 'Club Manager'}
-          </h1>
+            <div>
+              <h1 style={{
+                fontSize: '24px',
+                fontWeight: '700',
+                color: '#0f172a',
+                margin: 0
+              }}>
+                {menuItems.find(item => item.path === location.pathname)?.label || 'NovaClub'}
+              </h1>
+            </div>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px'
+            }}>
+              <div style={{
+                padding: '8px 16px',
+                backgroundColor: '#10b981',
+                color: 'white',
+                borderRadius: '20px',
+                fontSize: '13px',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <span style={{
+                  width: '6px',
+                  height: '6px',
+                  backgroundColor: 'white',
+                  borderRadius: '50%',
+                  display: 'inline-block'
+                }}></span>
+                En ligne
+              </div>
+            </div>
+          </div>
         </header>
 
         <main style={{

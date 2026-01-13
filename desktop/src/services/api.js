@@ -38,6 +38,11 @@ export const api = {
 
     const data = await response.json();
     setAuthToken(data.access_token);
+
+    if (data.user) {
+      localStorage.setItem('user', JSON.stringify(data.user));
+    }
+
     return data;
   },
 
