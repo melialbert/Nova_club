@@ -25,6 +25,13 @@ function MembersPage() {
     registration_date: new Date().toISOString().split('T')[0]
   });
 
+  const [sellKimono, setSellKimono] = useState(false);
+  const [kimonoData, setKimonoData] = useState({
+    size: '140',
+    quantity: 1,
+    price: 15000
+  });
+
   useEffect(() => {
     loadMembers();
   }, []);
@@ -74,6 +81,25 @@ function MembersPage() {
       await addToStore('members', newMember);
       await queueChange('members', newMember.id, newMember);
       addMember(newMember);
+
+      if (sellKimono) {
+        const totalAmount = kimonoData.price * kimonoData.quantity;
+
+        const kimonoTransaction = {
+          id: crypto.randomUUID(),
+          type: 'income',
+          category: 'equipment_sale',
+          amount: totalAmount,
+          date: new Date().toISOString().split('T')[0],
+          description: `Vente kimono - ${kimonoData.size}cm (x${kimonoData.quantity}) - ${newMember.first_name} ${newMember.last_name}`,
+          member_id: newMember.id,
+          club_id: 'current_club_id',
+          created_at: new Date().toISOString()
+        };
+
+        await addToStore('transactions', kimonoTransaction);
+        await queueChange('transactions', kimonoTransaction.id, kimonoTransaction);
+      }
     }
 
     setFormData({
@@ -89,6 +115,12 @@ function MembersPage() {
       status: 'active',
       monthly_fee: '',
       registration_date: new Date().toISOString().split('T')[0]
+    });
+    setSellKimono(false);
+    setKimonoData({
+      size: '140',
+      quantity: 1,
+      price: 15000
     });
     setShowForm(false);
   };
@@ -135,6 +167,12 @@ function MembersPage() {
       status: 'active',
       monthly_fee: '',
       registration_date: new Date().toISOString().split('T')[0]
+    });
+    setSellKimono(false);
+    setKimonoData({
+      size: '140',
+      quantity: 1,
+      price: 15000
     });
     setShowForm(false);
   };
@@ -305,6 +343,110 @@ function MembersPage() {
                   <input type="number" name="monthly_fee" value={formData.monthly_fee} onChange={handleChange} required />
                 </div>
               </div>
+
+              {!editingMember && (
+                <>
+                  <div style={{
+                    marginTop: '24px',
+                    padding: '20px',
+                    backgroundColor: '#f8fafc',
+                    borderRadius: '8px',
+                    border: '1px solid #e2e8f0'
+                  }}>
+                    <div style={{ marginBottom: '16px' }}>
+                      <label style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        color: '#0f172a'
+                      }}>
+                        <input
+                          type="checkbox"
+                          checked={sellKimono}
+                          onChange={(e) => setSellKimono(e.target.checked)}
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            cursor: 'pointer'
+                          }}
+                        />
+                        <span>Vendre un kimono lors de l'inscription</span>
+                      </label>
+                    </div>
+
+                    {sellKimono && (
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                        gap: '16px',
+                        marginTop: '16px'
+                      }}>
+                        <div className="form-group">
+                          <label>Taille *</label>
+                          <select
+                            value={kimonoData.size}
+                            onChange={(e) => setKimonoData({ ...kimonoData, size: e.target.value })}
+                            required
+                          >
+                            <option value="100">100 cm (4-5 ans)</option>
+                            <option value="110">110 cm (5-6 ans)</option>
+                            <option value="120">120 cm (6-7 ans)</option>
+                            <option value="130">130 cm (7-8 ans)</option>
+                            <option value="140">140 cm (8-9 ans)</option>
+                            <option value="150">150 cm (9-11 ans)</option>
+                            <option value="160">160 cm (11-13 ans)</option>
+                            <option value="170">170 cm (13-15 ans)</option>
+                            <option value="180">180 cm (Adulte S)</option>
+                            <option value="190">190 cm (Adulte M)</option>
+                            <option value="200">200 cm (Adulte L)</option>
+                          </select>
+                        </div>
+
+                        <div className="form-group">
+                          <label>Quantité *</label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={kimonoData.quantity}
+                            onChange={(e) => setKimonoData({ ...kimonoData, quantity: parseInt(e.target.value) || 1 })}
+                            required
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label>Prix unitaire (FCFA) *</label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={kimonoData.price}
+                            onChange={(e) => setKimonoData({ ...kimonoData, price: parseInt(e.target.value) || 0 })}
+                            required
+                          />
+                        </div>
+
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'flex-end',
+                          padding: '12px',
+                          backgroundColor: '#10b981',
+                          borderRadius: '8px',
+                          color: 'white'
+                        }}>
+                          <div style={{ width: '100%' }}>
+                            <div style={{ fontSize: '12px', opacity: 0.9 }}>Montant total</div>
+                            <div style={{ fontSize: '20px', fontWeight: '700' }}>
+                              {(kimonoData.price * kimonoData.quantity).toLocaleString()} FCFA
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
 
               <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
                 <button type="submit" className="btn btn-success">
