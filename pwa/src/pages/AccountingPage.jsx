@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { getAllFromStore, addToStore } from '../db';
 import { queueChange } from '../services/syncService';
 import { useToast } from '../utils/useToast';
+import { useTransactionStore } from '../utils/store';
 import Layout from '../components/Layout';
 
 function AccountingPage() {
-  const [transactions, setTransactions] = useState([]);
+  const { transactions, setTransactions, addTransaction } = useTransactionStore();
   const [showModal, setShowModal] = useState(false);
   const [filterType, setFilterType] = useState('all');
   const [filterPeriod, setFilterPeriod] = useState('all');
@@ -46,7 +47,7 @@ function AccountingPage() {
     await addToStore('transactions', newTransaction);
     await queueChange('transactions', newTransaction.id, newTransaction);
 
-    setTransactions([newTransaction, ...transactions]);
+    addTransaction(newTransaction);
     success('Transaction ajoutée avec succès');
 
     setFormData({

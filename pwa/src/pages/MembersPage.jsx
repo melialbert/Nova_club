@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllFromStore, addToStore, updateInStore, deleteFromStore } from '../db';
 import { queueChange } from '../services/syncService';
-import { useMemberStore } from '../utils/store';
+import { useMemberStore, useTransactionStore } from '../utils/store';
 import Layout from '../components/Layout';
 
 function MembersPage() {
   const { members, setMembers, addMember, updateMember, removeMember } = useMemberStore();
+  const { addTransaction } = useTransactionStore();
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingMember, setEditingMember] = useState(null);
@@ -119,6 +120,7 @@ function MembersPage() {
 
           await addToStore('transactions', transaction);
           await queueChange('transactions', transaction.id, transaction);
+          addTransaction(transaction);
         }
       }
     }

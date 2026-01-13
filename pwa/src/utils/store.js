@@ -28,6 +28,24 @@ export const usePaymentStore = create((set) => ({
   addPayment: (payment) => set((state) => ({ payments: [...state.payments, payment] })),
 }));
 
+export const useTransactionStore = create((set) => ({
+  transactions: [],
+  setTransactions: (transactions) => set({ transactions }),
+  addTransaction: (transaction) => set((state) => ({
+    transactions: [transaction, ...state.transactions].sort((a, b) =>
+      new Date(b.transaction_date) - new Date(a.transaction_date)
+    )
+  })),
+  updateTransaction: (updatedTransaction) => set((state) => ({
+    transactions: state.transactions.map(t =>
+      t.id === updatedTransaction.id ? updatedTransaction : t
+    )
+  })),
+  removeTransaction: (id) => set((state) => ({
+    transactions: state.transactions.filter(t => t.id !== id)
+  })),
+}));
+
 export const useAppStore = create((set) => ({
   isOnline: navigator.onLine,
   isSyncing: false,

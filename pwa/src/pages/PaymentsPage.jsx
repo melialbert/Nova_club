@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { getAllFromStore, addToStore } from '../db';
 import { queueChange } from '../services/syncService';
-import { usePaymentStore, useMemberStore } from '../utils/store';
+import { usePaymentStore, useMemberStore, useTransactionStore } from '../utils/store';
 import Layout from '../components/Layout';
 
 function PaymentsPage() {
   const { payments, setPayments, addPayment } = usePaymentStore();
   const { members, setMembers } = useMemberStore();
+  const { addTransaction } = useTransactionStore();
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
@@ -49,6 +50,22 @@ function PaymentsPage() {
     await addToStore('payments', newPayment);
     await queueChange('payments', newPayment.id, newPayment);
     addPayment(newPayment);
+
+    const member = members.find(m => m.id === formData.member_id);
+    const transaction = {
+      id: crypto.randomUUID(),
+      type: 'income',
+      category: 'subscription',
+      amount: parseFloat(formData.amount),
+      description: `${getPaymentTypeLabel(formData.payment_type)} - ${member ? `${member.first_name} ${member.last_name}` : 'Adhérent'}`,
+      transaction_date: formData.payment_date,
+      club_id: 'current_club_id',
+      created_at: new Date().toISOString()
+    };
+
+    await addToStore('transactions', transaction);
+    await queueChange('transactions', transaction.id, transaction);
+    addTransaction(transaction);
 
     setFormData({
       member_id: '',
