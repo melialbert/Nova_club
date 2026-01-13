@@ -127,28 +127,58 @@ function MembersPage() {
     setShowForm(false);
   };
 
+  const getBeltLabel = (beltCode) => {
+    const belts = {
+      'white': 'Blanche',
+      'white_yellow': 'Blanche-jaune',
+      'yellow': 'Jaune',
+      'yellow_orange': 'Jaune-orange',
+      'orange': 'Orange',
+      'orange_green': 'Orange-verte',
+      'green': 'Verte',
+      'blue': 'Bleue',
+      'brown': 'Marron',
+      'black': 'Noire',
+      'black_1dan': 'Noire 1er dan',
+      'black_2dan': 'Noire 2ème dan',
+      'black_3dan': 'Noire 3ème dan',
+      'black_4dan': 'Noire 4ème dan',
+      'black_5dan': 'Noire 5ème dan'
+    };
+    return belts[beltCode] || beltCode;
+  };
+
+  const getBeltColor = (beltCode) => {
+    const colors = {
+      'white': '#ffffff',
+      'white_yellow': 'linear-gradient(90deg, #ffffff 50%, #fbbf24 50%)',
+      'yellow': '#fbbf24',
+      'yellow_orange': 'linear-gradient(90deg, #fbbf24 50%, #f97316 50%)',
+      'orange': '#f97316',
+      'orange_green': 'linear-gradient(90deg, #f97316 50%, #22c55e 50%)',
+      'green': '#22c55e',
+      'blue': '#3b82f6',
+      'brown': '#92400e',
+      'black': '#0f172a',
+      'black_1dan': '#0f172a',
+      'black_2dan': '#0f172a',
+      'black_3dan': '#0f172a',
+      'black_4dan': '#0f172a',
+      'black_5dan': '#0f172a'
+    };
+    return colors[beltCode] || '#cbd5e1';
+  };
+
+  const getBeltTextColor = (beltCode) => {
+    const lightBelts = ['white', 'white_yellow', 'yellow', 'yellow_orange', 'orange', 'orange_green'];
+    return lightBelts.includes(beltCode) ? '#0f172a' : '#ffffff';
+  };
+
   const filteredMembers = members.filter(member =>
     `${member.first_name} ${member.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     member.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
     member.discipline.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const getBeltColor = (belt) => {
-    const colors = {
-      'white': '#f8fafc',
-      'yellow': '#fef3c7',
-      'orange': '#fed7aa',
-      'green': '#d1fae5',
-      'blue': '#dbeafe',
-      'brown': '#d6bcb0',
-      'black': '#1e293b'
-    };
-    return colors[belt.toLowerCase()] || '#f1f5f9';
-  };
-
-  const getBeltTextColor = (belt) => {
-    return belt.toLowerCase() === 'black' ? 'white' : '#1e293b';
-  };
 
   return (
     <Layout>
@@ -240,7 +270,23 @@ function MembersPage() {
                 </div>
                 <div className="form-group">
                   <label>Ceinture</label>
-                  <input type="text" name="belt_level" value={formData.belt_level} onChange={handleChange} />
+                  <select name="belt_level" value={formData.belt_level} onChange={handleChange}>
+                    <option value="white">Blanche</option>
+                    <option value="white_yellow">Blanche-jaune</option>
+                    <option value="yellow">Jaune</option>
+                    <option value="yellow_orange">Jaune-orange</option>
+                    <option value="orange">Orange</option>
+                    <option value="orange_green">Orange-verte</option>
+                    <option value="green">Verte</option>
+                    <option value="blue">Bleue</option>
+                    <option value="brown">Marron</option>
+                    <option value="black">Noire</option>
+                    <option value="black_1dan">Noire 1er dan</option>
+                    <option value="black_2dan">Noire 2ème dan</option>
+                    <option value="black_3dan">Noire 3ème dan</option>
+                    <option value="black_4dan">Noire 4ème dan</option>
+                    <option value="black_5dan">Noire 5ème dan</option>
+                  </select>
                 </div>
                 <div className="form-group">
                   <label>Cotisation mensuelle (FCFA) *</label>
@@ -329,14 +375,14 @@ function MembersPage() {
                           alignItems: 'center',
                           padding: '6px 12px',
                           borderRadius: '8px',
-                          backgroundColor: getBeltColor(member.belt_level),
+                          background: getBeltColor(member.belt_level),
                           color: getBeltTextColor(member.belt_level),
                           fontWeight: '600',
                           fontSize: '13px',
                           border: '2px solid',
-                          borderColor: member.belt_level.toLowerCase() === 'white' ? '#e2e8f0' : 'transparent'
+                          borderColor: member.belt_level === 'white' ? '#e2e8f0' : 'transparent'
                         }}>
-                          {member.belt_level}
+                          {getBeltLabel(member.belt_level)}
                         </div>
                       </td>
                       <td>
