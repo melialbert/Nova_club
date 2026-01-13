@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useToast } from '../utils/useToast';
-import { useAuthStore, useAppStore } from '../utils/store';
-import Layout from '../components/Layout';
-import { apiCall } from '../services/api';
-import { getAllFromStore, addToStore, updateInStore, deleteFromStore } from '../db';
-import { queueChange } from '../services/syncService';
+import { api } from '../services/api';
 
 function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
@@ -19,33 +14,16 @@ function EmployeesPage() {
     password: ''
   });
 
-  const { user } = useAuthStore();
-  const { isOnline } = useAppStore();
-  const { success, error } = useToast();
-
   useEffect(() => {
-    if (user?.role?.toUpperCase() !== 'ADMIN') {
-      return;
-    }
     loadEmployees();
-  }, [user]);
+  }, []);
 
   const loadEmployees = async () => {
     try {
-      const data = await apiCall('/employees');
-
-      for (const employee of data) {
-        await addToStore('employees', employee);
-      }
-
+      const data = await api.getEmployees();
       setEmployees(data);
-    } catch (err) {
-      try {
-        const offlineData = await getAllFromStore('employees');
-        setEmployees(offlineData);
-      } catch (offlineErr) {
-        error('Erreur lors du chargement des employés');
-      }
+    } catch (error) {
+      console.error('Error loading employees:', error);
     }
   };
 
@@ -58,38 +36,16 @@ function EmployeesPage() {
 
     try {
       if (editingEmployee) {
-        try {
-          await apiCall(`/employees/${editingEmployee.id}`, {
-            method: 'PUT',
-            body: JSON.stringify(formData)
-          });
-
-          const updated = { ...editingEmployee, ...formData };
-          await updateInStore('employees', updated);
-          success('Employé mis à jour avec succès');
-        } catch (err) {
-          if (err.message.includes('Mode hors ligne')) {
-            const updated = { ...editingEmployee, ...formData };
-            await updateInStore('employees', updated);
-            await queueChange('employees', editingEmployee.id, updated);
-            success('Employé mis à jour (sera synchronisé)');
-          } else {
-            throw err;
-          }
-        }
+        await api.updateEmployee(editingEmployee.id, formData);
       } else {
-        await apiCall('/employees', {
-          method: 'POST',
-          body: JSON.stringify(formData)
-        });
-        success('Employé créé avec succès');
+        await api.createEmployee(formData);
       }
-
       setShowModal(false);
       resetForm();
       loadEmployees();
-    } catch (err) {
-      error(err.message || 'Erreur lors de la sauvegarde');
+    } catch (error) {
+      console.error('Error saving employee:', error);
+      alert('Erreur lors de la sauvegarde');
     }
   };
 
@@ -97,14 +53,11 @@ function EmployeesPage() {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cet employé ?')) return;
 
     try {
-      await apiCall(`/employees/${id}`, {
-        method: 'DELETE'
-      });
-      await deleteFromStore('employees', id);
-      success('Employé supprimé avec succès');
+      await api.deleteEmployee(id);
       loadEmployees();
-    } catch (err) {
-      error(err.message || 'Erreur lors de la suppression');
+    } catch (error) {
+      console.error('Error deleting employee:', error);
+      alert('Erreur lors de la suppression');
     }
   };
 
@@ -138,92 +91,94 @@ function EmployeesPage() {
     setShowModal(true);
   };
 
-  if (user?.role?.toUpperCase() !== 'ADMIN') {
-    return (
-      <Layout>
-        <div style={{ textAlign: 'center', padding: '48px 24px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔒</div>
-          <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a', marginBottom: '8px' }}>
-            Accès non autorisé
-          </h2>
-          <p style={{ color: '#64748b' }}>
-            Vous devez être administrateur pour accéder à cette page.
+  return (
+    <div className="fade-in">
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '32px'
+      }}>
+        <div>
+          <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>
+            Gérez les employés de votre club
           </p>
         </div>
-      </Layout>
-    );
-  }
+        <button onClick={openModal} className="btn btn-success">
+          <span>➕</span>
+          <span>Nouvel employé</span>
+        </button>
+      </div>
 
-  return (
-    <Layout>
-      <div className="fade-in">
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '32px'
-        }}>
-          <div>
-            <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>
-              Gérez les employés de votre club
-            </p>
-          </div>
-          <button onClick={openModal} className="btn btn-success">
-            <span>➕</span>
-            <span>Nouvel employé</span>
-          </button>
+      <div className="card">
+        <div className="card-header">
+          <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
+            Liste des employés
+          </h2>
         </div>
 
-        <div className="card">
-          <div className="card-header">
-            <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
-              Liste des employés
-            </h2>
-          </div>
-
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{
-              width: '100%',
-              borderCollapse: 'collapse'
-            }}>
-              <thead>
-                <tr style={{ backgroundColor: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
-                  <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Nom</th>
-                  <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Email</th>
-                  <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Téléphone</th>
-                  <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Rôle</th>
-                  <th style={{ padding: '16px', textAlign: 'right', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {employees.map((employee) => (
-                  <tr key={employee.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                    <td style={{ padding: '16px' }}>
-                      <div style={{ fontWeight: '600', color: '#0f172a' }}>
-                        {employee.first_name} {employee.last_name}
-                      </div>
-                    </td>
-                    <td style={{ padding: '16px', color: '#64748b' }}>{employee.email}</td>
-                    <td style={{ padding: '16px', color: '#64748b' }}>{employee.phone || '-'}</td>
-                    <td style={{ padding: '16px' }}>
-                      <span style={{
-                        padding: '6px 12px',
-                        borderRadius: '6px',
-                        fontSize: '13px',
-                        fontWeight: '600',
-                        backgroundColor: employee.role?.toUpperCase() === 'ADMIN' ? '#dbeafe' : employee.role?.toUpperCase() === 'SECRETARY' ? '#fef3c7' : '#dcfce7',
-                        color: employee.role?.toUpperCase() === 'ADMIN' ? '#1e40af' : employee.role?.toUpperCase() === 'SECRETARY' ? '#92400e' : '#166534'
-                      }}>
-                        {employee.role?.toUpperCase() === 'ADMIN' ? 'Admin' : employee.role?.toUpperCase() === 'SECRETARY' ? 'Secrétaire' : 'Coach'}
-                      </span>
-                    </td>
-                    <td style={{ padding: '16px' }}>
-                      <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{
+            width: '100%',
+            borderCollapse: 'collapse'
+          }}>
+            <thead>
+              <tr style={{ backgroundColor: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Nom</th>
+                <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Email</th>
+                <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Téléphone</th>
+                <th style={{ padding: '16px', textAlign: 'left', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Rôle</th>
+                <th style={{ padding: '16px', textAlign: 'right', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {employees.map((employee) => (
+                <tr key={employee.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                  <td style={{ padding: '16px' }}>
+                    <div style={{ fontWeight: '600', color: '#0f172a' }}>
+                      {employee.first_name} {employee.last_name}
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px', color: '#64748b' }}>{employee.email}</td>
+                  <td style={{ padding: '16px', color: '#64748b' }}>{employee.phone || '-'}</td>
+                  <td style={{ padding: '16px' }}>
+                    <span style={{
+                      padding: '6px 12px',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      backgroundColor: employee.role?.toUpperCase() === 'ADMIN' ? '#dbeafe' : employee.role?.toUpperCase() === 'SECRETARY' ? '#fef3c7' : '#dcfce7',
+                      color: employee.role?.toUpperCase() === 'ADMIN' ? '#1e40af' : employee.role?.toUpperCase() === 'SECRETARY' ? '#92400e' : '#166534'
+                    }}>
+                      {employee.role?.toUpperCase() === 'ADMIN' ? 'Admin' : employee.role?.toUpperCase() === 'SECRETARY' ? 'Secrétaire' : 'Coach'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '16px' }}>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                      <button
+                        onClick={() => handleEdit(employee)}
+                        style={{
+                          padding: '8px 16px',
+                          backgroundColor: '#3b82f6',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          fontWeight: '600',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
+                        onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                      >
+                        Modifier
+                      </button>
+                      {employee.role?.toUpperCase() !== 'ADMIN' && (
                         <button
-                          onClick={() => handleEdit(employee)}
+                          onClick={() => handleDelete(employee.id)}
                           style={{
                             padding: '8px 16px',
-                            backgroundColor: '#3b82f6',
+                            backgroundColor: '#ef4444',
                             color: 'white',
                             border: 'none',
                             borderRadius: '6px',
@@ -232,45 +187,25 @@ function EmployeesPage() {
                             fontWeight: '600',
                             transition: 'all 0.2s'
                           }}
-                          onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-                          onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                          onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
+                          onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
                         >
-                          Modifier
+                          Supprimer
                         </button>
-                        {employee.role?.toUpperCase() !== 'ADMIN' && (
-                          <button
-                            onClick={() => handleDelete(employee.id)}
-                            style={{
-                              padding: '8px 16px',
-                              backgroundColor: '#ef4444',
-                              color: 'white',
-                              border: 'none',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              fontSize: '13px',
-                              fontWeight: '600',
-                              transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
-                            onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
-                          >
-                            Supprimer
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {employees.length === 0 && (
-                  <tr>
-                    <td colSpan="5" style={{ padding: '48px', textAlign: 'center', color: '#94a3b8' }}>
-                      Aucun employé trouvé
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {employees.length === 0 && (
+                <tr>
+                  <td colSpan="5" style={{ padding: '48px', textAlign: 'center', color: '#94a3b8' }}>
+                    Aucun employé trouvé
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -418,7 +353,7 @@ function EmployeesPage() {
           </div>
         </div>
       )}
-    </Layout>
+    </div>
   );
 }
 
