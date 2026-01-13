@@ -29,6 +29,7 @@ function initDatabase() {
 
   createTables();
   migrateMembersTable();
+  migrateBeltPromotionsTable();
   createDefaultData();
 
   return db;
@@ -65,6 +66,19 @@ function migrateMembersTable() {
   if (!columns.includes('registration_date')) {
     db.exec("ALTER TABLE members ADD COLUMN registration_date DATE");
     console.log('Added registration_date column to members table');
+  }
+}
+
+function migrateBeltPromotionsTable() {
+  try {
+    const columns = db.pragma("table_info(belt_promotions)").map(col => col.name);
+
+    if (!columns.includes('status')) {
+      db.exec("ALTER TABLE belt_promotions ADD COLUMN status TEXT DEFAULT 'pending'");
+      console.log('Added status column to belt_promotions table');
+    }
+  } catch (error) {
+    console.log('belt_promotions table does not exist yet, will be created');
   }
 }
 
