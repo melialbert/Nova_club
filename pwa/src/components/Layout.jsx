@@ -14,6 +14,7 @@ function Layout({ children }) {
     { path: '/licenses', label: 'Licences', icon: '🎫' },
     { path: '/attendances', label: 'Présences', icon: '📋' },
     { path: '/payments', label: 'Paiements', icon: '💳' },
+    { path: '/settings', label: 'Paramètres', icon: '⚙️' },
   ];
 
   return (

@@ -1,7 +1,7 @@
 import { openDB } from 'idb';
 
 const DB_NAME = 'novaclub_db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export const initDB = async () => {
   const db = await openDB(DB_NAME, DB_VERSION, {
@@ -65,6 +65,11 @@ export const initDB = async () => {
 
       if (!db.objectStoreNames.contains('sync_metadata')) {
         db.createObjectStore('sync_metadata', { keyPath: 'key' });
+      }
+
+      if (!db.objectStoreNames.contains('settings')) {
+        const settingsStore = db.createObjectStore('settings', { keyPath: 'id' });
+        settingsStore.createIndex('updated_at', 'updated_at');
       }
     },
   });
