@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: novaclub-postgres
+    environment:
+      POSTGRES_USER: novaclub
+      POSTGRES_PASSWORD: novaclub123
+      POSTGRES_DB: novaclub_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - novaclub-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U novaclub"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: novaclub-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - novaclub-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: novaclub-backend
+    environment:
+      DATABASE_URL: postgresql://novaclub:novaclub123@postgres:5432/novaclub_db
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY: novaclub-secret-key-change-in-production
+      ALLOWED_ORIGINS: http://192.168.1.8:3000,http://localhost:3000
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - /app/__pycache__
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - novaclub-network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  pwa:
+    build:
+      context: ./pwa
+      dockerfile: Dockerfile.dev
+    container_name: novaclub-pwa
+    environment:
+      VITE_API_URL: http://192.168.1.8:8000
+      VITE_APP_NAME: NovaClub
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./pwa:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - novaclub-network
+    command: npm run dev -- --host 0.0.0.0
+
+networks:
+  novaclub-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
