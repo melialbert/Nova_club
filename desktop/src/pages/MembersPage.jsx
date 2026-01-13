@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
+import CareerModal from '../components/CareerModal';
 
 function MembersPage() {
   const [members, setMembers] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingMember, setEditingMember] = useState(null);
+  const [selectedMemberForCareer, setSelectedMemberForCareer] = useState(null);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -582,6 +584,29 @@ function MembersPage() {
                             🎫
                           </Link>
                           <button
+                            onClick={() => setSelectedMemberForCareer(member)}
+                            style={{
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              border: '1px solid #e2e8f0',
+                              backgroundColor: 'white',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.backgroundColor = '#fef3c7';
+                              e.target.style.borderColor = '#fbbf24';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.backgroundColor = 'white';
+                              e.target.style.borderColor = '#e2e8f0';
+                            }}
+                            title="Voir carrière"
+                          >
+                            🏆
+                          </button>
+                          <button
                             onClick={() => handleEdit(member)}
                             style={{
                               padding: '6px 12px',
@@ -655,6 +680,13 @@ function MembersPage() {
           )}
         </div>
       </div>
+
+      {selectedMemberForCareer && (
+        <CareerModal
+          member={selectedMemberForCareer}
+          onClose={() => setSelectedMemberForCareer(null)}
+        />
+      )}
   );
 }
 

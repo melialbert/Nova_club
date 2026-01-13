@@ -10,6 +10,8 @@ const licensesRoutes = require('./routes/licenses');
 const employeesRoutes = require('./routes/employees');
 const transactionsRoutes = require('./routes/transactions');
 const clubRoutes = require('./routes/club');
+const competitionsRoutes = require('./routes/competitions');
+const careerRoutes = require('./routes/career');
 
 const app = express();
 const PORT = 3001;
@@ -27,6 +29,8 @@ app.use('/api/licenses', licensesRoutes);
 app.use('/api/employees', employeesRoutes);
 app.use('/api/transactions', transactionsRoutes);
 app.use('/api/club', clubRoutes);
+app.use('/api/competitions', competitionsRoutes);
+app.use('/api/career', careerRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend running' });

@@ -205,4 +205,98 @@ export const api = {
     if (!response.ok) throw new Error('Erreur lors de la mise à jour du club');
     return response.json();
   },
+
+  async getCompetitions() {
+    const response = await fetch(`${API_URL}/competitions`, {
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la récupération des compétitions');
+    return response.json();
+  },
+
+  async createCompetition(competitionData) {
+    const response = await fetch(`${API_URL}/competitions`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(competitionData),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la création de la compétition');
+    return response.json();
+  },
+
+  async getMemberCareer(memberId) {
+    const response = await fetch(`${API_URL}/career/member/${memberId}`, {
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la récupération de la carrière');
+    return response.json();
+  },
+
+  async addCompetitionToMember(memberId, competitionData) {
+    const response = await fetch(`${API_URL}/career/member/${memberId}/competition`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(competitionData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Erreur lors de l\'ajout de la compétition');
+    }
+    return response.json();
+  },
+
+  async updateMemberCompetition(memberId, competitionId, resultData) {
+    const response = await fetch(`${API_URL}/career/member/${memberId}/competition/${competitionId}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(resultData),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la mise à jour du résultat');
+    return response.json();
+  },
+
+  async deleteMemberCompetition(memberId, competitionId) {
+    const response = await fetch(`${API_URL}/career/member/${memberId}/competition/${competitionId}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la suppression de la participation');
+  },
+
+  async addCareerEvent(memberId, eventData) {
+    const response = await fetch(`${API_URL}/career/member/${memberId}/event`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(eventData),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de l\'ajout de l\'événement');
+    return response.json();
+  },
+
+  async updateCareerEvent(memberId, eventId, eventData) {
+    const response = await fetch(`${API_URL}/career/member/${memberId}/event/${eventId}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(eventData),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la mise à jour de l\'événement');
+    return response.json();
+  },
+
+  async deleteCareerEvent(memberId, eventId) {
+    const response = await fetch(`${API_URL}/career/member/${memberId}/event/${eventId}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la suppression de l\'événement');
+  },
 };
