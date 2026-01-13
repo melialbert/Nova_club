@@ -46,6 +46,10 @@ export function Toast({ message, type = 'info', duration = 3000, onClose }) {
 }
 
 export function ToastContainer({ toasts = [], removeToast }) {
+  if (!Array.isArray(toasts)) {
+    return null;
+  }
+
   return (
     <div className="toast-container">
       {toasts.map((toast) => (

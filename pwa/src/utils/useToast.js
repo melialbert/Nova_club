@@ -1,7 +1,9 @@
 import { useToastStore } from './store';
 
 export function useToast() {
-  const { toasts, addToast, removeToast } = useToastStore();
+  const toasts = useToastStore((state) => state.toasts);
+  const addToast = useToastStore((state) => state.addToast);
+  const removeToast = useToastStore((state) => state.removeToast);
 
   const success = (message, duration) => {
     addToast(message, 'success', duration);
