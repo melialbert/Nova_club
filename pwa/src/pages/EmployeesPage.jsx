@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useToast } from '../utils/useToast';
-import { useAuthStore } from '../utils/store';
+import { useAuthStore, useAppStore } from '../utils/store';
 import Layout from '../components/Layout';
 import { apiCall } from '../services/api';
+import { getAllFromStore, addToStore, updateInStore, deleteFromStore } from '../db';
+import { queueChange } from '../services/syncService';
 
 function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
@@ -18,6 +20,7 @@ function EmployeesPage() {
   });
 
   const { user } = useAuthStore();
+  const { isOnline } = useAppStore();
   const { success, error } = useToast();
 
   useEffect(() => {
@@ -29,7 +32,18 @@ function EmployeesPage() {
 
   const loadEmployees = async () => {
     try {
-      const data = await apiCall('/employees');
+      let data;
+
+      if (navigator.onLine) {
+        data = await apiCall('/employees');
+
+        for (const employee of data) {
+          await addToStore('employees', employee);
+        }
+      } else {
+        data = await getAllFromStore('employees');
+      }
+
       setEmployees(data);
     } catch (err) {
       error('Erreur lors du chargement des employés');
@@ -45,12 +59,27 @@ function EmployeesPage() {
 
     try {
       if (editingEmployee) {
-        await apiCall(`/employees/${editingEmployee.id}`, {
-          method: 'PUT',
-          body: JSON.stringify(formData)
-        });
-        success('Employé mis à jour avec succès');
+        if (navigator.onLine) {
+          await apiCall(`/employees/${editingEmployee.id}`, {
+            method: 'PUT',
+            body: JSON.stringify(formData)
+          });
+
+          const updated = { ...editingEmployee, ...formData };
+          await updateInStore('employees', updated);
+        } else {
+          const updated = { ...editingEmployee, ...formData };
+          await updateInStore('employees', updated);
+          await queueChange('employees', editingEmployee.id, updated);
+        }
+
+        success(navigator.onLine ? 'Employé mis à jour avec succès' : 'Employé mis à jour (sera synchronisé)');
       } else {
+        if (!navigator.onLine) {
+          error('Mode hors ligne : Impossible de créer un employé');
+          return;
+        }
+
         await apiCall('/employees', {
           method: 'POST',
           body: JSON.stringify(formData)
@@ -69,10 +98,16 @@ function EmployeesPage() {
   const handleDelete = async (id) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cet employé ?')) return;
 
+    if (!navigator.onLine) {
+      error('Mode hors ligne : Impossible de supprimer un employé');
+      return;
+    }
+
     try {
       await apiCall(`/employees/${id}`, {
         method: 'DELETE'
       });
+      await deleteFromStore('employees', id);
       success('Employé supprimé avec succès');
       loadEmployees();
     } catch (err) {

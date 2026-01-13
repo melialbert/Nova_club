@@ -1,11 +1,11 @@
 import { openDB } from 'idb';
 
 const DB_NAME = 'novaclub_db';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 export const initDB = async () => {
   const db = await openDB(DB_NAME, DB_VERSION, {
-    upgrade(db) {
+    upgrade(db, oldVersion) {
       if (!db.objectStoreNames.contains('members')) {
         const memberStore = db.createObjectStore('members', { keyPath: 'id' });
         memberStore.createIndex('club_id', 'club_id');
@@ -57,6 +57,16 @@ export const initDB = async () => {
         const messageStore = db.createObjectStore('messages', { keyPath: 'id' });
         messageStore.createIndex('club_id', 'club_id');
         messageStore.createIndex('updated_at', 'updated_at');
+      }
+
+      if (!db.objectStoreNames.contains('employees')) {
+        const employeeStore = db.createObjectStore('employees', { keyPath: 'id' });
+        employeeStore.createIndex('club_id', 'club_id');
+        employeeStore.createIndex('updated_at', 'updated_at');
+      }
+
+      if (!db.objectStoreNames.contains('auth_data')) {
+        db.createObjectStore('auth_data', { keyPath: 'key' });
       }
 
       if (!db.objectStoreNames.contains('sync_queue')) {

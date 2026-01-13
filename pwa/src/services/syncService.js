@@ -75,7 +75,7 @@ const pullChanges = async () => {
   const db = await getDB();
 
   const lastSync = {};
-  const stores = ['members', 'payments', 'licenses', 'equipment', 'equipment_purchases', 'attendances', 'transactions', 'messages'];
+  const stores = ['members', 'payments', 'licenses', 'equipment', 'equipment_purchases', 'attendances', 'transactions', 'messages', 'employees'];
 
   for (const store of stores) {
     const metadata = await db.get('sync_metadata', store);

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login, getCurrentUser } from '../services/api';
+import { login, getCurrentUser, saveAuthData } from '../services/api';
 import { useAuthStore } from '../utils/store';
 import { startSync } from '../services/syncService';
 import { useToast } from '../utils/useToast';
@@ -41,10 +41,19 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      const response = await login(email, password);
       const user = await getCurrentUser();
+
+      if (navigator.onLine) {
+        await saveAuthData(email, password, user);
+      }
+
       setUser(user);
-      startSync();
+
+      if (navigator.onLine) {
+        startSync();
+      }
+
       toast.success(`Bienvenue ${user.first_name} !`);
       setTimeout(() => navigate('/dashboard'), 1000);
     } catch (err) {
