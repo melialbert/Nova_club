@@ -2,16 +2,14 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllFromStore, addToStore, updateInStore, deleteFromStore } from '../db';
 import { queueChange } from '../services/syncService';
-import { useMemberStore, useTransactionStore } from '../utils/store';
+import { useMemberStore } from '../utils/store';
 import Layout from '../components/Layout';
 
 function MembersPage() {
   const { members, setMembers, addMember, updateMember, removeMember } = useMemberStore();
-  const { addTransaction } = useTransactionStore();
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingMember, setEditingMember] = useState(null);
-  const [equipment, setEquipment] = useState([]);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -24,26 +22,16 @@ function MembersPage() {
     belt_level: 'white',
     status: 'active',
     monthly_fee: '',
-    registration_date: new Date().toISOString().split('T')[0],
-    sell_kimono: false,
-    kimono_id: '',
-    kimono_size: '',
-    kimono_quantity: 1
+    registration_date: new Date().toISOString().split('T')[0]
   });
 
   useEffect(() => {
     loadMembers();
-    loadEquipment();
   }, []);
 
   const loadMembers = async () => {
     const data = await getAllFromStore('members');
     setMembers(data);
-  };
-
-  const loadEquipment = async () => {
-    const data = await getAllFromStore('equipment');
-    setEquipment(data.filter(item => item.category === 'uniform'));
   };
 
   const handleChange = (e) => {
@@ -86,43 +74,6 @@ function MembersPage() {
       await addToStore('members', newMember);
       await queueChange('members', newMember.id, newMember);
       addMember(newMember);
-
-      if (formData.sell_kimono && formData.kimono_id) {
-        const selectedKimono = equipment.find(e => e.id === formData.kimono_id);
-        if (selectedKimono) {
-          const sale = {
-            id: crypto.randomUUID(),
-            member_id: newMember.id,
-            equipment_id: formData.kimono_id,
-            equipment_name: selectedKimono.name,
-            size: formData.kimono_size,
-            quantity: parseInt(formData.kimono_quantity),
-            unit_price: parseFloat(selectedKimono.price),
-            total_price: parseFloat(selectedKimono.price) * parseInt(formData.kimono_quantity),
-            sale_date: new Date().toISOString().split('T')[0],
-            club_id: 'current_club_id',
-            created_at: new Date().toISOString()
-          };
-
-          await addToStore('equipment_sales', sale);
-          await queueChange('equipment_sales', sale.id, sale);
-
-          const transaction = {
-            id: crypto.randomUUID(),
-            type: 'income',
-            category: 'equipment_sale',
-            amount: sale.total_price,
-            description: `Vente de ${selectedKimono.name} (${formData.kimono_size}) à ${newMember.first_name} ${newMember.last_name}`,
-            transaction_date: new Date().toISOString().split('T')[0],
-            club_id: 'current_club_id',
-            created_at: new Date().toISOString()
-          };
-
-          await addToStore('transactions', transaction);
-          await queueChange('transactions', transaction.id, transaction);
-          addTransaction(transaction);
-        }
-      }
     }
 
     setFormData({
@@ -137,11 +88,7 @@ function MembersPage() {
       belt_level: 'white',
       status: 'active',
       monthly_fee: '',
-      registration_date: new Date().toISOString().split('T')[0],
-      sell_kimono: false,
-      kimono_id: '',
-      kimono_size: '',
-      kimono_quantity: 1
+      registration_date: new Date().toISOString().split('T')[0]
     });
     setShowForm(false);
   };
@@ -187,11 +134,7 @@ function MembersPage() {
       belt_level: 'white',
       status: 'active',
       monthly_fee: '',
-      registration_date: new Date().toISOString().split('T')[0],
-      sell_kimono: false,
-      kimono_id: '',
-      kimono_size: '',
-      kimono_quantity: 1
+      registration_date: new Date().toISOString().split('T')[0]
     });
     setShowForm(false);
   };
@@ -362,87 +305,6 @@ function MembersPage() {
                   <input type="number" name="monthly_fee" value={formData.monthly_fee} onChange={handleChange} required />
                 </div>
               </div>
-
-              {!editingMember && (
-                <div style={{ marginTop: '24px', padding: '20px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '2px solid #e2e8f0' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                    <input
-                      type="checkbox"
-                      id="sell_kimono"
-                      checked={formData.sell_kimono}
-                      onChange={(e) => setFormData({ ...formData, sell_kimono: e.target.checked })}
-                      style={{ width: '20px', height: '20px', cursor: 'pointer' }}
-                    />
-                    <label htmlFor="sell_kimono" style={{ cursor: 'pointer', fontWeight: '600', fontSize: '16px', margin: 0 }}>
-                      Vendre un kimono lors de l'inscription
-                    </label>
-                  </div>
-
-                  {formData.sell_kimono && (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginTop: '16px' }}>
-                      <div className="form-group">
-                        <label>Kimono *</label>
-                        <select
-                          name="kimono_id"
-                          value={formData.kimono_id}
-                          onChange={handleChange}
-                          required={formData.sell_kimono}
-                        >
-                          <option value="">Sélectionner un kimono</option>
-                          {equipment.map(item => (
-                            <option key={item.id} value={item.id}>
-                              {item.name} - {parseFloat(item.price).toLocaleString()} FCFA
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className="form-group">
-                        <label>Taille *</label>
-                        <select
-                          name="kimono_size"
-                          value={formData.kimono_size}
-                          onChange={handleChange}
-                          required={formData.sell_kimono}
-                        >
-                          <option value="">Sélectionner une taille</option>
-                          <option value="100">100 cm (4-5 ans)</option>
-                          <option value="110">110 cm (5-6 ans)</option>
-                          <option value="120">120 cm (6-7 ans)</option>
-                          <option value="130">130 cm (7-8 ans)</option>
-                          <option value="140">140 cm (8-9 ans)</option>
-                          <option value="150">150 cm (9-11 ans)</option>
-                          <option value="160">160 cm (11-13 ans)</option>
-                          <option value="170">170 cm (13-15 ans)</option>
-                          <option value="180">180 cm (Adulte S)</option>
-                          <option value="190">190 cm (Adulte M)</option>
-                          <option value="200">200 cm (Adulte L)</option>
-                        </select>
-                      </div>
-
-                      <div className="form-group">
-                        <label>Quantité *</label>
-                        <input
-                          type="number"
-                          name="kimono_quantity"
-                          min="1"
-                          value={formData.kimono_quantity}
-                          onChange={handleChange}
-                          required={formData.sell_kimono}
-                        />
-                      </div>
-
-                      {formData.kimono_id && (
-                        <div style={{ gridColumn: '1 / -1', padding: '12px', backgroundColor: '#dcfce7', borderRadius: '6px' }}>
-                          <div style={{ fontWeight: '600', color: '#166534' }}>
-                            Total: {(parseFloat(equipment.find(e => e.id === formData.kimono_id)?.price || 0) * parseInt(formData.kimono_quantity)).toLocaleString()} FCFA
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
 
               <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
                 <button type="submit" className="btn btn-success">
