@@ -175,13 +175,15 @@ function PaymentsPage() {
       return;
     }
 
-    if (!clubSettings) {
-      error('Paramètres du club non chargés');
-      return;
-    }
-
     const paymentMethodLabel = getPaymentMethodLabel(payment.payment_method);
     const paymentTypeLabel = getPaymentTypeLabel(payment.payment_type);
+
+    const clubInfo = clubSettings || {
+      club_name: 'Mon Club',
+      city: '',
+      slogan: '',
+      logo: ''
+    };
 
     const invoiceWindow = window.open('', '_blank');
     if (!invoiceWindow) {
@@ -360,12 +362,12 @@ function PaymentsPage() {
         <div class="invoice-container">
           <div class="header">
             <div class="logo-section">
-              ${clubSettings.logo ? `<img src="${clubSettings.logo}" alt="Logo" class="logo" />` : ''}
+              ${clubInfo.logo ? `<img src="${clubInfo.logo}" alt="Logo" class="logo" />` : ''}
               <div>
-                <div class="club-name">${clubSettings.club_name || 'Club'}</div>
+                <div class="club-name">${clubInfo.club_name}</div>
                 <div class="club-info">
-                  ${clubSettings.city || ''}
-                  ${clubSettings.slogan ? `<br>${clubSettings.slogan}` : ''}
+                  ${clubInfo.city}
+                  ${clubInfo.slogan ? `<br>${clubInfo.slogan}` : ''}
                 </div>
               </div>
             </div>
