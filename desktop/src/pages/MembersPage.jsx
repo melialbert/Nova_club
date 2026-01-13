@@ -224,7 +224,8 @@ function MembersPage() {
   );
 
   return (
-    <div className="fade-in">
+    <>
+      <div className="fade-in">
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -687,6 +688,7 @@ function MembersPage() {
           onClose={() => setSelectedMemberForCareer(null)}
         />
       )}
+    </>
   );
 }
 
