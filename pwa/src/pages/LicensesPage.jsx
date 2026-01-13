@@ -19,7 +19,7 @@ function LicensesPage() {
     license_number: '',
     issue_date: new Date().toISOString().split('T')[0],
     expiry_date: '',
-    federation: 'FFJDA',
+    federation: 'FECAJUDO',
     season: new Date().getFullYear() + '-' + (new Date().getFullYear() + 1),
     photo: '',
     status: 'active',
@@ -119,7 +119,7 @@ function LicensesPage() {
       license_number: '',
       issue_date: new Date().toISOString().split('T')[0],
       expiry_date: '',
-      federation: 'FFJDA',
+      federation: 'FECAJUDO',
       season: new Date().getFullYear() + '-' + (new Date().getFullYear() + 1),
       photo: '',
       status: 'active',
@@ -232,16 +232,6 @@ function LicensesPage() {
                 <div className="form-group">
                   <label>Numéro de licence *</label>
                   <input type="text" name="license_number" value={formData.license_number} onChange={handleChange} required placeholder="Ex: 12345678" />
-                </div>
-                <div className="form-group">
-                  <label>Fédération</label>
-                  <select name="federation" value={formData.federation} onChange={handleChange}>
-                    <option value="FFJDA">FFJDA - Fédération Française de Judo</option>
-                    <option value="FFJJKA">FFJJKA - Fédération Française de Ju-Jitsu</option>
-                    <option value="UFOLEP">UFOLEP</option>
-                    <option value="FSGT">FSGT</option>
-                    <option value="other">Autre</option>
-                  </select>
                 </div>
                 <div className="form-group">
                   <label>Saison *</label>
@@ -422,7 +412,7 @@ function LicensesPage() {
                         </td>
                         <td>
                           <span className="badge badge-blue">
-                            {license.federation}
+                            FECAJUDO
                           </span>
                         </td>
                         <td>{license.season}</td>
