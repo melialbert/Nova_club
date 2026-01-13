@@ -3,6 +3,7 @@ import { getAllFromStore, addToStore, deleteFromStore } from '../db';
 import { queueChange } from '../services/syncService';
 import { usePaymentStore, useMemberStore, useTransactionStore } from '../utils/store';
 import { useToast } from '../utils/useToast';
+import { apiCall } from '../services/api';
 import Layout from '../components/Layout';
 
 function PaymentsPage() {
@@ -33,11 +34,19 @@ function PaymentsPage() {
   const loadData = async () => {
     const paymentsData = await getAllFromStore('payments');
     const membersData = await getAllFromStore('members');
-    const settingsData = await getAllFromStore('settings');
     setPayments(paymentsData);
     setMembers(membersData);
-    if (settingsData.length > 0) {
-      setClubSettings(settingsData[0]);
+
+    try {
+      const clubData = await apiCall('/clubs/my-club');
+      setClubSettings({
+        club_name: clubData.club_name,
+        city: clubData.city,
+        slogan: clubData.slogan,
+        logo: clubData.logo
+      });
+    } catch (err) {
+      console.error('Erreur lors du chargement des paramètres du club:', err);
     }
   };
 

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { getAllFromStore, addToStore, updateInStore } from '../db';
-import { queueChange } from '../services/syncService';
+import { apiCall } from '../services/api';
 import { useToast } from '../utils/useToast';
 import Layout from '../components/Layout';
 
 function SettingsPage() {
   const [clubSettings, setClubSettings] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     club_name: '',
     city: '',
@@ -21,12 +21,22 @@ function SettingsPage() {
   }, []);
 
   const loadSettings = async () => {
-    const settings = await getAllFromStore('settings');
-    if (settings.length > 0) {
-      const clubSettings = settings[0];
-      setClubSettings(clubSettings);
-      setFormData(clubSettings);
-      setLogoPreview(clubSettings.logo);
+    try {
+      setLoading(true);
+      const clubData = await apiCall('/clubs/my-club');
+      setClubSettings(clubData);
+      setFormData({
+        club_name: clubData.club_name || '',
+        city: clubData.city || '',
+        slogan: clubData.slogan || '',
+        logo: clubData.logo || ''
+      });
+      setLogoPreview(clubData.logo);
+    } catch (err) {
+      console.error('Erreur lors du chargement:', err);
+      error('Erreur lors du chargement des paramètres');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,33 +65,34 @@ function SettingsPage() {
     e.preventDefault();
 
     try {
-      if (clubSettings) {
-        const updatedSettings = {
-          ...clubSettings,
-          ...formData,
-          updated_at: new Date().toISOString()
-        };
-        await updateInStore('settings', updatedSettings);
-        await queueChange('settings', updatedSettings.id, updatedSettings);
-        setClubSettings(updatedSettings);
-        success('Paramètres mis à jour avec succès');
-      } else {
-        const newSettings = {
-          id: crypto.randomUUID(),
-          ...formData,
-          club_id: 'current_club_id',
-          created_at: new Date().toISOString()
-        };
-        await addToStore('settings', newSettings);
-        await queueChange('settings', newSettings.id, newSettings);
-        setClubSettings(newSettings);
-        success('Paramètres créés avec succès');
-      }
+      const updatedClub = await apiCall('/clubs/my-club', {
+        method: 'PUT',
+        body: JSON.stringify({
+          name: formData.club_name,
+          city: formData.city,
+          slogan: formData.slogan,
+          logo_url: formData.logo
+        })
+      });
+
+      setClubSettings(updatedClub);
+      success('Paramètres mis à jour avec succès');
     } catch (err) {
       console.error('Erreur lors de la sauvegarde:', err);
       error('Erreur lors de la sauvegarde des paramètres: ' + err.message);
     }
   };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div style={{ textAlign: 'center', padding: '48px' }}>
+          <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏳</div>
+          <div style={{ color: '#64748b' }}>Chargement des paramètres...</div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
