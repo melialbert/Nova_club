@@ -8,14 +8,17 @@ function Layout({ children }) {
 
   const isActive = (path) => location.pathname === path;
 
-  const menuItems = [
-    { path: '/dashboard', label: 'Tableau de bord', icon: '📊' },
-    { path: '/members', label: 'Adhérents', icon: '👥' },
-    { path: '/licenses', label: 'Licences', icon: '🎫' },
-    { path: '/attendances', label: 'Présences', icon: '📋' },
-    { path: '/payments', label: 'Paiements', icon: '💳' },
-    { path: '/settings', label: 'Paramètres', icon: '⚙️' },
+  const allMenuItems = [
+    { path: '/dashboard', label: 'Tableau de bord', icon: '📊', roles: ['admin', 'secretary', 'coach'] },
+    { path: '/members', label: 'Adhérents', icon: '👥', roles: ['admin', 'secretary', 'coach'] },
+    { path: '/licenses', label: 'Licences', icon: '🎫', roles: ['admin', 'secretary'] },
+    { path: '/attendances', label: 'Présences', icon: '📋', roles: ['admin', 'secretary', 'coach'] },
+    { path: '/payments', label: 'Paiements', icon: '💳', roles: ['admin', 'secretary'] },
+    { path: '/employees', label: 'Employés', icon: '👔', roles: ['admin'] },
+    { path: '/settings', label: 'Paramètres', icon: '⚙️', roles: ['admin'] },
   ];
+
+  const menuItems = allMenuItems.filter(item => item.roles.includes(user?.role));
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>

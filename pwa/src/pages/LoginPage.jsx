@@ -75,10 +75,6 @@ function LoginPage() {
             {loading ? 'Connexion...' : 'Se connecter'}
           </button>
         </form>
-
-        <div style={{ marginTop: '20px', textAlign: 'center' }}>
-          <Link to="/register" style={{ color: '#1976d2' }}>Créer un compte</Link>
-        </div>
         </div>
       </div>
     </>
