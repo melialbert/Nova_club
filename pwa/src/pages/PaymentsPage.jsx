@@ -329,6 +329,22 @@ function PaymentsPage() {
             color: #6b7280;
             font-size: 13px;
           }
+          .powered-by {
+            margin-top: 20px;
+            padding-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #9ca3af;
+          }
+          .powered-logo {
+            max-width: 100px;
+            max-height: 40px;
+            object-fit: contain;
+            opacity: 0.7;
+          }
           .notes {
             margin-top: 30px;
             padding: 20px;
@@ -447,6 +463,10 @@ function PaymentsPage() {
               month: 'long',
               year: 'numeric'
             })}</p>
+            <div class="powered-by">
+              <span>Propulsé par</span>
+              <img src="${window.location.origin}/image.png" alt="Nova Company Technology" class="powered-logo" />
+            </div>
           </div>
         </div>
       </body>
