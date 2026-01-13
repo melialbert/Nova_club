@@ -4,6 +4,18 @@ import App from './App';
 import { initDB } from './db';
 import './index.css';
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('Service Worker enregistré:', registration);
+      })
+      .catch(error => {
+        console.log('Erreur Service Worker:', error);
+      });
+  });
+}
+
 initDB().then(() => {
   ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>

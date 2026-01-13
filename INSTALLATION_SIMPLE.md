@@ -55,10 +55,25 @@ Vous pouvez maintenant :
 ## Installer l'application sur votre écran
 
 ### Sur PC (Chrome/Edge)
+
+**IMPORTANT : Redémarrez l'application avant d'installer**
+```bash
+docker-compose down
+./start.bat   # ou ./start.sh sur Mac/Linux
+```
+
+Ensuite :
 1. Ouvrez http://localhost:3000
-2. Cliquez sur l'icône **+** dans la barre d'adresse
-3. Cliquez sur **"Installer"**
-4. L'application s'ouvre dans sa propre fenêtre !
+2. Attendez 10 secondes que la page charge complètement
+3. Cherchez l'icône **d'installation** dans la barre d'adresse (à droite) :
+   - Chrome : icône **⊕** (cercle avec +)
+   - Edge : icône **+** ou **ordinateur**
+4. Cliquez dessus → **"Installer NovaClub"**
+5. L'application s'ouvre dans sa propre fenêtre !
+
+**Alternative si vous ne voyez pas l'icône :**
+- Menu Chrome (3 points verticaux) → **"Enregistrer et partager"** → **"Installer NovaClub..."**
+- Menu Edge (3 points horizontaux) → **"Applications"** → **"Installer ce site en tant qu'application"**
 
 ### Sur téléphone Android
 1. Ouvrez http://[ADRESSE-IP-PC]:3000 dans Chrome
