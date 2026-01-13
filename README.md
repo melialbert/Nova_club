@@ -2,6 +2,27 @@
 
 Système de gestion offline-first multi-clubs pour l'Afrique avec connectivité instable.
 
+## ⚠️ Première Installation
+
+**IMPORTANT** : Si c'est votre première installation ou si vous rencontrez des erreurs, exécutez :
+
+**Linux/Mac** :
+```bash
+./fix-and-restart.sh
+```
+
+**Windows** :
+```cmd
+fix-and-restart.bat
+```
+
+Ce script va :
+- Corriger les dépendances
+- Rebuild le backend
+- Démarrer tous les services
+
+📖 **Guide détaillé** : [FIX_ERRORS.md](FIX_ERRORS.md)
+
 ## Architecture
 
 - **Backend**: FastAPI + PostgreSQL + Redis
