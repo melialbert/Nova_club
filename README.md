@@ -2,6 +2,10 @@
 
 Système de gestion offline-first multi-clubs pour l'Afrique avec connectivité instable.
 
+## ⚡ Démarrage Ultra-Rapide
+
+**Vous voulez tester en 5 minutes ?** → [QUICKSTART.md](QUICKSTART.md)
+
 ## ⚠️ Première Installation
 
 **IMPORTANT** : Si c'est votre première installation ou si vous rencontrez des erreurs, exécutez :
@@ -95,6 +99,49 @@ Ce script va :
      - Utilisateur: novaclub
      - Mot de passe: novaclub123
      - Base de données: novaclub_db
+
+## 🧪 Tester l'Application
+
+### Test Automatique des Services
+
+**Linux/Mac** :
+```bash
+./test-services.sh
+```
+
+**Windows** :
+```cmd
+test-services.bat
+```
+
+Ce script vérifie automatiquement :
+- État des conteneurs Docker
+- Accessibilité des services HTTP
+- Connexions aux bases de données
+- Logs d'erreurs
+
+### Test Manuel Complet
+
+Suivez le guide détaillé : **[GUIDE_TEST.md](GUIDE_TEST.md)**
+
+Ce guide couvre :
+1. ✅ Création de compte club
+2. 👥 Ajout et gestion d'adhérents
+3. 💰 Enregistrement de paiements
+4. 📊 Consultation du dashboard
+5. 🔄 Test du mode hors ligne
+6. 🔐 Connexion/Déconnexion
+7. 🗄️ Vérification de la base de données
+
+### Test Rapide (3 minutes)
+
+1. **Ouvrir** http://localhost:3000
+2. **Créer un compte** avec les informations de votre club
+3. **Ajouter un adhérent** en cliquant sur "Adhérents" → "+ Nouvel adhérent"
+4. **Enregistrer un paiement** dans "Paiements" → "+ Nouveau paiement"
+5. **Consulter le dashboard** pour voir les statistiques
+
+**✅ Si tout fonctionne** : Vous êtes prêt à utiliser NovaClub !
 
 ### Vérifier que tout fonctionne
 
