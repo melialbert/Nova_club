@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getAllFromStore, addToStore, updateInStore, deleteFromStore } from '../db';
 import { queueChange } from '../services/syncService';
 import { useMemberStore } from '../utils/store';
@@ -395,6 +396,32 @@ function MembersPage() {
                       </td>
                       <td>
                         <div style={{ display: 'flex', gap: '8px' }}>
+                          <Link
+                            to="/licenses"
+                            state={{ memberId: member.id }}
+                            style={{
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              border: '1px solid #e2e8f0',
+                              backgroundColor: 'white',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              transition: 'all 0.2s',
+                              textDecoration: 'none',
+                              display: 'inline-block'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.backgroundColor = '#f0fdf4';
+                              e.target.style.borderColor = '#10b981';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.backgroundColor = 'white';
+                              e.target.style.borderColor = '#e2e8f0';
+                            }}
+                            title="Créer une licence"
+                          >
+                            🎫
+                          </Link>
                           <button
                             onClick={() => handleEdit(member)}
                             style={{

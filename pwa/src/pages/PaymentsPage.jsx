@@ -67,7 +67,6 @@ function PaymentsPage() {
       'monthly_fee': 'Cotisation mensuelle',
       'registration': 'Inscription',
       'equipment': 'Équipement',
-      'license': 'Licence',
       'other': 'Autre'
     };
     return types[type] || type;
@@ -112,7 +111,6 @@ function PaymentsPage() {
     monthly_fee: payments.filter(p => p.payment_type === 'monthly_fee').length,
     registration: payments.filter(p => p.payment_type === 'registration').length,
     equipment: payments.filter(p => p.payment_type === 'equipment').length,
-    license: payments.filter(p => p.payment_type === 'license').length,
   };
 
   return (
@@ -193,8 +191,8 @@ function PaymentsPage() {
             >
               📋
             </div>
-            <div className="stat-value">{paymentsByType.license}</div>
-            <div className="stat-label">Licences</div>
+            <div className="stat-value">{paymentsByType.equipment}</div>
+            <div className="stat-label">Équipements</div>
           </div>
         </div>
 
@@ -228,7 +226,6 @@ function PaymentsPage() {
                     <option value="monthly_fee">Cotisation mensuelle</option>
                     <option value="registration">Inscription</option>
                     <option value="equipment">Équipement</option>
-                    <option value="license">Licence</option>
                     <option value="other">Autre</option>
                   </select>
                 </div>
@@ -289,7 +286,6 @@ function PaymentsPage() {
                 <option value="monthly_fee">Cotisations</option>
                 <option value="registration">Inscriptions</option>
                 <option value="equipment">Équipements</option>
-                <option value="license">Licences</option>
                 <option value="other">Autres</option>
               </select>
               <input
