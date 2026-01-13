@@ -22,13 +22,14 @@ def create_test_users():
         # Créer le club de test
         print("📋 Création du club de test...")
         club_query = text("""
-            INSERT INTO clubs (id, name, city, slogan, is_active, created_at, updated_at)
+            INSERT INTO clubs (id, name, city, slogan, is_active, sync_version, created_at, updated_at)
             VALUES (
                 'c1111111-1111-1111-1111-111111111111',
                 'Club de Judo Excellence',
                 'Paris',
                 'Excellence et Passion du Judo',
                 true,
+                1,
                 NOW(),
                 NOW()
             )
@@ -47,7 +48,7 @@ def create_test_users():
         # Créer l'administrateur
         print("👤 Création de l'administrateur...")
         admin_query = text("""
-            INSERT INTO users (id, club_id, email, hashed_password, first_name, last_name, phone, role, is_active, created_at, updated_at)
+            INSERT INTO users (id, club_id, email, hashed_password, first_name, last_name, phone, role, is_active, sync_version, created_at, updated_at)
             VALUES (
                 :id,
                 :club_id,
@@ -58,6 +59,7 @@ def create_test_users():
                 :phone,
                 :role,
                 true,
+                1,
                 NOW(),
                 NOW()
             )
@@ -78,7 +80,7 @@ def create_test_users():
         # Créer la secrétaire
         print("👤 Création de la secrétaire...")
         secretary_query = text("""
-            INSERT INTO users (id, club_id, email, hashed_password, first_name, last_name, phone, role, is_active, created_at, updated_at)
+            INSERT INTO users (id, club_id, email, hashed_password, first_name, last_name, phone, role, is_active, sync_version, created_at, updated_at)
             VALUES (
                 :id,
                 :club_id,
@@ -89,6 +91,7 @@ def create_test_users():
                 :phone,
                 :role,
                 true,
+                1,
                 NOW(),
                 NOW()
             )
@@ -109,7 +112,7 @@ def create_test_users():
         # Créer le coach
         print("👤 Création du coach...")
         coach_query = text("""
-            INSERT INTO users (id, club_id, email, hashed_password, first_name, last_name, phone, role, is_active, created_at, updated_at)
+            INSERT INTO users (id, club_id, email, hashed_password, first_name, last_name, phone, role, is_active, sync_version, created_at, updated_at)
             VALUES (
                 :id,
                 :club_id,
@@ -120,6 +123,7 @@ def create_test_users():
                 :phone,
                 :role,
                 true,
+                1,
                 NOW(),
                 NOW()
             )
