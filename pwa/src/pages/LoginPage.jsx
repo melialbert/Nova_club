@@ -41,7 +41,22 @@ function LoginPage() {
       <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
       <div className="container" style={{ maxWidth: '400px', marginTop: '100px' }}>
         <div className="card">
-          <h1 style={{ textAlign: 'center', marginBottom: '32px', color: '#1976d2' }}>NovaClub</h1>
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <img
+              src="/logo-club.png"
+              alt="NovaClub"
+              style={{
+                maxWidth: '150px',
+                height: 'auto',
+                marginBottom: '16px'
+              }}
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextElementSibling.style.display = 'block';
+              }}
+            />
+            <h1 style={{ color: '#1976d2', display: 'none' }}>NovaClub</h1>
+          </div>
         <h2 style={{ marginBottom: '24px' }}>Connexion</h2>
 
         {error && (

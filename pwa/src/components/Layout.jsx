@@ -38,8 +38,23 @@ function Layout({ children }) {
       }}>
         <div style={{
           padding: '32px 24px',
-          borderBottom: '1px solid rgba(255,255,255,0.1)'
+          borderBottom: '1px solid rgba(255,255,255,0.1)',
+          textAlign: 'center'
         }}>
+          <img
+            src="/logo-club.png"
+            alt="NovaClub"
+            style={{
+              maxWidth: '120px',
+              height: 'auto',
+              marginBottom: '12px'
+            }}
+            onError={(e) => {
+              e.target.style.display = 'none';
+              const textLogo = e.target.nextElementSibling;
+              if (textLogo) textLogo.style.display = 'block';
+            }}
+          />
           <div style={{
             fontSize: '28px',
             fontWeight: '700',
@@ -47,7 +62,8 @@ function Layout({ children }) {
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
-            letterSpacing: '-0.5px'
+            letterSpacing: '-0.5px',
+            display: 'none'
           }}>
             NovaClub
           </div>
