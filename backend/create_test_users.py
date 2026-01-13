@@ -22,11 +22,12 @@ def create_test_users():
         # Créer le club de test
         print("📋 Création du club de test...")
         club_query = text("""
-            INSERT INTO clubs (id, name, phone, is_active, created_at, updated_at)
+            INSERT INTO clubs (id, name, city, slogan, is_active, created_at, updated_at)
             VALUES (
                 'c1111111-1111-1111-1111-111111111111',
                 'Club de Judo Excellence',
-                '+33123456789',
+                'Paris',
+                'Excellence et Passion du Judo',
                 true,
                 NOW(),
                 NOW()
