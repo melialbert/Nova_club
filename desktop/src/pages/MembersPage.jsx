@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getAllFromStore, addToStore, updateInStore, deleteFromStore } from '../db';
-import { queueChange } from '../services/syncService';
-import { useMemberStore } from '../utils/store';
+import { api } from '../services/api';
 import Layout from '../components/Layout';
 
 function MembersPage() {
-  const { members, setMembers, addMember, updateMember, removeMember } = useMemberStore();
+  const [members, setMembers] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [editingMember, setEditingMember] = useState(null);
@@ -37,8 +35,12 @@ function MembersPage() {
   }, []);
 
   const loadMembers = async () => {
-    const data = await getAllFromStore('members');
-    setMembers(data);
+    try {
+      const data = await api.getMembers();
+      setMembers(data);
+    } catch (error) {
+      console.error('Error loading members:', error);
+    }
   };
 
   const calculateAge = (dateOfBirth) => {
@@ -60,81 +62,55 @@ function MembersPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (editingMember) {
-      const updatedMember = {
-        ...editingMember,
-        ...formData,
-        updated_at: new Date().toISOString()
-      };
+    try {
+      if (editingMember) {
+        await api.updateMember(editingMember.id, formData);
+        setEditingMember(null);
+      } else {
+        const newMember = await api.createMember(formData);
 
-      await updateInStore('members', updatedMember);
-      await queueChange('members', updatedMember.id, updatedMember);
-      updateMember(updatedMember);
-      setEditingMember(null);
-    } else {
-      const newMember = {
-        id: crypto.randomUUID(),
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        date_of_birth: formData.date_of_birth,
-        gender: formData.gender,
-        phone: formData.phone,
-        email: formData.email,
-        category: formData.category,
-        discipline: formData.discipline,
-        belt_level: formData.belt_level,
-        status: formData.status,
-        monthly_fee: formData.monthly_fee,
-        registration_date: formData.registration_date,
-        club_id: 'current_club_id',
-        created_at: new Date().toISOString()
-      };
+        if (sellKimono) {
+          const totalAmount = kimonoData.price * kimonoData.quantity;
 
-      await addToStore('members', newMember);
-      await queueChange('members', newMember.id, newMember);
-      addMember(newMember);
+          const kimonoTransaction = {
+            type: 'income',
+            category: 'equipment_sale',
+            amount: totalAmount,
+            date: new Date().toISOString().split('T')[0],
+            description: `Vente kimono - ${kimonoData.size}cm (x${kimonoData.quantity}) - ${formData.first_name} ${formData.last_name}`,
+            member_id: newMember.id
+          };
 
-      if (sellKimono) {
-        const totalAmount = kimonoData.price * kimonoData.quantity;
-
-        const kimonoTransaction = {
-          id: crypto.randomUUID(),
-          type: 'income',
-          category: 'equipment_sale',
-          amount: totalAmount,
-          date: new Date().toISOString().split('T')[0],
-          description: `Vente kimono - ${kimonoData.size}cm (x${kimonoData.quantity}) - ${newMember.first_name} ${newMember.last_name}`,
-          member_id: newMember.id,
-          club_id: 'current_club_id',
-          created_at: new Date().toISOString()
-        };
-
-        await addToStore('transactions', kimonoTransaction);
-        await queueChange('transactions', kimonoTransaction.id, kimonoTransaction);
+          await api.createTransaction(kimonoTransaction);
+        }
       }
-    }
 
-    setFormData({
-      first_name: '',
-      last_name: '',
-      date_of_birth: '',
-      gender: 'male',
-      phone: '',
-      email: '',
-      category: 'benjamin',
-      discipline: 'judo',
-      belt_level: 'white',
-      status: 'active',
-      monthly_fee: '',
-      registration_date: new Date().toISOString().split('T')[0]
-    });
-    setSellKimono(false);
-    setKimonoData({
-      size: '140',
-      quantity: 1,
-      price: 15000
-    });
-    setShowForm(false);
+      setFormData({
+        first_name: '',
+        last_name: '',
+        date_of_birth: '',
+        gender: 'male',
+        phone: '',
+        email: '',
+        category: 'benjamin',
+        discipline: 'judo',
+        belt_level: 'white',
+        status: 'active',
+        monthly_fee: '',
+        registration_date: new Date().toISOString().split('T')[0]
+      });
+      setSellKimono(false);
+      setKimonoData({
+        size: '140',
+        quantity: 1,
+        price: 15000
+      });
+      setShowForm(false);
+      loadMembers();
+    } catch (error) {
+      console.error('Error saving member:', error);
+      alert('Erreur lors de l\'enregistrement de l\'adhérent');
+    }
   };
 
   const handleEdit = (member) => {
@@ -143,24 +119,28 @@ function MembersPage() {
       first_name: member.first_name,
       last_name: member.last_name,
       date_of_birth: member.date_of_birth,
-      gender: member.gender,
+      gender: member.gender || 'male',
       phone: member.phone || '',
       email: member.email || '',
-      category: member.category,
-      discipline: member.discipline,
+      category: member.category || 'benjamin',
+      discipline: member.discipline || 'judo',
       belt_level: member.belt_level,
-      status: member.status,
-      monthly_fee: member.monthly_fee,
-      registration_date: member.registration_date
+      status: member.status || 'active',
+      monthly_fee: member.monthly_fee || '',
+      registration_date: member.registration_date || new Date().toISOString().split('T')[0]
     });
     setShowForm(true);
   };
 
   const handleDelete = async (member) => {
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer ${member.first_name} ${member.last_name} ?`)) {
-      await deleteFromStore('members', member.id);
-      await queueChange('members', member.id, null);
-      removeMember(member.id);
+      try {
+        await api.deleteMember(member.id);
+        loadMembers();
+      } catch (error) {
+        console.error('Error deleting member:', error);
+        alert('Erreur lors de la suppression');
+      }
     }
   };
 
@@ -238,8 +218,8 @@ function MembersPage() {
 
   const filteredMembers = members.filter(member =>
     `${member.first_name} ${member.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.discipline.toLowerCase().includes(searchTerm.toLowerCase())
+    (member.category && member.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (member.discipline && member.discipline.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -547,10 +527,10 @@ function MembersPage() {
                       </td>
                       <td>
                         <span className="badge badge-blue">
-                          {member.category}
+                          {member.category || '-'}
                         </span>
                       </td>
-                      <td>{member.discipline}</td>
+                      <td>{member.discipline || '-'}</td>
                       <td>
                         <div style={{
                           display: 'inline-flex',
@@ -568,7 +548,7 @@ function MembersPage() {
                         </div>
                       </td>
                       <td>
-                        <span className={`status-badge status-${member.status}`}>
+                        <span className={`status-badge status-${member.status || 'active'}`}>
                           {member.status === 'active' ? 'Actif' : member.status === 'pending' ? 'En attente' : 'Suspendu'}
                         </span>
                       </td>
