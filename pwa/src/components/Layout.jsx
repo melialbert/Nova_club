@@ -1,10 +1,13 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../utils/store';
 import { logout } from '../services/api';
+import { useToast } from '../utils/useToast';
+import { ToastContainer } from './Toast';
 
 function Layout({ children }) {
   const { user } = useAuthStore();
   const location = useLocation();
+  const toast = useToast();
 
   const isActive = (path) => location.pathname === path;
 
@@ -22,8 +25,10 @@ function Layout({ children }) {
   const menuItems = allMenuItems.filter(item => item.roles.includes(user?.role?.toUpperCase()));
 
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      <aside style={{
+    <>
+      <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
+      <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+        <aside style={{
         width: '280px',
         backgroundColor: '#1e293b',
         color: 'white',
@@ -266,6 +271,7 @@ function Layout({ children }) {
         </main>
       </div>
     </div>
+    </>
   );
 }
 

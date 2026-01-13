@@ -1,7 +1,7 @@
 import { useToastStore } from './store';
 
 export function useToast() {
-  const { addToast } = useToastStore();
+  const { toasts, addToast, removeToast } = useToastStore();
 
   const success = (message, duration) => {
     addToast(message, 'success', duration);
@@ -20,6 +20,8 @@ export function useToast() {
   };
 
   return {
+    toasts,
+    removeToast,
     success,
     error,
     info,
