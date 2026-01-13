@@ -127,7 +127,8 @@ function MembersPage() {
       belt_level: member.belt_level,
       status: member.status || 'active',
       monthly_fee: member.monthly_fee || '',
-      registration_date: member.registration_date || new Date().toISOString().split('T')[0]
+      registration_date: member.registration_date || new Date().toISOString().split('T')[0],
+      is_active: member.is_active !== undefined ? member.is_active : 1
     });
     setShowForm(true);
   };

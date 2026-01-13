@@ -28,9 +28,44 @@ function initDatabase() {
   db.pragma('journal_mode = WAL');
 
   createTables();
+  migrateMembersTable();
   createDefaultData();
 
   return db;
+}
+
+function migrateMembersTable() {
+  const columns = db.pragma("table_info(members)").map(col => col.name);
+
+  if (!columns.includes('gender')) {
+    db.exec("ALTER TABLE members ADD COLUMN gender TEXT DEFAULT 'male'");
+    console.log('Added gender column to members table');
+  }
+
+  if (!columns.includes('category')) {
+    db.exec("ALTER TABLE members ADD COLUMN category TEXT");
+    console.log('Added category column to members table');
+  }
+
+  if (!columns.includes('discipline')) {
+    db.exec("ALTER TABLE members ADD COLUMN discipline TEXT");
+    console.log('Added discipline column to members table');
+  }
+
+  if (!columns.includes('status')) {
+    db.exec("ALTER TABLE members ADD COLUMN status TEXT DEFAULT 'active'");
+    console.log('Added status column to members table');
+  }
+
+  if (!columns.includes('monthly_fee')) {
+    db.exec("ALTER TABLE members ADD COLUMN monthly_fee REAL DEFAULT 0");
+    console.log('Added monthly_fee column to members table');
+  }
+
+  if (!columns.includes('registration_date')) {
+    db.exec("ALTER TABLE members ADD COLUMN registration_date DATE");
+    console.log('Added registration_date column to members table');
+  }
 }
 
 function createTables() {
@@ -63,6 +98,7 @@ function createTables() {
       first_name TEXT NOT NULL,
       last_name TEXT NOT NULL,
       date_of_birth DATE,
+      gender TEXT DEFAULT 'male',
       belt_level TEXT,
       phone TEXT,
       email TEXT,
@@ -70,6 +106,11 @@ function createTables() {
       emergency_contact TEXT,
       emergency_phone TEXT,
       photo_url TEXT,
+      category TEXT,
+      discipline TEXT,
+      status TEXT DEFAULT 'active',
+      monthly_fee REAL DEFAULT 0,
+      registration_date DATE,
       is_active INTEGER DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (club_id) REFERENCES clubs(id)

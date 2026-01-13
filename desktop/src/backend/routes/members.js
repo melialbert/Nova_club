@@ -34,12 +34,37 @@ router.get('/:id', authenticate, (req, res) => {
 router.post('/', authenticate, (req, res) => {
   try {
     const db = getDb();
-    const { first_name, last_name, date_of_birth, belt_level, phone, email, address, emergency_contact, emergency_phone, photo_url } = req.body;
+    const {
+      first_name,
+      last_name,
+      date_of_birth,
+      gender,
+      belt_level,
+      phone,
+      email,
+      address,
+      emergency_contact,
+      emergency_phone,
+      photo_url,
+      category,
+      discipline,
+      status,
+      monthly_fee,
+      registration_date
+    } = req.body;
 
     const result = db.prepare(`
-      INSERT INTO members (club_id, first_name, last_name, date_of_birth, belt_level, phone, email, address, emergency_contact, emergency_phone, photo_url)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(req.clubId, first_name, last_name, date_of_birth, belt_level, phone, email, address, emergency_contact, emergency_phone, photo_url);
+      INSERT INTO members (
+        club_id, first_name, last_name, date_of_birth, gender, belt_level,
+        phone, email, address, emergency_contact, emergency_phone, photo_url,
+        category, discipline, status, monthly_fee, registration_date
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      req.clubId, first_name, last_name, date_of_birth, gender, belt_level,
+      phone, email, address, emergency_contact, emergency_phone, photo_url,
+      category, discipline, status, monthly_fee, registration_date
+    );
 
     const member = db.prepare('SELECT * FROM members WHERE id = ?').get(result.lastInsertRowid);
     res.status(201).json(member);
@@ -52,14 +77,39 @@ router.post('/', authenticate, (req, res) => {
 router.put('/:id', authenticate, (req, res) => {
   try {
     const db = getDb();
-    const { first_name, last_name, date_of_birth, belt_level, phone, email, address, emergency_contact, emergency_phone, photo_url, is_active } = req.body;
+    const {
+      first_name,
+      last_name,
+      date_of_birth,
+      gender,
+      belt_level,
+      phone,
+      email,
+      address,
+      emergency_contact,
+      emergency_phone,
+      photo_url,
+      category,
+      discipline,
+      status,
+      monthly_fee,
+      registration_date,
+      is_active
+    } = req.body;
 
     db.prepare(`
       UPDATE members
-      SET first_name = ?, last_name = ?, date_of_birth = ?, belt_level = ?, phone = ?, email = ?,
-          address = ?, emergency_contact = ?, emergency_phone = ?, photo_url = ?, is_active = ?
+      SET first_name = ?, last_name = ?, date_of_birth = ?, gender = ?, belt_level = ?,
+          phone = ?, email = ?, address = ?, emergency_contact = ?, emergency_phone = ?,
+          photo_url = ?, category = ?, discipline = ?, status = ?, monthly_fee = ?,
+          registration_date = ?, is_active = ?
       WHERE id = ? AND club_id = ?
-    `).run(first_name, last_name, date_of_birth, belt_level, phone, email, address, emergency_contact, emergency_phone, photo_url, is_active, req.params.id, req.clubId);
+    `).run(
+      first_name, last_name, date_of_birth, gender, belt_level,
+      phone, email, address, emergency_contact, emergency_phone, photo_url,
+      category, discipline, status, monthly_fee, registration_date, is_active,
+      req.params.id, req.clubId
+    );
 
     const member = db.prepare('SELECT * FROM members WHERE id = ?').get(req.params.id);
     res.json(member);
