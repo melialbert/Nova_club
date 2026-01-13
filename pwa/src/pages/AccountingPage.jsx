@@ -143,7 +143,7 @@ function AccountingPage() {
 
   const getCategoryIcon = (category) => {
     const icons = {
-      subscription: '��',
+      subscription: '💰',
       equipment_sale: '👔',
       subsidy: '🏦',
       rent: '🏢',
