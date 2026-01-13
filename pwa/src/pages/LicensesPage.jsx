@@ -341,147 +341,202 @@ function LicensesPage() {
           </div>
 
           {filteredLicenses.length > 0 ? (
-            <div className="table-container">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Photo</th>
-                    <th>Adhérent</th>
-                    <th>N° Licence</th>
-                    <th>Fédération</th>
-                    <th>Saison</th>
-                    <th>Expiration</th>
-                    <th>Statut</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredLicenses.map(license => {
-                    const member = getMemberInfo(license.member_id);
-                    const expired = isExpired(license.expiry_date);
-                    return (
-                      <tr key={license.id}>
-                        <td>
-                          {license.photo ? (
-                            <img
-                              src={license.photo}
-                              alt={member?.first_name}
-                              style={{
-                                width: '48px',
-                                height: '48px',
-                                borderRadius: '50%',
-                                objectFit: 'cover',
-                                border: '2px solid #e2e8f0'
-                              }}
-                            />
-                          ) : (
-                            <div style={{
-                              width: '48px',
-                              height: '48px',
-                              borderRadius: '50%',
-                              background: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: 'white',
-                              fontWeight: '700',
-                              fontSize: '14px'
-                            }}>
-                              {member ? member.first_name[0] + member.last_name[0] : '?'}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+              gap: '24px',
+              padding: '16px'
+            }}>
+              {filteredLicenses.map(license => {
+                const member = getMemberInfo(license.member_id);
+                const expired = isExpired(license.expiry_date);
+                return (
+                  <div
+                    key={license.id}
+                    style={{
+                      background: 'white',
+                      borderRadius: '16px',
+                      border: '2px solid #e2e8f0',
+                      overflow: 'hidden',
+                      transition: 'all 0.3s ease',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                      position: 'relative'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-4px)';
+                      e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+                    }}
+                  >
+                    <div style={{
+                      background: expired ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      padding: '24px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      position: 'relative'
+                    }}>
+                      <span className={`status-badge status-${expired ? 'suspended' : license.status}`}
+                        style={{
+                          position: 'absolute',
+                          top: '12px',
+                          right: '12px',
+                          backgroundColor: 'white',
+                          color: expired ? '#ef4444' : '#10b981',
+                          fontWeight: '600',
+                          fontSize: '11px'
+                        }}
+                      >
+                        {expired ? 'Expirée' : license.status === 'active' ? 'Active' : license.status === 'pending' ? 'En attente' : 'Suspendue'}
+                      </span>
+
+                      {license.photo ? (
+                        <img
+                          src={license.photo}
+                          alt={member?.first_name}
+                          style={{
+                            width: '96px',
+                            height: '96px',
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            border: '4px solid white',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                          }}
+                        />
+                      ) : (
+                        <div style={{
+                          width: '96px',
+                          height: '96px',
+                          borderRadius: '50%',
+                          backgroundColor: 'white',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: expired ? '#ef4444' : '#10b981',
+                          fontWeight: '700',
+                          fontSize: '32px',
+                          border: '4px solid white',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                        }}>
+                          {member ? member.first_name[0] + member.last_name[0] : '?'}
+                        </div>
+                      )}
+
+                      <div style={{
+                        marginTop: '16px',
+                        textAlign: 'center',
+                        color: 'white'
+                      }}>
+                        {member ? (
+                          <>
+                            <div style={{ fontSize: '18px', fontWeight: '700', marginBottom: '4px' }}>
+                              {member.first_name} {member.last_name}
                             </div>
-                          )}
-                        </td>
-                        <td>
-                          {member ? (
-                            <div>
-                              <div style={{ fontWeight: '600', color: '#0f172a' }}>
-                                {member.first_name} {member.last_name}
-                              </div>
-                              <div style={{ fontSize: '12px', color: '#64748b' }}>
-                                {member.category} - {member.belt_level}
-                              </div>
+                            <div style={{ fontSize: '13px', opacity: '0.9' }}>
+                              {member.category} - {member.belt_level}
                             </div>
-                          ) : (
-                            <span style={{ color: '#94a3b8' }}>Inconnu</span>
-                          )}
-                        </td>
-                        <td>
-                          <span style={{ fontFamily: 'monospace', fontWeight: '600', color: '#0f172a' }}>
+                          </>
+                        ) : (
+                          <div style={{ fontSize: '18px', fontWeight: '700' }}>Adhérent inconnu</div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div style={{ padding: '20px' }}>
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: '16px',
+                        paddingBottom: '16px',
+                        borderBottom: '1px solid #e2e8f0'
+                      }}>
+                        <div>
+                          <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '4px', textTransform: 'uppercase', fontWeight: '600' }}>
+                            Numéro de licence
+                          </div>
+                          <div style={{ fontFamily: 'monospace', fontWeight: '700', fontSize: '16px', color: '#0f172a' }}>
                             {license.license_number}
-                          </span>
-                        </td>
-                        <td>
-                          <span className="badge badge-blue">
-                            FECAJUDO
-                          </span>
-                        </td>
-                        <td>{license.season}</td>
-                        <td>
-                          <div style={{ color: expired ? '#ef4444' : '#10b981', fontWeight: '600' }}>
+                          </div>
+                        </div>
+                        <span className="badge badge-blue" style={{ fontSize: '11px', padding: '6px 12px' }}>
+                          FECAJUDO
+                        </span>
+                      </div>
+
+                      <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '16px',
+                        marginBottom: '16px'
+                      }}>
+                        <div>
+                          <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '4px', textTransform: 'uppercase', fontWeight: '600' }}>
+                            Saison
+                          </div>
+                          <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>
+                            {license.season}
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '4px', textTransform: 'uppercase', fontWeight: '600' }}>
+                            Expiration
+                          </div>
+                          <div style={{ fontSize: '14px', fontWeight: '600', color: expired ? '#ef4444' : '#10b981' }}>
                             {new Date(license.expiry_date).toLocaleDateString('fr-FR')}
-                            {expired && <div style={{ fontSize: '11px', marginTop: '2px' }}>⚠️ Expirée</div>}
                           </div>
-                        </td>
-                        <td>
-                          <span className={`status-badge status-${expired ? 'suspended' : license.status}`}>
-                            {expired ? 'Expirée' : license.status === 'active' ? 'Active' : license.status === 'pending' ? 'En attente' : 'Suspendue'}
-                          </span>
-                        </td>
-                        <td>
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <button
-                              style={{
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                border: '1px solid #e2e8f0',
-                                backgroundColor: 'white',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                transition: 'all 0.2s'
-                              }}
-                              onClick={() => handleEdit(license)}
-                              onMouseEnter={(e) => {
-                                e.target.style.backgroundColor = '#f8fafc';
-                                e.target.style.borderColor = '#3b82f6';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.target.style.backgroundColor = 'white';
-                                e.target.style.borderColor = '#e2e8f0';
-                              }}
-                              title="Modifier"
-                            >
-                              ✏️
-                            </button>
-                            <button
-                              style={{
-                                padding: '6px 12px',
-                                borderRadius: '6px',
-                                border: '1px solid #e2e8f0',
-                                backgroundColor: 'white',
-                                cursor: 'pointer',
-                                fontSize: '14px',
-                                transition: 'all 0.2s'
-                              }}
-                              onClick={() => handleDelete(license)}
-                              onMouseEnter={(e) => {
-                                e.target.style.backgroundColor = '#fef2f2';
-                                e.target.style.borderColor = '#ef4444';
-                              }}
-                              onMouseLeave={(e) => {
-                                e.target.style.backgroundColor = 'white';
-                                e.target.style.borderColor = '#e2e8f0';
-                              }}
-                              title="Supprimer"
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                        </div>
+                      </div>
+
+                      {license.notes && (
+                        <div style={{
+                          fontSize: '13px',
+                          color: '#64748b',
+                          backgroundColor: '#f8fafc',
+                          padding: '12px',
+                          borderRadius: '8px',
+                          marginBottom: '16px',
+                          borderLeft: '3px solid #3b82f6'
+                        }}>
+                          {license.notes}
+                        </div>
+                      )}
+
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                        <button
+                          className="btn btn-secondary"
+                          style={{
+                            flex: 1,
+                            padding: '10px',
+                            fontSize: '13px',
+                            fontWeight: '600'
+                          }}
+                          onClick={() => handleEdit(license)}
+                        >
+                          <span>✏️</span>
+                          <span>Modifier</span>
+                        </button>
+                        <button
+                          className="btn btn-danger"
+                          style={{
+                            flex: 1,
+                            padding: '10px',
+                            fontSize: '13px',
+                            fontWeight: '600'
+                          }}
+                          onClick={() => handleDelete(license)}
+                        >
+                          <span>🗑️</span>
+                          <span>Supprimer</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className="empty-state">
