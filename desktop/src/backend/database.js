@@ -257,6 +257,7 @@ function createTables() {
       promotion_date DATE NOT NULL,
       examiner TEXT,
       notes TEXT,
+      status TEXT DEFAULT 'pending',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (member_id) REFERENCES members(id),
       FOREIGN KEY (club_id) REFERENCES clubs(id)

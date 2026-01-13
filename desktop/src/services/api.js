@@ -320,6 +320,28 @@ export const api = {
     return response.json();
   },
 
+  async createBulkBeltPromotions(promotionsData) {
+    const response = await fetch(`${API_URL}/belt-promotions/bulk`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(promotionsData),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la création des passages de grade');
+    return response.json();
+  },
+
+  async updateBeltPromotionStatus(id, status) {
+    const response = await fetch(`${API_URL}/belt-promotions/${id}/status`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify({ status }),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la mise à jour du statut');
+    return response.json();
+  },
+
   async updateBeltPromotion(id, promotionData) {
     const response = await fetch(`${API_URL}/belt-promotions/${id}`, {
       method: 'PUT',
