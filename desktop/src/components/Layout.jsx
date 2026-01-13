@@ -167,7 +167,7 @@ function Layout({ children, onLogout }) {
                 marginTop: '8px',
                 fontWeight: '600'
               }}>
-                {user.role === 'ADMIN' ? 'Administrateur' : user.role === 'SECRETARY' ? 'Secrétaire' : 'Coach'}
+                {user.role?.toUpperCase() === 'ADMIN' ? 'Admin' : user.role?.toUpperCase() === 'SECRETARY' ? 'Secrétaire' : 'Coach'}
               </div>
             </div>
           )}
