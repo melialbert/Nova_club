@@ -69,6 +69,7 @@ function SettingsPage() {
         const newSettings = {
           id: crypto.randomUUID(),
           ...formData,
+          club_id: 'current_club_id',
           created_at: new Date().toISOString()
         };
         await addToStore('settings', newSettings);
@@ -77,7 +78,8 @@ function SettingsPage() {
         success('Paramètres créés avec succès');
       }
     } catch (err) {
-      error('Erreur lors de la sauvegarde des paramètres');
+      console.error('Erreur lors de la sauvegarde:', err);
+      error('Erreur lors de la sauvegarde des paramètres: ' + err.message);
     }
   };
 
