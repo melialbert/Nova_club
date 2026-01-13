@@ -100,7 +100,7 @@ function CareerModal({ member, onClose }) {
     return new Date(date).toLocaleDateString('fr-FR');
   };
 
-  if (loading) {
+  if (loading || !careerData) {
     return (
       <div style={{
         position: 'fixed',

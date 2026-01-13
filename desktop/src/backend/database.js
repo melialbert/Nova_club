@@ -207,6 +207,46 @@ function createTables() {
       FOREIGN KEY (sender_id) REFERENCES users(id),
       FOREIGN KEY (recipient_id) REFERENCES users(id)
     );
+
+    CREATE TABLE IF NOT EXISTS competitions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      club_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      competition_type TEXT,
+      location TEXT,
+      competition_date DATE NOT NULL,
+      description TEXT,
+      level TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (club_id) REFERENCES clubs(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS member_competitions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      member_id INTEGER NOT NULL,
+      competition_id INTEGER NOT NULL,
+      rank_achieved INTEGER,
+      weight_category TEXT,
+      medal TEXT,
+      points_earned INTEGER DEFAULT 0,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (member_id) REFERENCES members(id),
+      FOREIGN KEY (competition_id) REFERENCES competitions(id),
+      UNIQUE(member_id, competition_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS career_events (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      member_id INTEGER NOT NULL,
+      event_type TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT,
+      event_date DATE NOT NULL,
+      achievement_level TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (member_id) REFERENCES members(id)
+    );
   `);
 
   console.log('Tables created successfully');
