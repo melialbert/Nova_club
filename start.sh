@@ -11,7 +11,12 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-if ! command -v docker-compose &> /dev/null; then
+# Détecter la commande Docker Compose (nouvelle ou ancienne version)
+if docker compose version &> /dev/null; then
+    DOCKER_COMPOSE="docker compose"
+elif command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE="docker-compose"
+else
     echo "❌ Docker Compose n'est pas installé."
     exit 1
 fi
@@ -28,7 +33,7 @@ echo "📍 Adresse IP détectée: $IP"
 echo ""
 
 echo "🚀 Démarrage des services Docker..."
-docker-compose up -d
+$DOCKER_COMPOSE up -d
 
 echo ""
 echo "⏳ Attente du démarrage des services (30 secondes)..."
@@ -61,10 +66,10 @@ echo ""
 echo "======================================"
 echo ""
 echo "💡 Commandes utiles:"
-echo "   docker-compose ps          # Voir les services"
-echo "   docker-compose logs -f     # Voir les logs"
-echo "   docker-compose stop        # Arrêter"
-echo "   docker-compose down        # Tout supprimer"
+echo "   $DOCKER_COMPOSE ps          # Voir les services"
+echo "   $DOCKER_COMPOSE logs -f     # Voir les logs"
+echo "   $DOCKER_COMPOSE stop        # Arrêter"
+echo "   $DOCKER_COMPOSE down        # Tout supprimer"
 echo ""
 echo "📖 Documentation complète: README.md"
 echo ""

@@ -2,11 +2,13 @@
 Script pour créer les utilisateurs de test dans PostgreSQL
 """
 import sys
+import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from app.core.security import get_password_hash
 
-DATABASE_URL = "postgresql://novaclub:novaclub123@localhost:5432/novaclub_db"
+# Utiliser la variable d'environnement si disponible (dans Docker), sinon localhost
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://novaclub:novaclub123@postgres:5432/novaclub_db")
 
 def create_test_users():
     engine = create_engine(DATABASE_URL)

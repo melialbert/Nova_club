@@ -10,8 +10,8 @@ if errorlevel 1 (
     exit /b 1
 )
 
-echo Attente que PostgreSQL soit pret...
-timeout /t 3 /nobreak >nul
+echo Attente que PostgreSQL soit pret (10 secondes)...
+timeout /t 10 /nobreak >nul
 
 REM Vérifier que le conteneur backend est en cours d'exécution
 docker ps | findstr novaclub-backend >nul 2>&1
@@ -22,7 +22,7 @@ if errorlevel 1 (
 )
 
 echo Execution du script de creation...
-docker exec -it novaclub-backend python create_test_users.py
+docker exec novaclub-backend python create_test_users.py
 
 echo.
 echo Termine!

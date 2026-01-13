@@ -16,7 +16,10 @@ echo √ Docker est installe
 echo.
 
 echo Demarrage des services Docker...
-docker-compose up -d
+docker compose up -d 2>nul
+if errorlevel 1 (
+    docker-compose up -d
+)
 
 echo.
 echo Attente du demarrage des services (30 secondes)...
