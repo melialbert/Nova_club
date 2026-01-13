@@ -12,6 +12,7 @@ import AttendancesPage from './pages/AttendancesPage';
 import PaymentsPage from './pages/PaymentsPage';
 import SettingsPage from './pages/SettingsPage';
 import EmployeesPage from './pages/EmployeesPage';
+import AccountingPage from './pages/AccountingPage';
 
 function App() {
   const { isAuthenticated, setUser } = useAuthStore();
@@ -57,6 +58,7 @@ function App() {
         <Route path="/licenses" element={isAuthenticated ? <LicensesPage /> : <Navigate to="/login" />} />
         <Route path="/attendances" element={isAuthenticated ? <AttendancesPage /> : <Navigate to="/login" />} />
         <Route path="/payments" element={isAuthenticated ? <PaymentsPage /> : <Navigate to="/login" />} />
+        <Route path="/accounting" element={isAuthenticated ? <AccountingPage /> : <Navigate to="/login" />} />
         <Route path="/employees" element={isAuthenticated ? <EmployeesPage /> : <Navigate to="/login" />} />
         <Route path="/settings" element={isAuthenticated ? <SettingsPage /> : <Navigate to="/login" />} />
         <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />} />

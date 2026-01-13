@@ -14,6 +14,7 @@ function Layout({ children }) {
     { path: '/licenses', label: 'Licences', icon: '🎫', roles: ['admin', 'secretary'] },
     { path: '/attendances', label: 'Présences', icon: '📋', roles: ['admin', 'secretary', 'coach'] },
     { path: '/payments', label: 'Paiements', icon: '💳', roles: ['admin', 'secretary'] },
+    { path: '/accounting', label: 'Comptabilité', icon: '💰', roles: ['admin', 'secretary'] },
     { path: '/employees', label: 'Employés', icon: '👔', roles: ['admin'] },
     { path: '/settings', label: 'Paramètres', icon: '⚙️', roles: ['admin'] },
   ];
