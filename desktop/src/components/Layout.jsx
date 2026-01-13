@@ -20,6 +20,7 @@ function Layout({ children, onLogout }) {
     { path: '/attendances', label: 'Présences', icon: '📋' },
     { path: '/payments', label: 'Paiements', icon: '💳' },
     { path: '/licenses', label: 'Licences', icon: '🎫' },
+    { path: '/belt-promotions', label: 'Passages de grade', icon: '🥋' },
     { path: '/employees', label: 'Employés', icon: '👔' },
     { path: '/accounting', label: 'Comptabilité', icon: '💰' },
     { path: '/settings', label: 'Paramètres', icon: '⚙️' },

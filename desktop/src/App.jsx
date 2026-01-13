@@ -9,6 +9,7 @@ import LicensesPage from './pages/LicensesPage';
 import EmployeesPage from './pages/EmployeesPage';
 import AccountingPage from './pages/AccountingPage';
 import SettingsPage from './pages/SettingsPage';
+import BeltPromotionsPage from './pages/BeltPromotionsPage';
 import Layout from './components/Layout';
 
 function App() {
@@ -41,6 +42,7 @@ function App() {
           <Route path="/attendances" element={<AttendancesPage />} />
           <Route path="/payments" element={<PaymentsPage />} />
           <Route path="/licenses" element={<LicensesPage />} />
+          <Route path="/belt-promotions" element={<BeltPromotionsPage />} />
           <Route path="/employees" element={<EmployeesPage />} />
           <Route path="/accounting" element={<AccountingPage />} />
           <Route path="/settings" element={<SettingsPage />} />

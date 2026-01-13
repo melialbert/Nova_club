@@ -299,4 +299,44 @@ export const api = {
 
     if (!response.ok) throw new Error('Erreur lors de la suppression de l\'événement');
   },
+
+  async getBeltPromotions() {
+    const response = await fetch(`${API_URL}/belt-promotions`, {
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la récupération des passages de grade');
+    return response.json();
+  },
+
+  async createBeltPromotion(promotionData) {
+    const response = await fetch(`${API_URL}/belt-promotions`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(promotionData),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la création du passage de grade');
+    return response.json();
+  },
+
+  async updateBeltPromotion(id, promotionData) {
+    const response = await fetch(`${API_URL}/belt-promotions/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(promotionData),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la mise à jour du passage de grade');
+    return response.json();
+  },
+
+  async deleteBeltPromotion(id) {
+    const response = await fetch(`${API_URL}/belt-promotions/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la suppression du passage de grade');
+  },
 };

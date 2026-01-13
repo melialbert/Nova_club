@@ -247,6 +247,20 @@ function createTables() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (member_id) REFERENCES members(id)
     );
+
+    CREATE TABLE IF NOT EXISTS belt_promotions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      member_id INTEGER NOT NULL,
+      club_id INTEGER NOT NULL,
+      previous_belt TEXT NOT NULL,
+      new_belt TEXT NOT NULL,
+      promotion_date DATE NOT NULL,
+      examiner TEXT,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (member_id) REFERENCES members(id),
+      FOREIGN KEY (club_id) REFERENCES clubs(id)
+    );
   `);
 
   console.log('Tables created successfully');

@@ -12,6 +12,7 @@ const transactionsRoutes = require('./routes/transactions');
 const clubRoutes = require('./routes/club');
 const competitionsRoutes = require('./routes/competitions');
 const careerRoutes = require('./routes/career');
+const beltPromotionsRoutes = require('./routes/belt-promotions');
 
 const app = express();
 const PORT = 3001;
@@ -31,6 +32,7 @@ app.use('/api/transactions', transactionsRoutes);
 app.use('/api/club', clubRoutes);
 app.use('/api/competitions', competitionsRoutes);
 app.use('/api/career', careerRoutes);
+app.use('/api/belt-promotions', beltPromotionsRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend running' });
