@@ -1,37 +1,51 @@
 #!/bin/bash
 
 echo "======================================"
-echo "  NovaClub - Correction et Rebuild"
+echo "  NovaClub - Correction Complète"
 echo "======================================"
 echo ""
 
 echo "1️⃣  Arrêt des services..."
-docker-compose down
+docker-compose stop backend
+echo "✅ Backend arrêté"
 
 echo ""
-echo "2️⃣  Suppression du volume des dépendances Python..."
-docker volume rm novaclub_backend_venv 2>/dev/null || echo "Volume déjà supprimé"
+echo "2️⃣  Application de la migration pour corriger l'enum UserRole..."
+docker exec -i novaclub-postgres psql -U novaclub -d novaclub_db < backend/migrations/002_fix_userrole_enum.sql
+
+if [ $? -ne 0 ]; then
+    echo "❌ Erreur lors de l'application de la migration"
+    exit 1
+fi
+echo "✅ Enum corrigé (valeurs: ADMIN, SECRETARY, COACH)"
 
 echo ""
-echo "3️⃣  Rebuild du backend (peut prendre 2-3 minutes)..."
+echo "3️⃣  Rebuild du backend..."
 docker-compose build backend
 
 echo ""
-echo "4️⃣  Démarrage de tous les services..."
-docker-compose up -d
+echo "4️⃣  Redémarrage du backend..."
+docker-compose up -d backend
 
 echo ""
-echo "5️⃣  Attente du démarrage (30 secondes)..."
-sleep 30
+echo "5️⃣  Attente que le backend soit prêt (10 secondes)..."
+sleep 10
 
 echo ""
-echo "======================================"
-echo "  ✅ Correction terminée"
-echo "======================================"
-echo ""
-echo "🌐 Testez maintenant :"
-echo "   http://localhost:3000"
-echo ""
-echo "📋 Vérifiez les logs :"
-echo "   docker-compose logs -f backend"
-echo ""
+echo "6️⃣  Création des utilisateurs de test..."
+docker exec novaclub-backend python create_test_users.py
+
+if [ $? -eq 0 ]; then
+    echo ""
+    echo "======================================"
+    echo "  ✅ SYSTÈME PRÊT!"
+    echo "======================================"
+    echo ""
+    echo "🌐 Connectez-vous sur: http://localhost:3000/login"
+    echo ""
+else
+    echo ""
+    echo "❌ Erreur lors de la création des utilisateurs"
+    echo "Vérifiez les logs: docker-compose logs -f backend"
+    exit 1
+fi

@@ -4,9 +4,9 @@ from app.models.base import BaseModel
 import enum
 
 class UserRole(str, enum.Enum):
-    ADMIN = "admin"
-    SECRETARY = "secretary"
-    COACH = "coach"
+    ADMIN = "ADMIN"
+    SECRETARY = "SECRETARY"
+    COACH = "COACH"
 
 class User(BaseModel):
     __tablename__ = "users"

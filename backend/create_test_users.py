@@ -73,7 +73,7 @@ def create_test_users():
             'first_name': 'Admin',
             'last_name': 'Principal',
             'phone': '+33123456789',
-            'role': 'admin'
+            'role': 'ADMIN'
         })
         print("✅ Admin créé: admin@club.com / password123")
 
@@ -105,7 +105,7 @@ def create_test_users():
             'first_name': 'Marie',
             'last_name': 'Dupont',
             'phone': '+33123456788',
-            'role': 'secretary'
+            'role': 'SECRETARY'
         })
         print("✅ Secrétaire créée: secretaire@club.com / password123")
 
@@ -137,7 +137,7 @@ def create_test_users():
             'first_name': 'Pierre',
             'last_name': 'Martin',
             'phone': '+33123456787',
-            'role': 'coach'
+            'role': 'COACH'
         })
         print("✅ Coach créé: coach@club.com / password123")
 
