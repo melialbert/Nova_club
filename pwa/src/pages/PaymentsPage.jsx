@@ -170,9 +170,25 @@ function PaymentsPage() {
 
   const printInvoice = (payment) => {
     const member = members.find(m => m.id === payment.member_id);
-    if (!member) return;
+    if (!member) {
+      error('Adhérent introuvable');
+      return;
+    }
+
+    if (!clubSettings) {
+      error('Paramètres du club non chargés');
+      return;
+    }
+
+    const paymentMethodLabel = getPaymentMethodLabel(payment.payment_method);
+    const paymentTypeLabel = getPaymentTypeLabel(payment.payment_type);
 
     const invoiceWindow = window.open('', '_blank');
+    if (!invoiceWindow) {
+      error('Impossible d\'ouvrir la fenêtre d\'impression. Vérifiez que les popups ne sont pas bloquées.');
+      return;
+    }
+
     const invoiceContent = `
       <!DOCTYPE html>
       <html>
@@ -344,12 +360,12 @@ function PaymentsPage() {
         <div class="invoice-container">
           <div class="header">
             <div class="logo-section">
-              ${clubSettings?.logo ? `<img src="${clubSettings.logo}" alt="Logo" class="logo" />` : ''}
+              ${clubSettings.logo ? `<img src="${clubSettings.logo}" alt="Logo" class="logo" />` : ''}
               <div>
-                <div class="club-name">${clubSettings?.club_name || 'Club'}</div>
+                <div class="club-name">${clubSettings.club_name || 'Club'}</div>
                 <div class="club-info">
-                  ${clubSettings?.city || ''}
-                  ${clubSettings?.slogan ? `<br>${clubSettings.slogan}` : ''}
+                  ${clubSettings.city || ''}
+                  ${clubSettings.slogan ? `<br>${clubSettings.slogan}` : ''}
                 </div>
               </div>
             </div>
@@ -376,7 +392,7 @@ function PaymentsPage() {
                   month: 'long',
                   year: 'numeric'
                 })}<br>
-                <strong>Méthode:</strong> ${getPaymentMethodLabel(payment.payment_method)}<br>
+                <strong>Méthode:</strong> ${paymentMethodLabel}<br>
                 <strong>Statut:</strong> <span style="color: #10b981; font-weight: 600;">Payé</span>
               </p>
             </div>
@@ -393,7 +409,7 @@ function PaymentsPage() {
             <tbody>
               <tr>
                 <td>
-                  <strong>${getPaymentTypeLabel(payment.payment_type)}</strong>
+                  <strong>${paymentTypeLabel}</strong>
                 </td>
                 <td>
                   ${payment.month_year ? new Date(payment.month_year + '-01').toLocaleDateString('fr-FR', {
