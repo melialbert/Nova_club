@@ -1,5 +1,6 @@
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 const { app } = require('electron');
 const bcrypt = require('bcryptjs');
 
@@ -16,6 +17,12 @@ function getDbPath() {
 function initDatabase() {
   const dbPath = getDbPath();
   console.log('Database path:', dbPath);
+
+  const dbDir = path.dirname(dbPath);
+  if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+    console.log('Created database directory:', dbDir);
+  }
 
   db = new Database(dbPath);
   db.pragma('journal_mode = WAL');
