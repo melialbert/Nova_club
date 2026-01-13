@@ -227,13 +227,6 @@ function Layout({ children }) {
               }}>
                 {menuItems.find(item => item.path === location.pathname)?.label || 'NovaClub'}
               </h1>
-              <p style={{
-                fontSize: '14px',
-                color: '#64748b',
-                margin: '4px 0 0 0'
-              }}>
-                {user?.club_id && `Club ID: ${user.club_id}`}
-              </p>
             </div>
             <div style={{
               display: 'flex',
