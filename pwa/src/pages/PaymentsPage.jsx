@@ -335,15 +335,15 @@ function PaymentsPage() {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            font-size: 12px;
-            color: #9ca3af;
+            gap: 12px;
+            font-size: 13px;
+            color: #6b7280;
           }
           .powered-logo {
-            max-width: 100px;
-            max-height: 40px;
+            max-width: 180px;
+            max-height: 60px;
             object-fit: contain;
-            opacity: 0.7;
+            opacity: 1;
           }
           .notes {
             margin-top: 30px;
