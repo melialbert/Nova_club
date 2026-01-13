@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { register } from '../services/api';
+import { register, getCurrentUser } from '../services/api';
 import { useAuthStore } from '../utils/store';
+import { useToast } from '../utils/useToast';
+import { ToastContainer } from '../components/Toast';
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -16,6 +18,7 @@ function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { setUser } = useAuthStore();
+  const toast = useToast();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,17 +31,24 @@ function RegisterPage() {
 
     try {
       await register(formData);
-      navigate('/dashboard');
+      const user = await getCurrentUser();
+      setUser(user);
+      toast.success('Inscription réussie ! Bienvenue sur NovaClub.');
+      setTimeout(() => navigate('/dashboard'), 1500);
     } catch (err) {
-      setError(err.message || 'Erreur lors de l\'inscription');
+      const errorMessage = err.message || 'Erreur lors de l\'inscription';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container" style={{ maxWidth: '500px', marginTop: '50px' }}>
-      <div className="card">
+    <>
+      <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
+      <div className="container" style={{ maxWidth: '500px', marginTop: '50px' }}>
+        <div className="card">
         <h1 style={{ textAlign: 'center', marginBottom: '32px', color: '#1976d2' }}>NovaClub</h1>
         <h2 style={{ marginBottom: '24px' }}>Créer un compte</h2>
 
@@ -126,7 +136,8 @@ function RegisterPage() {
           <Link to="/login" style={{ color: '#1976d2' }}>Déjà un compte ? Se connecter</Link>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 

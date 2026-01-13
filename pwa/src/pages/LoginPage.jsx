@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { login, getCurrentUser } from '../services/api';
 import { useAuthStore } from '../utils/store';
 import { startSync } from '../services/syncService';
+import { useToast } from '../utils/useToast';
+import { ToastContainer } from '../components/Toast';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -11,6 +13,7 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { setUser } = useAuthStore();
+  const toast = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,18 +25,23 @@ function LoginPage() {
       const user = await getCurrentUser();
       setUser(user);
       startSync();
-      navigate('/dashboard');
+      toast.success(`Bienvenue ${user.first_name} !`);
+      setTimeout(() => navigate('/dashboard'), 1000);
     } catch (err) {
-      setError(err.message || 'Erreur de connexion');
+      const errorMessage = err.message || 'Erreur de connexion';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container" style={{ maxWidth: '400px', marginTop: '100px' }}>
-      <div className="card">
-        <h1 style={{ textAlign: 'center', marginBottom: '32px', color: '#1976d2' }}>NovaClub</h1>
+    <>
+      <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
+      <div className="container" style={{ maxWidth: '400px', marginTop: '100px' }}>
+        <div className="card">
+          <h1 style={{ textAlign: 'center', marginBottom: '32px', color: '#1976d2' }}>NovaClub</h1>
         <h2 style={{ marginBottom: '24px' }}>Connexion</h2>
 
         {error && (
@@ -71,8 +79,9 @@ function LoginPage() {
         <div style={{ marginTop: '20px', textAlign: 'center' }}>
           <Link to="/register" style={{ color: '#1976d2' }}>Créer un compte</Link>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

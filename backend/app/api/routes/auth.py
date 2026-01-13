@@ -14,8 +14,13 @@ router = APIRouter()
 
 @router.post("/register", response_model=Token)
 def register(request: RegisterRequest, db: Session = Depends(get_db)):
+    import logging
+    logger = logging.getLogger(__name__)
+
+    logger.info(f"Registration attempt for email: {request.email}")
     existing_user = db.query(User).filter(User.email == request.email).first()
     if existing_user:
+        logger.warning(f"Email already exists: {request.email}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered"
@@ -29,10 +34,14 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
     db.add(new_club)
     db.flush()
 
+    logger.info(f"Hashing password for new user...")
+    hashed_pwd = get_password_hash(request.password)
+    logger.info(f"Password hashed successfully, length: {len(hashed_pwd)}")
+
     new_user = User(
         club_id=new_club.id,
         email=request.email,
-        hashed_password=get_password_hash(request.password),
+        hashed_password=hashed_pwd,
         first_name=request.first_name,
         last_name=request.last_name,
         phone=request.phone,
@@ -42,6 +51,8 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
+    logger.info(f"User created successfully: {new_user.email}")
 
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
@@ -57,15 +68,32 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
+    import logging
+    logger = logging.getLogger(__name__)
+
+    logger.info(f"Login attempt for email: {request.email}")
     user = db.query(User).filter(User.email == request.email).first()
 
-    if not user or not verify_password(request.password, user.hashed_password):
+    if not user:
+        logger.warning(f"User not found: {request.email}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password"
+        )
+
+    logger.info(f"User found: {user.email}, checking password...")
+    password_valid = verify_password(request.password, user.hashed_password)
+    logger.info(f"Password valid: {password_valid}")
+
+    if not password_valid:
+        logger.warning(f"Invalid password for user: {request.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password"
         )
 
     if not user.is_active:
+        logger.warning(f"Inactive user tried to login: {request.email}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="User account is inactive"

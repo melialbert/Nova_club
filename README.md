@@ -27,6 +27,18 @@ Ce script va :
 
 📖 **Guide détaillé** : [FIX_ERRORS.md](FIX_ERRORS.md)
 
+## 🔑 Problème de Connexion / Authentification
+
+**Vous ne pouvez pas vous connecter après l'inscription ?**
+
+→ [DEBUG_AUTH.md](DEBUG_AUTH.md)
+
+Ce guide contient :
+- Diagnostic étape par étape
+- Logs détaillés pour identifier le problème
+- Solutions rapides
+- Système de notifications élégantes
+
 ## 🌐 Accès via IP Locale (Réseau Local)
 
 **Vous voulez accéder à NovaClub depuis votre téléphone ou un autre appareil ?**
