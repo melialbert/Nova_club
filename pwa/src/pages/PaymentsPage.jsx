@@ -2,15 +2,18 @@ import { useEffect, useState } from 'react';
 import { getAllFromStore, addToStore } from '../db';
 import { queueChange } from '../services/syncService';
 import { usePaymentStore, useMemberStore, useTransactionStore } from '../utils/store';
+import { useToast } from '../utils/useToast';
 import Layout from '../components/Layout';
 
 function PaymentsPage() {
   const { payments, setPayments, addPayment } = usePaymentStore();
   const { members, setMembers } = useMemberStore();
   const { addTransaction } = useTransactionStore();
+  const { success } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
+  const [clubSettings, setClubSettings] = useState(null);
   const [formData, setFormData] = useState({
     member_id: '',
     amount: '',
@@ -28,8 +31,12 @@ function PaymentsPage() {
   const loadData = async () => {
     const paymentsData = await getAllFromStore('payments');
     const membersData = await getAllFromStore('members');
+    const settingsData = await getAllFromStore('settings');
     setPayments(paymentsData);
     setMembers(membersData);
+    if (settingsData.length > 0) {
+      setClubSettings(settingsData[0]);
+    }
   };
 
   const handleChange = (e) => {
@@ -128,6 +135,285 @@ function PaymentsPage() {
     monthly_fee: payments.filter(p => p.payment_type === 'monthly_fee').length,
     registration: payments.filter(p => p.payment_type === 'registration').length,
     equipment: payments.filter(p => p.payment_type === 'equipment').length,
+  };
+
+  const printInvoice = (payment) => {
+    const member = members.find(m => m.id === payment.member_id);
+    if (!member) return;
+
+    const invoiceWindow = window.open('', '_blank');
+    const invoiceContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Facture - ${member.first_name} ${member.last_name}</title>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px;
+            background: white;
+            color: #1f2937;
+          }
+          .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 40px;
+          }
+          .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #3b82f6;
+          }
+          .logo-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+          }
+          .logo {
+            max-width: 120px;
+            max-height: 120px;
+            object-fit: contain;
+          }
+          .club-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+          }
+          .club-info {
+            font-size: 14px;
+            color: #6b7280;
+          }
+          .invoice-title {
+            text-align: right;
+          }
+          .invoice-title h1 {
+            font-size: 32px;
+            color: #3b82f6;
+            font-weight: 700;
+            margin-bottom: 8px;
+          }
+          .invoice-number {
+            font-size: 14px;
+            color: #6b7280;
+          }
+          .info-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+          }
+          .info-block h3 {
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            font-weight: 600;
+          }
+          .info-block p {
+            font-size: 15px;
+            color: #1f2937;
+            line-height: 1.6;
+          }
+          .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+          }
+          .details-table th {
+            background: #f3f4f6;
+            padding: 16px;
+            text-align: left;
+            font-size: 13px;
+            color: #374151;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          .details-table td {
+            padding: 20px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 15px;
+            color: #1f2937;
+          }
+          .details-table tr:last-child td {
+            border-bottom: none;
+          }
+          .total-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 30px;
+          }
+          .total-box {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            padding: 24px 40px;
+            border-radius: 12px;
+            min-width: 300px;
+          }
+          .total-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+          }
+          .total-amount {
+            font-size: 36px;
+            font-weight: 700;
+          }
+          .footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #e5e7eb;
+            text-align: center;
+            color: #6b7280;
+            font-size: 13px;
+          }
+          .notes {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+          }
+          .notes h4 {
+            font-size: 13px;
+            color: #374151;
+            margin-bottom: 8px;
+            font-weight: 600;
+          }
+          .notes p {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+          }
+          @media print {
+            body {
+              padding: 0;
+            }
+            .invoice-container {
+              border: none;
+              padding: 20px;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="invoice-container">
+          <div class="header">
+            <div class="logo-section">
+              ${clubSettings?.logo ? `<img src="${clubSettings.logo}" alt="Logo" class="logo" />` : ''}
+              <div>
+                <div class="club-name">${clubSettings?.club_name || 'Club'}</div>
+                <div class="club-info">
+                  ${clubSettings?.city || ''}
+                  ${clubSettings?.slogan ? `<br>${clubSettings.slogan}` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="invoice-title">
+              <h1>FACTURE</h1>
+              <div class="invoice-number">N° ${payment.id.slice(0, 8).toUpperCase()}</div>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <div class="info-block">
+              <h3>Facturé à</h3>
+              <p>
+                <strong>${member.first_name} ${member.last_name}</strong><br>
+                ${member.email || ''}<br>
+                ${member.phone || ''}
+              </p>
+            </div>
+            <div class="info-block">
+              <h3>Informations de paiement</h3>
+              <p>
+                <strong>Date:</strong> ${new Date(payment.payment_date).toLocaleDateString('fr-FR', {
+                  day: '2-digit',
+                  month: 'long',
+                  year: 'numeric'
+                })}<br>
+                <strong>Méthode:</strong> ${getPaymentMethodLabel(payment.payment_method)}<br>
+                <strong>Statut:</strong> <span style="color: #10b981; font-weight: 600;">Payé</span>
+              </p>
+            </div>
+          </div>
+
+          <table class="details-table">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Période</th>
+                <th style="text-align: right;">Montant</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>${getPaymentTypeLabel(payment.payment_type)}</strong>
+                </td>
+                <td>
+                  ${payment.month_year ? new Date(payment.month_year + '-01').toLocaleDateString('fr-FR', {
+                    month: 'long',
+                    year: 'numeric'
+                  }) : '-'}
+                </td>
+                <td style="text-align: right; font-weight: 700;">
+                  ${parseFloat(payment.amount).toLocaleString()} FCFA
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          ${payment.notes ? `
+            <div class="notes">
+              <h4>Notes</h4>
+              <p>${payment.notes}</p>
+            </div>
+          ` : ''}
+
+          <div class="total-section">
+            <div class="total-box">
+              <div class="total-label">MONTANT TOTAL</div>
+              <div class="total-amount">${parseFloat(payment.amount).toLocaleString()} FCFA</div>
+            </div>
+          </div>
+
+          <div class="footer">
+            <p>Merci pour votre paiement</p>
+            <p style="margin-top: 8px;">Cette facture a été générée le ${new Date().toLocaleDateString('fr-FR', {
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric'
+            })}</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    invoiceWindow.document.write(invoiceContent);
+    invoiceWindow.document.close();
+
+    invoiceWindow.onload = () => {
+      setTimeout(() => {
+        invoiceWindow.print();
+      }, 250);
+    };
+
+    success('Facture générée avec succès');
   };
 
   return (
@@ -407,6 +693,29 @@ function PaymentsPage() {
                         </td>
                         <td>
                           <div style={{ display: 'flex', gap: '8px' }}>
+                            <button
+                              onClick={() => printInvoice(payment)}
+                              style={{
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                border: '1px solid #e2e8f0',
+                                backgroundColor: 'white',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                transition: 'all 0.2s'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = '#f0fdf4';
+                                e.target.style.borderColor = '#10b981';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = 'white';
+                                e.target.style.borderColor = '#e2e8f0';
+                              }}
+                              title="Imprimer la facture"
+                            >
+                              🖨️
+                            </button>
                             <button
                               style={{
                                 padding: '6px 12px',
