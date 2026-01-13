@@ -1,6 +1,23 @@
 # Comptes de test
 
-Voici les comptes de test créés dans la base de données :
+## 🚀 Comment créer les utilisateurs de test
+
+Après avoir démarré l'application avec `./start.sh` (ou `start.bat`), exécutez :
+
+```bash
+./creer-utilisateurs.sh
+```
+
+Ou sur Windows :
+```cmd
+creer-utilisateurs.bat
+```
+
+Ce script va insérer automatiquement les 3 utilisateurs de test dans votre base de données PostgreSQL locale.
+
+---
+
+## 📝 Comptes disponibles
 
 ## Admin
 - **Email:** admin@club.com
