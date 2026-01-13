@@ -77,9 +77,8 @@ function MembersPage() {
             type: 'income',
             category: 'equipment_sale',
             amount: totalAmount,
-            date: new Date().toISOString().split('T')[0],
-            description: `Vente kimono - ${kimonoData.size}cm (x${kimonoData.quantity}) - ${formData.first_name} ${formData.last_name}`,
-            member_id: newMember.id
+            transaction_date: new Date().toISOString().split('T')[0],
+            description: `Vente kimono - ${kimonoData.size}cm (x${kimonoData.quantity}) - ${formData.first_name} ${formData.last_name}`
           };
 
           await api.createTransaction(kimonoTransaction);
