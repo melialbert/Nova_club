@@ -8,7 +8,7 @@ class Club(BaseModel):
     name = Column(String(200), nullable=False)
     city = Column(String(100), nullable=True)
     slogan = Column(String(500), nullable=True)
-    logo_url = Column(String(500), nullable=True)
+    logo_url = Column(Text, nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
 
     users = relationship("User", back_populates="club", cascade="all, delete-orphan")
