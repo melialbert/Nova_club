@@ -31,6 +31,7 @@ function initDatabase() {
   migrateMembersTable();
   migrateBeltPromotionsTable();
   migratePaymentsTable();
+  migrateLicensesTable();
   createDefaultData();
 
   return db;
@@ -98,6 +99,34 @@ function migratePaymentsTable() {
     }
   } catch (error) {
     console.log('payments table does not exist yet, will be created');
+  }
+}
+
+function migrateLicensesTable() {
+  try {
+    const columns = db.pragma("table_info(licenses)").map(col => col.name);
+
+    if (!columns.includes('federation')) {
+      db.exec("ALTER TABLE licenses ADD COLUMN federation TEXT DEFAULT 'FECAJUDO'");
+      console.log('Added federation column to licenses table');
+    }
+
+    if (!columns.includes('season')) {
+      db.exec("ALTER TABLE licenses ADD COLUMN season TEXT");
+      console.log('Added season column to licenses table');
+    }
+
+    if (!columns.includes('photo')) {
+      db.exec("ALTER TABLE licenses ADD COLUMN photo TEXT");
+      console.log('Added photo column to licenses table');
+    }
+
+    if (!columns.includes('notes')) {
+      db.exec("ALTER TABLE licenses ADD COLUMN notes TEXT");
+      console.log('Added notes column to licenses table');
+    }
+  } catch (error) {
+    console.log('licenses table does not exist yet, will be created');
   }
 }
 
@@ -184,7 +213,11 @@ function createTables() {
       license_number TEXT UNIQUE,
       issue_date DATE,
       expiry_date DATE,
+      federation TEXT DEFAULT 'FECAJUDO',
+      season TEXT,
+      photo TEXT,
       status TEXT DEFAULT 'active',
+      notes TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (member_id) REFERENCES members(id),
       FOREIGN KEY (club_id) REFERENCES clubs(id)

@@ -24,12 +24,12 @@ router.get('/', authenticate, (req, res) => {
 router.post('/', authenticate, (req, res) => {
   try {
     const db = getDb();
-    const { member_id, license_number, issue_date, expiry_date, status } = req.body;
+    const { member_id, license_number, issue_date, expiry_date, federation, season, photo, status, notes } = req.body;
 
     const result = db.prepare(`
-      INSERT INTO licenses (club_id, member_id, license_number, issue_date, expiry_date, status)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `).run(req.clubId, member_id, license_number, issue_date, expiry_date, status || 'active');
+      INSERT INTO licenses (club_id, member_id, license_number, issue_date, expiry_date, federation, season, photo, status, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(req.clubId, member_id, license_number, issue_date, expiry_date, federation || 'FECAJUDO', season, photo, status || 'active', notes);
 
     const license = db.prepare('SELECT * FROM licenses WHERE id = ?').get(result.lastInsertRowid);
     res.status(201).json(license);
@@ -42,13 +42,13 @@ router.post('/', authenticate, (req, res) => {
 router.put('/:id', authenticate, (req, res) => {
   try {
     const db = getDb();
-    const { license_number, issue_date, expiry_date, status } = req.body;
+    const { license_number, issue_date, expiry_date, federation, season, photo, status, notes } = req.body;
 
     db.prepare(`
       UPDATE licenses
-      SET license_number = ?, issue_date = ?, expiry_date = ?, status = ?
+      SET license_number = ?, issue_date = ?, expiry_date = ?, federation = ?, season = ?, photo = ?, status = ?, notes = ?
       WHERE id = ? AND club_id = ?
-    `).run(license_number, issue_date, expiry_date, status, req.params.id, req.clubId);
+    `).run(license_number, issue_date, expiry_date, federation, season, photo, status, notes, req.params.id, req.clubId);
 
     const license = db.prepare('SELECT * FROM licenses WHERE id = ?').get(req.params.id);
     res.json(license);
