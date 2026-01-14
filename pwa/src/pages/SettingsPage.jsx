@@ -84,44 +84,6 @@ function SettingsPage() {
     setFormData({ ...formData, logo: '' });
   };
 
-  const handleResetDatabase = async () => {
-    const confirmation = window.confirm(
-      'ATTENTION !\n\n' +
-      'Cette action va SUPPRIMER TOUTES les donnees locales :\n' +
-      '- Tous les adherents\n' +
-      '- Tous les paiements\n' +
-      '- Toutes les presences\n' +
-      '- Toutes les licences\n' +
-      '- Tous les employes\n' +
-      '- Toutes les transactions\n\n' +
-      'Cette action est IRREVERSIBLE !\n\n' +
-      'Etes-vous sur de vouloir continuer ?'
-    );
-
-    if (!confirmation) return;
-
-    const doubleConfirmation = window.confirm(
-      'DERNIERE CONFIRMATION !\n\n' +
-      'Tapez OK pour confirmer la suppression DEFINITIVE de toutes les donnees.'
-    );
-
-    if (!doubleConfirmation) return;
-
-    try {
-      const dbName = 'novaclub_db';
-
-      indexedDB.deleteDatabase(dbName);
-
-      success('Base de donnees reinitialise !');
-
-      setTimeout(() => {
-        window.location.href = '/login';
-      }, 1500);
-    } catch (err) {
-      console.error('Erreur lors de la reinitialisation:', err);
-      error('Erreur lors de la reinitialisation');
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -334,42 +296,6 @@ function SettingsPage() {
             </button>
           </div>
         </form>
-
-        <div className="card" style={{ marginTop: '24px', border: '2px solid #fee2e2' }}>
-          <div className="card-header" style={{ backgroundColor: '#fee2e2', borderBottom: '2px solid #fecaca' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#991b1b', margin: 0 }}>
-              Zone dangereuse
-            </h2>
-          </div>
-          <div className="card-content">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', padding: '20px', backgroundColor: '#fef2f2', borderRadius: '12px' }}>
-              <div style={{ flex: 1 }}>
-                <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#991b1b', marginBottom: '8px' }}>
-                  Reinitialiser toutes les donnees
-                </h3>
-                <p style={{ fontSize: '14px', color: '#7f1d1d', lineHeight: '1.5', margin: 0 }}>
-                  Cette action supprimera TOUTES les donnees locales de l'application (adherents, paiements, presences, etc.).
-                  Cette action est IRREVERSIBLE !
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleResetDatabase}
-                className="btn"
-                style={{
-                  backgroundColor: '#dc2626',
-                  color: 'white',
-                  fontSize: '14px',
-                  padding: '12px 24px',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                <span>🗑️</span>
-                <span>Reinitialiser</span>
-              </button>
-            </div>
-          </div>
-        </div>
       </div>
     </Layout>
   );
