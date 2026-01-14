@@ -45,7 +45,7 @@ function AccountingPage() {
             Revenus
           </div>
           <div style={{ fontSize: '28px', fontWeight: '700', color: '#10b981' }}>
-            {income.toFixed(2)} FCFA
+            {Math.round(income).toLocaleString()} FCFA
           </div>
         </div>
         <div style={{
@@ -58,7 +58,7 @@ function AccountingPage() {
             Dépenses
           </div>
           <div style={{ fontSize: '28px', fontWeight: '700', color: '#ef4444' }}>
-            {expense.toFixed(2)} FCFA
+            {Math.round(expense).toLocaleString()} FCFA
           </div>
         </div>
         <div style={{
@@ -75,7 +75,7 @@ function AccountingPage() {
             fontWeight: '700',
             color: balance >= 0 ? '#10b981' : '#ef4444'
           }}>
-            {balance.toFixed(2)} FCFA
+            {Math.round(balance).toLocaleString()} FCFA
           </div>
         </div>
       </div>
@@ -119,7 +119,7 @@ function AccountingPage() {
                   fontWeight: '600',
                   color: transaction.type === 'income' ? '#10b981' : '#ef4444'
                 }}>
-                  {parseFloat(transaction.amount).toFixed(2)} FCFA
+                  {Math.round(parseFloat(transaction.amount)).toLocaleString()} FCFA
                 </td>
                 <td style={{ padding: '16px', fontSize: '14px', color: '#64748b' }}>
                   {new Date(transaction.transaction_date).toLocaleDateString()}

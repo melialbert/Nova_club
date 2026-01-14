@@ -50,7 +50,7 @@ function DashboardPage() {
     },
     {
       label: 'Revenus Totaux',
-      value: `${stats.totalPayments.toFixed(2)} FCFA`,
+      value: `${Math.round(stats.totalPayments).toLocaleString()} FCFA`,
       icon: '💰',
       color: '#f59e0b',
       bgColor: 'rgba(245, 158, 11, 0.1)',
