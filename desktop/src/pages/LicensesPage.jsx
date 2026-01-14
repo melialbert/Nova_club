@@ -83,17 +83,17 @@ function LicensesPage() {
   const handleEdit = (license) => {
     setEditingLicense(license);
     setFormData({
-      member_id: license.member_id,
-      license_number: license.license_number,
-      issue_date: license.issue_date,
-      expiry_date: license.expiry_date,
-      federation: license.federation,
-      season: license.season,
-      photo: license.photo,
-      status: license.status,
+      member_id: license.member_id || '',
+      license_number: license.license_number || '',
+      issue_date: license.issue_date || new Date().toISOString().split('T')[0],
+      expiry_date: license.expiry_date || '',
+      federation: license.federation || 'FECAJUDO',
+      season: license.season || (new Date().getFullYear() + '-' + (new Date().getFullYear() + 1)),
+      photo: license.photo || '',
+      status: license.status || 'active',
       notes: license.notes || ''
     });
-    setPhotoPreview(license.photo);
+    setPhotoPreview(license.photo || null);
     setShowForm(true);
   };
 

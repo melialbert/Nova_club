@@ -146,6 +146,27 @@ export const api = {
     return response.json();
   },
 
+  async updateLicense(id, licenseData) {
+    const response = await fetch(`${API_URL}/licenses/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(licenseData),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la mise à jour de la licence');
+    return response.json();
+  },
+
+  async deleteLicense(id) {
+    const response = await fetch(`${API_URL}/licenses/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la suppression de la licence');
+    return response.json();
+  },
+
   async getEmployees() {
     const response = await fetch(`${API_URL}/employees`, {
       headers: getHeaders(),
@@ -204,6 +225,10 @@ export const api = {
 
     if (!response.ok) throw new Error('Erreur lors de la mise à jour du club');
     return response.json();
+  },
+
+  async getClubInfo() {
+    return this.getClub();
   },
 
   async getCompetitions() {
