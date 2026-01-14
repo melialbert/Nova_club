@@ -1,6 +1,8 @@
 const express = require('express');
 const { getDb } = require('../database');
 const { authenticate } = require('../middleware/auth');
+const fs = require('fs');
+const path = require('path');
 
 const router = express.Router();
 
@@ -36,6 +38,44 @@ router.put('/', authenticate, (req, res) => {
   } catch (error) {
     console.error('Update club error:', error);
     res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+router.post('/reset-database', authenticate, (req, res) => {
+  try {
+    const db = getDb();
+
+    db.close();
+
+    const dbPath = path.join(__dirname, '../../../data/club_management.db');
+
+    if (fs.existsSync(dbPath)) {
+      fs.unlinkSync(dbPath);
+      console.log('Base de donnees supprimee:', dbPath);
+    }
+
+    const dbShmPath = `${dbPath}-shm`;
+    const dbWalPath = `${dbPath}-wal`;
+
+    if (fs.existsSync(dbShmPath)) {
+      fs.unlinkSync(dbShmPath);
+    }
+
+    if (fs.existsSync(dbWalPath)) {
+      fs.unlinkSync(dbWalPath);
+    }
+
+    res.json({
+      success: true,
+      message: 'Base de donnees reinitialise avec succes'
+    });
+
+    setTimeout(() => {
+      process.exit(0);
+    }, 500);
+  } catch (error) {
+    console.error('Reset database error:', error);
+    res.status(500).json({ error: 'Erreur lors de la reinitialisation' });
   }
 });
 

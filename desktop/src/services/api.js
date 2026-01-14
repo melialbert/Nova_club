@@ -412,4 +412,14 @@ export const api = {
     if (!response.ok) throw new Error('Erreur lors de la récupération des statistiques');
     return response.json();
   },
+
+  async resetDatabase() {
+    const response = await fetch(`${API_URL}/club/reset-database`, {
+      method: 'POST',
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la réinitialisation de la base de données');
+    return response.json();
+  },
 };
