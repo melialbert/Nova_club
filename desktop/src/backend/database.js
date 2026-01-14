@@ -32,6 +32,7 @@ function initDatabase() {
   migrateBeltPromotionsTable();
   migratePaymentsTable();
   migrateLicensesTable();
+  migrateClubsTable();
   createDefaultData();
 
   return db;
@@ -127,6 +128,24 @@ function migrateLicensesTable() {
     }
   } catch (error) {
     console.log('licenses table does not exist yet, will be created');
+  }
+}
+
+function migrateClubsTable() {
+  try {
+    const columns = db.pragma("table_info(clubs)").map(col => col.name);
+
+    if (!columns.includes('city')) {
+      db.exec("ALTER TABLE clubs ADD COLUMN city TEXT");
+      console.log('Added city column to clubs table');
+    }
+
+    if (!columns.includes('slogan')) {
+      db.exec("ALTER TABLE clubs ADD COLUMN slogan TEXT");
+      console.log('Added slogan column to clubs table');
+    }
+  } catch (error) {
+    console.log('clubs table does not exist yet, will be created');
   }
 }
 
