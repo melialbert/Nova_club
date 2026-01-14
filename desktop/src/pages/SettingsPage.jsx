@@ -379,6 +379,56 @@ function SettingsPage() {
           </div>
         )}
 
+        <div className="card" style={{
+          marginBottom: '24px',
+          background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+          border: '2px solid #bbf7d0'
+        }}>
+          <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '24px' }}>🌐</span>
+            {t('settings.language')}
+          </h2>
+
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            background: 'white',
+            padding: '20px',
+            borderRadius: '12px',
+            border: '2px solid #bbf7d0'
+          }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '15px', fontWeight: '600', color: '#0f172a', marginBottom: '8px' }}>
+                Langue de l'interface / Interface Language
+              </div>
+              <div style={{ fontSize: '13px', color: '#64748b' }}>
+                Choisissez la langue de l'application
+              </div>
+            </div>
+
+            <select
+              value={language}
+              onChange={(e) => changeLanguage(e.target.value)}
+              style={{
+                padding: '12px 16px',
+                border: '2px solid #e2e8f0',
+                borderRadius: '10px',
+                fontSize: '15px',
+                color: '#0f172a',
+                backgroundColor: 'white',
+                cursor: 'pointer',
+                fontWeight: '600',
+                minWidth: '150px',
+                transition: 'all 0.2s'
+              }}
+            >
+              <option value="fr">Français</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+        </div>
+
         <div style={{
           display: 'flex',
           gap: '12px',

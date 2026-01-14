@@ -55,33 +55,6 @@ router.put('/', authenticate, (req, res) => {
   }
 });
 
-router.post('/fix-language-column', authenticate, (req, res) => {
-  try {
-    const db = getDb();
-
-    // Vérifier si la colonne existe
-    const columns = db.pragma("table_info(clubs)").map(col => col.name);
-
-    if (!columns.includes('language')) {
-      db.exec("ALTER TABLE clubs ADD COLUMN language TEXT DEFAULT 'fr'");
-      console.log('✓ Colonne language ajoutée avec succès!');
-      res.json({
-        success: true,
-        message: 'Colonne language ajoutée avec succès'
-      });
-    } else {
-      console.log('✓ La colonne language existe déjà');
-      res.json({
-        success: true,
-        message: 'La colonne language existe déjà'
-      });
-    }
-  } catch (error) {
-    console.error('Fix language column error:', error);
-    res.status(500).json({ error: 'Erreur lors de la correction' });
-  }
-});
-
 router.post('/reset-database', authenticate, (req, res) => {
   try {
     const db = getDb();
