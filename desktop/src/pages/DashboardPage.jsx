@@ -126,7 +126,7 @@ function DashboardPage() {
         });
 
       activities.sort((a, b) => b.date - a.date);
-      setRecentActivities(activities.slice(0, 10));
+      setRecentActivities(activities.slice(0, 5));
     } catch (error) {
       console.error('Error loading recent activities:', error);
     }
