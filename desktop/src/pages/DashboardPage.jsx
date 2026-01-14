@@ -2,6 +2,27 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 
+function formatRelativeTime(date) {
+  const now = new Date();
+  const diff = now - date;
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (days > 7) {
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  } else if (days > 0) {
+    return `Il y a ${days} jour${days > 1 ? 's' : ''}`;
+  } else if (hours > 0) {
+    return `Il y a ${hours} heure${hours > 1 ? 's' : ''}`;
+  } else if (minutes > 0) {
+    return `Il y a ${minutes} minute${minutes > 1 ? 's' : ''}`;
+  } else {
+    return 'À l\'instant';
+  }
+}
+
 function DashboardPage() {
   const [stats, setStats] = useState({
     totalMembers: 0,
@@ -9,9 +30,11 @@ function DashboardPage() {
     totalPayments: 0,
     pendingLicenses: 0
   });
+  const [recentActivities, setRecentActivities] = useState([]);
 
   useEffect(() => {
     loadStats();
+    loadRecentActivities();
   }, []);
 
   const loadStats = async () => {
@@ -28,6 +51,84 @@ function DashboardPage() {
       });
     } catch (error) {
       console.error('Error loading stats:', error);
+    }
+  };
+
+  const loadRecentActivities = async () => {
+    try {
+      const [members, payments, attendances, transactions] = await Promise.all([
+        api.getMembers(),
+        api.getPayments(),
+        api.getAttendances(),
+        api.getTransactions()
+      ]);
+
+      const activities = [];
+
+      members
+        .sort((a, b) => new Date(b.registration_date) - new Date(a.registration_date))
+        .slice(0, 3)
+        .forEach(member => {
+          activities.push({
+            type: 'member',
+            icon: '👤',
+            color: '#3b82f6',
+            bgColor: 'rgba(59, 130, 246, 0.1)',
+            title: 'Nouveau membre',
+            description: `${member.first_name} ${member.last_name} a rejoint le club`,
+            date: new Date(member.registration_date)
+          });
+        });
+
+      payments
+        .sort((a, b) => new Date(b.payment_date) - new Date(a.payment_date))
+        .slice(0, 3)
+        .forEach(payment => {
+          activities.push({
+            type: 'payment',
+            icon: '💰',
+            color: '#10b981',
+            bgColor: 'rgba(16, 185, 129, 0.1)',
+            title: 'Paiement reçu',
+            description: `${Math.round(payment.amount).toLocaleString()} FCFA - ${payment.payment_method || 'Non spécifié'}`,
+            date: new Date(payment.payment_date)
+          });
+        });
+
+      attendances
+        .sort((a, b) => new Date(b.attendance_date) - new Date(a.attendance_date))
+        .slice(0, 2)
+        .forEach(attendance => {
+          activities.push({
+            type: 'attendance',
+            icon: '✅',
+            color: '#f59e0b',
+            bgColor: 'rgba(245, 158, 11, 0.1)',
+            title: 'Présence enregistrée',
+            description: `Séance du ${new Date(attendance.attendance_date).toLocaleDateString('fr-FR')}`,
+            date: new Date(attendance.attendance_date)
+          });
+        });
+
+      transactions
+        .sort((a, b) => new Date(b.transaction_date) - new Date(a.transaction_date))
+        .slice(0, 3)
+        .forEach(transaction => {
+          activities.push({
+            type: transaction.type,
+            icon: transaction.type === 'income' ? '📈' : '📉',
+            color: transaction.type === 'income' ? '#10b981' : '#ef4444',
+            bgColor: transaction.type === 'income' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+            title: transaction.type === 'income' ? 'Revenu' : 'Dépense',
+            description: `${transaction.category} - ${Math.round(transaction.amount).toLocaleString()} FCFA`,
+            date: new Date(transaction.transaction_date)
+          });
+        });
+
+      activities.sort((a, b) => b.date - a.date);
+      setRecentActivities(activities.slice(0, 10));
+    } catch (error) {
+      console.error('Error loading recent activities:', error);
     }
   };
 
@@ -204,19 +305,92 @@ function DashboardPage() {
           </h2>
         </div>
 
-        <div style={{
-          padding: '32px',
-          textAlign: 'center',
-          color: '#64748b'
-        }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>📈</div>
-          <p style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
-            Aucune activité récente
-          </p>
-          <p style={{ fontSize: '14px', margin: 0 }}>
-            Les activités récentes apparaîtront ici
-          </p>
-        </div>
+        {recentActivities.length === 0 ? (
+          <div style={{
+            padding: '32px',
+            textAlign: 'center',
+            color: '#64748b'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📈</div>
+            <p style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>
+              Aucune activité récente
+            </p>
+            <p style={{ fontSize: '14px', margin: 0 }}>
+              Les activités récentes apparaîtront ici
+            </p>
+          </div>
+        ) : (
+          <div style={{ padding: '8px' }}>
+            {recentActivities.map((activity, index) => (
+              <div
+                key={index}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '16px',
+                  borderRadius: '8px',
+                  marginBottom: '8px',
+                  backgroundColor: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f1f5f9';
+                  e.currentTarget.style.borderColor = activity.color;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8fafc';
+                  e.currentTarget.style.borderColor = '#e2e8f0';
+                }}
+              >
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '12px',
+                    backgroundColor: activity.bgColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '24px',
+                    marginRight: '16px',
+                    flexShrink: 0
+                  }}
+                >
+                  {activity.icon}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: '#1e293b',
+                    marginBottom: '4px'
+                  }}>
+                    {activity.title}
+                  </div>
+                  <div style={{
+                    fontSize: '13px',
+                    color: '#64748b',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    {activity.description}
+                  </div>
+                </div>
+                <div style={{
+                  fontSize: '12px',
+                  color: '#94a3b8',
+                  marginLeft: '16px',
+                  flexShrink: 0,
+                  textAlign: 'right'
+                }}>
+                  {formatRelativeTime(activity.date)}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
