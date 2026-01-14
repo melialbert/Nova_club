@@ -326,6 +326,8 @@ function BeltPromotionsPage() {
             font-weight: 700;
             font-size: 16px;
             border: 2px solid #e2e8f0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
 
           .belt-count {
@@ -367,6 +369,8 @@ function BeltPromotionsPage() {
             font-size: 12px;
             font-weight: 600;
             border: 1px solid #e2e8f0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
           }
 
           .result-checkbox {
@@ -482,7 +486,12 @@ function BeltPromotionsPage() {
         }).join('')}
 
         <div class="footer">
-          Document généré le ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })} à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+          <div style="margin-bottom: 8px;">
+            Document généré le ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })} à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+          </div>
+          <div style="font-weight: 600; color: #475569;">
+            Propulsé par JudoClub Manager
+          </div>
         </div>
       </body>
       </html>
