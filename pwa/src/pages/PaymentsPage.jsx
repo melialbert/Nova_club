@@ -17,6 +17,9 @@ function PaymentsPage() {
   const [clubSettings, setClubSettings] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState(null);
+  const [displayLimit, setDisplayLimit] = useState(15);
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
   const [formData, setFormData] = useState({
     member_id: '',
     amount: '',
@@ -133,8 +136,15 @@ function PaymentsPage() {
     const matchesSearch = memberName.includes(searchTerm.toLowerCase()) ||
       getPaymentTypeLabel(payment.payment_type).toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterType === 'all' || payment.payment_type === filterType;
-    return matchesSearch && matchesFilter;
-  });
+
+    const paymentDate = new Date(payment.payment_date);
+    const matchesDateFrom = !dateFrom || paymentDate >= new Date(dateFrom);
+    const matchesDateTo = !dateTo || paymentDate <= new Date(dateTo);
+
+    return matchesSearch && matchesFilter && matchesDateFrom && matchesDateTo;
+  }).sort((a, b) => new Date(b.payment_date) - new Date(a.payment_date));
+
+  const displayedPayments = filteredPayments.slice(0, displayLimit);
 
   const totalAmount = filteredPayments.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0);
   const currentMonth = new Date().toISOString().slice(0, 7);
@@ -645,10 +655,15 @@ function PaymentsPage() {
         )}
 
         <div className="card">
-          <div className="card-header">
-            <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
-              💳 Historique des paiements
-            </h2>
+          <div className="card-header" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
+                💳 Historique des paiements
+              </h2>
+              <div style={{ fontSize: '14px', color: '#64748b' }}>
+                {displayedPayments.length} sur {filteredPayments.length} affichés
+              </div>
+            </div>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
               <select
                 value={filterType}
@@ -669,6 +684,36 @@ function PaymentsPage() {
                 <option value="other">Autres</option>
               </select>
               <input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                placeholder="Du..."
+                style={{
+                  padding: '10px 16px',
+                  border: '2px solid #e2e8f0',
+                  borderRadius: '10px',
+                  fontSize: '14px',
+                  backgroundColor: '#f8fafc',
+                  cursor: 'pointer'
+                }}
+                title="Date de début"
+              />
+              <input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                placeholder="Au..."
+                style={{
+                  padding: '10px 16px',
+                  border: '2px solid #e2e8f0',
+                  borderRadius: '10px',
+                  fontSize: '14px',
+                  backgroundColor: '#f8fafc',
+                  cursor: 'pointer'
+                }}
+                title="Date de fin"
+              />
+              <input
                 type="text"
                 placeholder="Rechercher un paiement..."
                 className="search-input"
@@ -677,9 +722,50 @@ function PaymentsPage() {
                 style={{ maxWidth: '300px' }}
               />
             </div>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setDisplayLimit(Math.max(15, displayLimit - 15))}
+                disabled={displayLimit <= 15}
+                style={{
+                  padding: '8px 16px',
+                  opacity: displayLimit <= 15 ? 0.5 : 1,
+                  cursor: displayLimit <= 15 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                Voir - 15
+              </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setDisplayLimit(displayLimit + 15)}
+                disabled={displayLimit >= filteredPayments.length}
+                style={{
+                  padding: '8px 16px',
+                  opacity: displayLimit >= filteredPayments.length ? 0.5 : 1,
+                  cursor: displayLimit >= filteredPayments.length ? 'not-allowed' : 'pointer'
+                }}
+              >
+                Voir + 15
+              </button>
+              {(dateFrom || dateTo || searchTerm || filterType !== 'all') && (
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => {
+                    setDateFrom('');
+                    setDateTo('');
+                    setSearchTerm('');
+                    setFilterType('all');
+                    setDisplayLimit(15);
+                  }}
+                  style={{ padding: '8px 16px' }}
+                >
+                  ✕ Réinitialiser
+                </button>
+              )}
+            </div>
           </div>
 
-          {filteredPayments.length > 0 ? (
+          {displayedPayments.length > 0 ? (
             <div className="table-container">
               <table className="table">
                 <thead>
@@ -695,7 +781,7 @@ function PaymentsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredPayments.map(payment => {
+                  {displayedPayments.map(payment => {
                     const member = members.find(m => m.id === payment.member_id);
                     return (
                       <tr key={payment.id}>
@@ -851,14 +937,14 @@ function PaymentsPage() {
             <div className="empty-state">
               <div className="empty-state-icon">💳</div>
               <div className="empty-state-title">
-                {searchTerm || filterType !== 'all' ? 'Aucun résultat' : 'Aucun paiement'}
+                {searchTerm || filterType !== 'all' || dateFrom || dateTo ? 'Aucun résultat' : 'Aucun paiement'}
               </div>
               <div className="empty-state-description">
-                {searchTerm || filterType !== 'all'
+                {searchTerm || filterType !== 'all' || dateFrom || dateTo
                   ? 'Aucun paiement ne correspond à vos critères'
                   : 'Commencez par enregistrer votre premier paiement'}
               </div>
-              {!searchTerm && filterType === 'all' && (
+              {!searchTerm && filterType === 'all' && !dateFrom && !dateTo && (
                 <button className="btn btn-success" onClick={() => setShowForm(true)}>
                   <span>+</span>
                   <span>Enregistrer un paiement</span>

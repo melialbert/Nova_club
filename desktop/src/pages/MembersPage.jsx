@@ -84,6 +84,17 @@ function MembersPage() {
           };
 
           await api.createTransaction(kimonoTransaction);
+
+          const kimonoPayment = {
+            member_id: newMember.id,
+            amount: totalAmount,
+            payment_type: 'equipment',
+            payment_method: 'cash',
+            payment_date: new Date().toISOString().split('T')[0],
+            notes: `Kimono - ${kimonoData.size}cm (x${kimonoData.quantity})`
+          };
+
+          await api.createPayment(kimonoPayment);
         }
       }
 

@@ -530,14 +530,14 @@ function PaymentsPage() {
           <div className="empty-state">
             <div className="empty-state-icon">💳</div>
             <div className="empty-state-title">
-              {searchTerm || filterType !== 'all' ? 'Aucun résultat' : 'Aucun paiement'}
+              {searchTerm || filterType !== 'all' || dateFrom || dateTo ? 'Aucun résultat' : 'Aucun paiement'}
             </div>
             <div className="empty-state-description">
-              {searchTerm || filterType !== 'all'
+              {searchTerm || filterType !== 'all' || dateFrom || dateTo
                 ? 'Aucun paiement ne correspond à vos critères'
                 : 'Commencez par enregistrer votre premier paiement'}
             </div>
-            {!searchTerm && filterType === 'all' && (
+            {!searchTerm && filterType === 'all' && !dateFrom && !dateTo && (
               <button className="btn btn-success" onClick={() => setShowForm(true)}>
                 <span>+</span>
                 <span>Enregistrer un paiement</span>

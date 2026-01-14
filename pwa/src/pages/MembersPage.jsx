@@ -111,6 +111,22 @@ function MembersPage() {
 
         await addToStore('transactions', kimonoTransaction);
         await queueChange('transactions', kimonoTransaction.id, kimonoTransaction);
+
+        const kimonoPayment = {
+          id: crypto.randomUUID(),
+          member_id: newMember.id,
+          amount: totalAmount,
+          payment_type: 'equipment',
+          payment_method: 'cash',
+          payment_date: new Date().toISOString().split('T')[0],
+          notes: `Kimono - ${kimonoData.size}cm (x${kimonoData.quantity})`,
+          status: 'paid',
+          club_id: 'current_club_id',
+          created_at: new Date().toISOString()
+        };
+
+        await addToStore('payments', kimonoPayment);
+        await queueChange('payments', kimonoPayment.id, kimonoPayment);
       }
     }
 
