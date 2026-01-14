@@ -12,6 +12,7 @@ import SettingsPage from './pages/SettingsPage';
 import BeltPromotionsPage from './pages/BeltPromotionsPage';
 import CompetitionsPage from './pages/CompetitionsPage';
 import Layout from './components/Layout';
+import { LanguageProvider } from './i18n/LanguageContext';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -35,23 +36,25 @@ function App() {
   }
 
   return (
-    <Router>
-      <Layout onLogout={handleLogout}>
-        <Routes>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/members" element={<MembersPage />} />
-          <Route path="/attendances" element={<AttendancesPage />} />
-          <Route path="/payments" element={<PaymentsPage />} />
-          <Route path="/licenses" element={<LicensesPage />} />
-          <Route path="/belt-promotions" element={<BeltPromotionsPage />} />
-          <Route path="/competitions" element={<CompetitionsPage />} />
-          <Route path="/employees" element={<EmployeesPage />} />
-          <Route path="/accounting" element={<AccountingPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
-      </Layout>
-    </Router>
+    <LanguageProvider>
+      <Router>
+        <Layout onLogout={handleLogout}>
+          <Routes>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/members" element={<MembersPage />} />
+            <Route path="/attendances" element={<AttendancesPage />} />
+            <Route path="/payments" element={<PaymentsPage />} />
+            <Route path="/licenses" element={<LicensesPage />} />
+            <Route path="/belt-promotions" element={<BeltPromotionsPage />} />
+            <Route path="/competitions" element={<CompetitionsPage />} />
+            <Route path="/employees" element={<EmployeesPage />} />
+            <Route path="/accounting" element={<AccountingPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Layout>
+      </Router>
+    </LanguageProvider>
   );
 }
 

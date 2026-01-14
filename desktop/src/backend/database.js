@@ -144,6 +144,11 @@ function migrateClubsTable() {
       db.exec("ALTER TABLE clubs ADD COLUMN slogan TEXT");
       console.log('Added slogan column to clubs table');
     }
+
+    if (!columns.includes('language')) {
+      db.exec("ALTER TABLE clubs ADD COLUMN language TEXT DEFAULT 'fr'");
+      console.log('Added language column to clubs table');
+    }
   } catch (error) {
     console.log('clubs table does not exist yet, will be created');
   }

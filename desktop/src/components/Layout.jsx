@@ -1,7 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { useTranslation } from '../i18n/LanguageContext';
 
 function Layout({ children, onLogout }) {
+  const { t } = useTranslation();
   const location = useLocation();
   const [user, setUser] = useState(null);
 
@@ -15,16 +17,16 @@ function Layout({ children, onLogout }) {
   const isActive = (path) => location.pathname === path;
 
   const menuItems = [
-    { path: '/', label: 'Tableau de bord', icon: '📊' },
-    { path: '/members', label: 'Adhérents', icon: '👥' },
-    { path: '/attendances', label: 'Présences', icon: '📋' },
-    { path: '/payments', label: 'Paiements', icon: '💳' },
-    { path: '/licenses', label: 'Licences', icon: '🎫' },
-    { path: '/belt-promotions', label: 'Passages de grade', icon: '🥋' },
-    { path: '/competitions', label: 'Compétitions', icon: '🏆' },
-    { path: '/employees', label: 'Employés', icon: '👔' },
-    { path: '/accounting', label: 'Comptabilité', icon: '💰' },
-    { path: '/settings', label: 'Paramètres', icon: '⚙️' },
+    { path: '/', label: t('navigation.dashboard'), icon: '📊' },
+    { path: '/members', label: t('navigation.members'), icon: '👥' },
+    { path: '/attendances', label: t('navigation.attendances'), icon: '📋' },
+    { path: '/payments', label: t('navigation.payments'), icon: '💳' },
+    { path: '/licenses', label: t('navigation.licenses'), icon: '🎫' },
+    { path: '/belt-promotions', label: t('navigation.beltPromotions'), icon: '🥋' },
+    { path: '/competitions', label: t('navigation.competitions'), icon: '🏆' },
+    { path: '/employees', label: t('navigation.employees'), icon: '👔' },
+    { path: '/accounting', label: t('navigation.accounting'), icon: '💰' },
+    { path: '/settings', label: t('navigation.settings'), icon: '⚙️' },
   ];
 
   return (
@@ -202,7 +204,7 @@ function Layout({ children, onLogout }) {
             }}
           >
             <span>🚪</span>
-            <span>Déconnexion</span>
+            <span>{t('navigation.logout')}</span>
           </button>
         </div>
       </aside>

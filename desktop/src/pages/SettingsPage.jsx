@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
+import { useTranslation } from '../i18n/LanguageContext';
 
 function SettingsPage() {
+  const { t, language, changeLanguage } = useTranslation();
   const [clubSettings, setClubSettings] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -9,7 +11,8 @@ function SettingsPage() {
     club_name: '',
     city: '',
     slogan: '',
-    logo: ''
+    logo: '',
+    language: 'fr'
   });
 
   useEffect(() => {
@@ -26,7 +29,8 @@ function SettingsPage() {
         club_name: clubData.name || clubData.club_name || '',
         city: clubData.city || '',
         slogan: clubData.slogan || '',
-        logo: clubData.logo_url || clubData.logo || ''
+        logo: clubData.logo_url || clubData.logo || '',
+        language: clubData.language || 'fr'
       });
       setLogoPreview(clubData.logo_url || clubData.logo);
     } catch (err) {
@@ -67,15 +71,17 @@ function SettingsPage() {
         name: formData.club_name,
         city: formData.city,
         slogan: formData.slogan,
-        logo_url: formData.logo
+        logo_url: formData.logo,
+        language: formData.language
       };
 
       await api.updateClub(updateData);
-      alert('Paramètres mis à jour avec succès');
+      await changeLanguage(formData.language);
+      alert(t('settings.saveSuccess'));
       loadSettings();
     } catch (err) {
       console.error('Erreur lors de la sauvegarde:', err);
-      alert('Erreur lors de la sauvegarde des paramètres');
+      alert(t('settings.saveError'));
     }
   };
 
@@ -83,7 +89,7 @@ function SettingsPage() {
     return (
       <div style={{ textAlign: 'center', padding: '48px' }}>
         <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏳</div>
-        <div style={{ color: '#64748b' }}>Chargement des paramètres...</div>
+        <div style={{ color: '#64748b' }}>{t('settings.loadingSettings')}</div>
       </div>
     );
   }
@@ -115,10 +121,10 @@ function SettingsPage() {
           </div>
           <div>
             <h1 style={{ fontSize: '28px', fontWeight: '700', margin: '0 0 8px 0' }}>
-              Paramètres du club
+              {t('settings.title')}
             </h1>
             <p style={{ margin: 0, opacity: 0.9, fontSize: '15px' }}>
-              Gérez les informations et l'identité de votre club
+              {t('settings.subtitle')}
             </p>
           </div>
         </div>
@@ -136,10 +142,10 @@ function SettingsPage() {
               <div style={{ flex: 1 }}>
                 <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ fontSize: '24px' }}>🖼️</span>
-                  Logo du club
+                  {t('settings.logo')}
                 </h2>
                 <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '24px', lineHeight: '1.6' }}>
-                  Téléchargez le logo de votre club. Il sera affiché sur tous vos documents et dans l'interface.
+                  {t('settings.logoDescription')}
                 </p>
 
                 {!logoPreview ? (
@@ -164,10 +170,10 @@ function SettingsPage() {
                   >
                     <div style={{ fontSize: '48px', marginBottom: '12px' }}>📤</div>
                     <div style={{ fontSize: '15px', fontWeight: '600', color: '#0f172a', marginBottom: '4px' }}>
-                      Cliquez pour télécharger
+                      {t('settings.clickToUpload')}
                     </div>
                     <div style={{ fontSize: '13px', color: '#64748b' }}>
-                      JPG, PNG ou SVG (max. 5MB)
+                      {t('settings.fileFormat')}
                     </div>
                     <input
                       type="file"
@@ -220,7 +226,7 @@ function SettingsPage() {
                     onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
                     onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
                     >
-                      Modifier
+                      {t('common.edit')}
                       <input
                         type="file"
                         accept="image/*"
@@ -245,7 +251,7 @@ function SettingsPage() {
                       onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
                       onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
                     >
-                      Supprimer
+                      {t('common.delete')}
                     </button>
                   </div>
                 </div>
@@ -256,13 +262,13 @@ function SettingsPage() {
           <div className="card">
             <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '24px' }}>🏛️</span>
-              Informations générales
+              {t('settings.generalInfo')}
             </h2>
 
             <div className="form-group">
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span>🏷️</span>
-                Nom du club *
+                {t('settings.clubName')} *
               </label>
               <input
                 type="text"
@@ -270,14 +276,14 @@ function SettingsPage() {
                 value={formData.club_name}
                 onChange={handleChange}
                 required
-                placeholder="Ex: Judo Club de Paris"
+                placeholder={t('settings.clubNamePlaceholder')}
               />
             </div>
 
             <div className="form-group">
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span>📍</span>
-                Ville *
+                {t('settings.city')} *
               </label>
               <input
                 type="text"
@@ -285,7 +291,7 @@ function SettingsPage() {
                 value={formData.city}
                 onChange={handleChange}
                 required
-                placeholder="Ex: Paris"
+                placeholder={t('settings.cityPlaceholder')}
               />
             </div>
           </div>
@@ -293,23 +299,52 @@ function SettingsPage() {
           <div className="card">
             <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '24px' }}>💬</span>
-              Identité du club
+              {t('settings.clubIdentity')}
             </h2>
 
             <div className="form-group">
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span>✨</span>
-                Slogan
+                {t('settings.slogan')}
               </label>
               <input
                 type="text"
                 name="slogan"
                 value={formData.slogan}
                 onChange={handleChange}
-                placeholder="Ex: L'esprit du combat, la force du respect"
+                placeholder={t('settings.sloganPlaceholder')}
               />
               <div style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
-                Un slogan qui reflète les valeurs de votre club
+                {t('settings.sloganDescription')}
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🌐</span>
+                {t('settings.language')}
+              </label>
+              <select
+                name="language"
+                value={formData.language}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: '2px solid #e2e8f0',
+                  borderRadius: '10px',
+                  fontSize: '15px',
+                  color: '#0f172a',
+                  backgroundColor: 'white',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+              </select>
+              <div style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
+                {t('settings.languageDescription')}
               </div>
             </div>
           </div>
@@ -323,7 +358,7 @@ function SettingsPage() {
           }}>
             <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '24px' }}>👁️</span>
-              Aperçu
+              {t('settings.preview')}
             </h2>
             <div style={{
               display: 'flex',
@@ -409,7 +444,7 @@ function SettingsPage() {
             onMouseLeave={(e) => e.target.style.backgroundColor = '#f1f5f9'}
           >
             <span>🔄</span>
-            <span>Annuler</span>
+            <span>{t('common.cancel')}</span>
           </button>
           <button
             type="submit"
@@ -438,7 +473,7 @@ function SettingsPage() {
             }}
           >
             <span>💾</span>
-            <span>Enregistrer les modifications</span>
+            <span>{t('settings.saveChanges')}</span>
           </button>
         </div>
       </form>

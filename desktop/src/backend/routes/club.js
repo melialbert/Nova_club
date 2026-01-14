@@ -25,13 +25,13 @@ router.get('/', authenticate, (req, res) => {
 router.put('/', authenticate, (req, res) => {
   try {
     const db = getDb();
-    const { name, address, phone, email, logo_url, city, slogan } = req.body;
+    const { name, address, phone, email, logo_url, city, slogan, language } = req.body;
 
     db.prepare(`
       UPDATE clubs
-      SET name = ?, address = ?, phone = ?, email = ?, logo_url = ?, city = ?, slogan = ?
+      SET name = ?, address = ?, phone = ?, email = ?, logo_url = ?, city = ?, slogan = ?, language = ?
       WHERE id = ?
-    `).run(name, address, phone, email, logo_url, city, slogan, req.clubId);
+    `).run(name, address, phone, email, logo_url, city, slogan, language, req.clubId);
 
     const club = db.prepare('SELECT * FROM clubs WHERE id = ?').get(req.clubId);
     res.json(club);
