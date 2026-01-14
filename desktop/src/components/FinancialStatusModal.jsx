@@ -19,8 +19,22 @@ export default function FinancialStatusModal({ member, onClose }) {
   const [loading, setLoading] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [notes, setNotes] = useState('');
+  const [clubInfo, setClubInfo] = useState(null);
 
   const years = Array.from({ length: 5 }, (_, i) => selectedYear - 2 + i);
+
+  useEffect(() => {
+    loadClubInfo();
+  }, []);
+
+  const loadClubInfo = async () => {
+    try {
+      const club = await api.getClub();
+      setClubInfo(club);
+    } catch (error) {
+      console.error('Error loading club info:', error);
+    }
+  };
 
   useEffect(() => {
     loadFinancialData();
@@ -55,6 +69,193 @@ export default function FinancialStatusModal({ member, onClose }) {
       console.error('Error updating payment:', error);
       alert('Erreur lors de la mise à jour du paiement');
     }
+  };
+
+  const handlePrint = () => {
+    const printContent = document.createElement('div');
+    printContent.innerHTML = `
+      <html>
+        <head>
+          <title>État Financier - ${financialData.member.name}</title>
+          <style>
+            @page {
+              margin: 2cm;
+            }
+            body {
+              font-family: Arial, sans-serif;
+              color: #000;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+              border-bottom: 3px solid #0f172a;
+              padding-bottom: 20px;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 28px;
+              color: #0f172a;
+            }
+            .header .club-name {
+              font-size: 18px;
+              color: #64748b;
+              margin-top: 5px;
+            }
+            .member-info {
+              margin: 20px 0;
+              padding: 15px;
+              background: #f8fafc;
+              border-left: 4px solid #3b82f6;
+            }
+            .member-info h2 {
+              margin: 0 0 10px 0;
+              font-size: 20px;
+              color: #0f172a;
+            }
+            .member-info p {
+              margin: 5px 0;
+              font-size: 14px;
+              color: #475569;
+            }
+            .stats {
+              display: grid;
+              grid-template-columns: repeat(4, 1fr);
+              gap: 15px;
+              margin: 25px 0;
+            }
+            .stat-card {
+              padding: 15px;
+              text-align: center;
+              border: 2px solid #e2e8f0;
+              border-radius: 8px;
+            }
+            .stat-card .label {
+              font-size: 12px;
+              color: #64748b;
+              font-weight: 600;
+              margin-bottom: 5px;
+            }
+            .stat-card .value {
+              font-size: 24px;
+              font-weight: 800;
+              color: #0f172a;
+              margin: 5px 0;
+            }
+            .stat-card .amount {
+              font-size: 12px;
+              color: #64748b;
+              font-weight: 600;
+            }
+            .months-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 20px 0;
+            }
+            .months-table th,
+            .months-table td {
+              padding: 10px;
+              text-align: left;
+              border: 1px solid #e2e8f0;
+            }
+            .months-table th {
+              background: #f8fafc;
+              font-weight: 700;
+              color: #0f172a;
+            }
+            .status-paid {
+              color: #059669;
+              font-weight: 600;
+            }
+            .status-unpaid {
+              color: #dc2626;
+              font-weight: 600;
+            }
+            .footer {
+              margin-top: 40px;
+              padding-top: 20px;
+              border-top: 2px solid #e2e8f0;
+              text-align: center;
+              font-size: 12px;
+              color: #64748b;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>ÉTAT FINANCIER</h1>
+            ${clubInfo ? `<div class="club-name">${clubInfo.name || clubInfo.club_name} - ${clubInfo.city}</div>` : ''}
+          </div>
+
+          <div class="member-info">
+            <h2>${financialData.member.name}</h2>
+            <p><strong>Année:</strong> ${selectedYear}</p>
+            <p><strong>Cotisation mensuelle:</strong> ${financialData.member.monthly_fee} FCFA</p>
+            <p><strong>Date d'impression:</strong> ${new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+          </div>
+
+          <div class="stats">
+            <div class="stat-card">
+              <div class="label">Total</div>
+              <div class="value">${financialData.stats.total}</div>
+              <div class="amount">${financialData.stats.totalAmount} FCFA</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Payés</div>
+              <div class="value">${financialData.stats.paid}</div>
+              <div class="amount">${financialData.stats.paidAmount} FCFA</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Non payés</div>
+              <div class="value">${financialData.stats.unpaid}</div>
+              <div class="amount">${financialData.stats.unpaidAmount} FCFA</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Taux de paiement</div>
+              <div class="value">${Math.round((financialData.stats.paid / financialData.stats.total) * 100)}%</div>
+              <div class="amount">complété</div>
+            </div>
+          </div>
+
+          <table class="months-table">
+            <thead>
+              <tr>
+                <th>Mois</th>
+                <th>Montant</th>
+                <th>Statut</th>
+                <th>Date de paiement</th>
+                <th>Méthode</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${financialData.months.map(monthData => `
+                <tr>
+                  <td>${MONTHS[monthData.month - 1]}</td>
+                  <td>${monthData.amount} FCFA</td>
+                  <td class="${monthData.status === 'paid' ? 'status-paid' : 'status-unpaid'}">
+                    ${monthData.status === 'paid' ? 'Payé' : 'Non payé'}
+                  </td>
+                  <td>${monthData.paid_date ? new Date(monthData.paid_date).toLocaleDateString('fr-FR') : '-'}</td>
+                  <td>${monthData.payment_method ? PAYMENT_METHODS.find(m => m.value === monthData.payment_method)?.label : '-'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <div class="footer">
+            ${clubInfo ? `${clubInfo.name || clubInfo.club_name} - ${clubInfo.city}` : ''} | Document généré le ${new Date().toLocaleDateString('fr-FR')}
+          </div>
+        </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printContent.innerHTML);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
   };
 
   if (loading) {
@@ -451,9 +652,37 @@ export default function FinancialStatusModal({ member, onClose }) {
           borderTop: '2px solid #f1f5f9',
           backgroundColor: '#f8fafc',
           display: 'flex',
-          justifyContent: 'flex-end',
+          justifyContent: 'space-between',
           gap: '12px'
         }}>
+          <button
+            onClick={handlePrint}
+            style={{
+              padding: '12px 32px',
+              borderRadius: '8px',
+              border: '2px solid #3b82f6',
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              fontSize: '15px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#2563eb';
+              e.target.style.borderColor = '#2563eb';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#3b82f6';
+              e.target.style.borderColor = '#3b82f6';
+            }}
+          >
+            <span>🖨️</span>
+            <span>Imprimer</span>
+          </button>
           <button
             onClick={onClose}
             style={{
