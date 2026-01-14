@@ -1,38 +1,17 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { translations } from './translations';
-import { api } from '../services/api';
 
 const LanguageContext = createContext();
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState('fr');
-  const [loading, setLoading] = useState(true);
+  const [language, setLanguage] = useState(() => {
+    return localStorage.getItem('app_language') || 'fr';
+  });
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    loadLanguageFromClub();
-  }, []);
-
-  const loadLanguageFromClub = async () => {
-    try {
-      const clubData = await api.getClub();
-      if (clubData && clubData.language) {
-        setLanguage(clubData.language);
-      }
-    } catch (error) {
-      console.error('Error loading language:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const changeLanguage = async (newLanguage) => {
-    try {
-      await api.updateClub({ language: newLanguage });
-      setLanguage(newLanguage);
-    } catch (error) {
-      console.error('Error changing language:', error);
-      throw error;
-    }
+  const changeLanguage = (newLanguage) => {
+    setLanguage(newLanguage);
+    localStorage.setItem('app_language', newLanguage);
   };
 
   const t = (key) => {
