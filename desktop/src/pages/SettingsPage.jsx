@@ -11,8 +11,7 @@ function SettingsPage() {
     club_name: '',
     city: '',
     slogan: '',
-    logo: '',
-    language: 'fr'
+    logo: ''
   });
 
   useEffect(() => {
@@ -29,8 +28,7 @@ function SettingsPage() {
         club_name: clubData.name || clubData.club_name || '',
         city: clubData.city || '',
         slogan: clubData.slogan || '',
-        logo: clubData.logo_url || clubData.logo || '',
-        language: clubData.language || 'fr'
+        logo: clubData.logo_url || clubData.logo || ''
       });
       setLogoPreview(clubData.logo_url || clubData.logo);
     } catch (err) {
@@ -62,30 +60,6 @@ function SettingsPage() {
     setFormData({ ...formData, logo: '' });
   };
 
-
-  const handleFixLanguageColumn = async () => {
-    try {
-      const response = await fetch('http://localhost:3001/api/club/fix-language-column', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Erreur lors de la correction');
-      }
-
-      const result = await response.json();
-      alert(result.message + '\nVeuillez recharger la page.');
-      window.location.reload();
-    } catch (err) {
-      console.error('Erreur lors de la correction:', err);
-      alert('Erreur lors de la correction de la colonne language');
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -94,12 +68,10 @@ function SettingsPage() {
         name: formData.club_name,
         city: formData.city,
         slogan: formData.slogan,
-        logo_url: formData.logo,
-        language: formData.language
+        logo_url: formData.logo
       };
 
       await api.updateClub(updateData);
-      await changeLanguage(formData.language);
       alert(t('settings.saveSuccess'));
       loadSettings();
     } catch (err) {
@@ -340,61 +312,6 @@ function SettingsPage() {
               <div style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
                 {t('settings.sloganDescription')}
               </div>
-            </div>
-
-            <div className="form-group">
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span>🌐</span>
-                {t('settings.language')}
-              </label>
-              <select
-                name="language"
-                value={formData.language}
-                onChange={handleChange}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '2px solid #e2e8f0',
-                  borderRadius: '10px',
-                  fontSize: '15px',
-                  color: '#0f172a',
-                  backgroundColor: 'white',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <option value="fr">Français</option>
-                <option value="en">English</option>
-              </select>
-              <div style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
-                {t('settings.languageDescription')}
-              </div>
-            </div>
-
-            {/* Bouton de correction temporaire */}
-            <div style={{ marginTop: '16px', padding: '16px', background: '#fef3c7', borderRadius: '10px', border: '1px solid #fbbf24' }}>
-              <div style={{ fontSize: '13px', color: '#92400e', marginBottom: '12px', fontWeight: '500' }}>
-                ⚠️ Si vous ne pouvez pas changer la langue, cliquez sur ce bouton pour corriger la base de données :
-              </div>
-              <button
-                type="button"
-                onClick={handleFixLanguageColumn}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#f59e0b',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#d97706'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#f59e0b'}
-              >
-                🔧 Corriger la colonne language
-              </button>
             </div>
           </div>
         </div>

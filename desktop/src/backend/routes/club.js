@@ -27,11 +27,25 @@ router.put('/', authenticate, (req, res) => {
     const db = getDb();
     const { name, address, phone, email, logo_url, city, slogan, language } = req.body;
 
-    db.prepare(`
-      UPDATE clubs
-      SET name = ?, address = ?, phone = ?, email = ?, logo_url = ?, city = ?, slogan = ?, language = ?
-      WHERE id = ?
-    `).run(name, address, phone, email, logo_url, city, slogan, language, req.clubId);
+    // Vérifier si la colonne language existe
+    const columns = db.pragma("table_info(clubs)").map(col => col.name);
+    const hasLanguageColumn = columns.includes('language');
+
+    if (hasLanguageColumn) {
+      // Inclure la colonne language dans l'UPDATE
+      db.prepare(`
+        UPDATE clubs
+        SET name = ?, address = ?, phone = ?, email = ?, logo_url = ?, city = ?, slogan = ?, language = ?
+        WHERE id = ?
+      `).run(name, address, phone, email, logo_url, city, slogan, language, req.clubId);
+    } else {
+      // Ne pas inclure la colonne language
+      db.prepare(`
+        UPDATE clubs
+        SET name = ?, address = ?, phone = ?, email = ?, logo_url = ?, city = ?, slogan = ?
+        WHERE id = ?
+      `).run(name, address, phone, email, logo_url, city, slogan, req.clubId);
+    }
 
     const club = db.prepare('SELECT * FROM clubs WHERE id = ?').get(req.clubId);
     res.json(club);
