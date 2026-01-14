@@ -289,6 +289,225 @@ function SettingsPage() {
             </div>
           </div>
 
+          <div className="card" style={{
+            marginBottom: '24px',
+            background: 'linear-gradient(135deg, #fefce8 0%, #fef3c7 100%)',
+            border: '2px solid #fde047'
+          }}>
+            <div className="card-header">
+              <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '24px' }}>🥋</span>
+                Code Moral du Judo
+              </h2>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '16px'
+            }}>
+              <div style={{
+                background: 'white',
+                padding: '20px',
+                borderRadius: '12px',
+                borderLeft: '4px solid #3b82f6',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                cursor: 'default'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(59, 130, 246, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '12px' }}>🙏</div>
+                <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#3b82f6', margin: '0 0 8px 0' }}>
+                  Politesse
+                </h3>
+                <p style={{ fontSize: '14px', color: '#64748b', margin: 0, lineHeight: '1.6' }}>
+                  C'est le respect d'autrui
+                </p>
+              </div>
+
+              <div style={{
+                background: 'white',
+                padding: '20px',
+                borderRadius: '12px',
+                borderLeft: '4px solid #ef4444',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                cursor: 'default'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(239, 68, 68, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '12px' }}>💪</div>
+                <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#ef4444', margin: '0 0 8px 0' }}>
+                  Courage
+                </h3>
+                <p style={{ fontSize: '14px', color: '#64748b', margin: 0, lineHeight: '1.6' }}>
+                  C'est faire ce qui est juste
+                </p>
+              </div>
+
+              <div style={{
+                background: 'white',
+                padding: '20px',
+                borderRadius: '12px',
+                borderLeft: '4px solid #10b981',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                cursor: 'default'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '12px' }}>✨</div>
+                <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#10b981', margin: '0 0 8px 0' }}>
+                  Sincérité
+                </h3>
+                <p style={{ fontSize: '14px', color: '#64748b', margin: 0, lineHeight: '1.6' }}>
+                  C'est s'exprimer sans déguiser sa pensée
+                </p>
+              </div>
+
+              <div style={{
+                background: 'white',
+                padding: '20px',
+                borderRadius: '12px',
+                borderLeft: '4px solid #f59e0b',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                cursor: 'default'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(245, 158, 11, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '12px' }}>🏆</div>
+                <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#f59e0b', margin: '0 0 8px 0' }}>
+                  Honneur
+                </h3>
+                <p style={{ fontSize: '14px', color: '#64748b', margin: 0, lineHeight: '1.6' }}>
+                  C'est être fidèle à la parole donnée
+                </p>
+              </div>
+
+              <div style={{
+                background: 'white',
+                padding: '20px',
+                borderRadius: '12px',
+                borderLeft: '4px solid #8b5cf6',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                cursor: 'default'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(139, 92, 246, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '12px' }}>🌸</div>
+                <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#8b5cf6', margin: '0 0 8px 0' }}>
+                  Modestie
+                </h3>
+                <p style={{ fontSize: '14px', color: '#64748b', margin: 0, lineHeight: '1.6' }}>
+                  C'est parler de soi-même sans orgueil
+                </p>
+              </div>
+
+              <div style={{
+                background: 'white',
+                padding: '20px',
+                borderRadius: '12px',
+                borderLeft: '4px solid #06b6d4',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                cursor: 'default'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(6, 182, 212, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '12px' }}>🤝</div>
+                <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#06b6d4', margin: '0 0 8px 0' }}>
+                  Respect
+                </h3>
+                <p style={{ fontSize: '14px', color: '#64748b', margin: 0, lineHeight: '1.6' }}>
+                  C'est la plus haute des vertus humaines
+                </p>
+              </div>
+
+              <div style={{
+                background: 'white',
+                padding: '20px',
+                borderRadius: '12px',
+                borderLeft: '4px solid #f97316',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                cursor: 'default'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(249, 115, 22, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '12px' }}>🧘</div>
+                <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#f97316', margin: '0 0 8px 0' }}>
+                  Contrôle de soi
+                </h3>
+                <p style={{ fontSize: '14px', color: '#64748b', margin: 0, lineHeight: '1.6' }}>
+                  C'est savoir se taire lorsque monte la colère
+                </p>
+              </div>
+
+              <div style={{
+                background: 'white',
+                padding: '20px',
+                borderRadius: '12px',
+                borderLeft: '4px solid #ec4899',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                cursor: 'default'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(236, 72, 153, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '12px' }}>❤️</div>
+                <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#ec4899', margin: '0 0 8px 0' }}>
+                  Amitié
+                </h3>
+                <p style={{ fontSize: '14px', color: '#64748b', margin: 0, lineHeight: '1.6' }}>
+                  C'est le plus pur des sentiments humains
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
             <button type="submit" className="btn btn-success" style={{ fontSize: '15px', padding: '14px 32px' }}>
               <span>💾</span>
