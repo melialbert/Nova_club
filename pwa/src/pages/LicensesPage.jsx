@@ -154,6 +154,38 @@ function LicensesPage() {
     <Layout>
       <div className="fade-in">
         <div style={{
+          marginBottom: '24px',
+          padding: '16px',
+          background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+          borderRadius: '12px',
+          boxShadow: '0 4px 12px rgba(59, 130, 246, 0.2)',
+          textAlign: 'center'
+        }}>
+          <a
+            href="https://extra.fecajudo.org/index/tarifs?ts=1"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: 'white',
+              textDecoration: 'none',
+              fontSize: '15px',
+              fontWeight: '600',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              transition: 'opacity 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+          >
+            <span style={{ fontSize: '20px' }}>🎫</span>
+            <span>Cliquer ici pour payer une licence à la FecaJudo</span>
+            <span style={{ fontSize: '16px' }}>→</span>
+          </a>
+        </div>
+
+        <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
