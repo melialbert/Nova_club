@@ -30,6 +30,7 @@ function initDatabase() {
   createTables();
   migrateMembersTable();
   migrateBeltPromotionsTable();
+  migratePaymentsTable();
   createDefaultData();
 
   return db;
@@ -79,6 +80,24 @@ function migrateBeltPromotionsTable() {
     }
   } catch (error) {
     console.log('belt_promotions table does not exist yet, will be created');
+  }
+}
+
+function migratePaymentsTable() {
+  try {
+    const columns = db.pragma("table_info(payments)").map(col => col.name);
+
+    if (!columns.includes('payment_type')) {
+      db.exec("ALTER TABLE payments ADD COLUMN payment_type TEXT DEFAULT 'other'");
+      console.log('Added payment_type column to payments table');
+    }
+
+    if (!columns.includes('month_year')) {
+      db.exec("ALTER TABLE payments ADD COLUMN month_year TEXT");
+      console.log('Added month_year column to payments table');
+    }
+  } catch (error) {
+    console.log('payments table does not exist yet, will be created');
   }
 }
 
@@ -149,6 +168,8 @@ function createTables() {
       amount REAL NOT NULL,
       payment_date DATE NOT NULL,
       payment_method TEXT,
+      payment_type TEXT DEFAULT 'other',
+      month_year TEXT,
       description TEXT,
       status TEXT DEFAULT 'completed',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

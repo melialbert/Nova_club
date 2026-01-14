@@ -328,8 +328,8 @@ export default function FinancialStatusModal({ member, onClose }) {
           {/* Months Grid */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-            gap: '16px',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
+            gap: '12px',
             marginBottom: '24px'
           }}>
             {financialData.months.map((monthData) => {
@@ -340,17 +340,17 @@ export default function FinancialStatusModal({ member, onClose }) {
                   key={monthData.month}
                   onClick={() => handleTogglePayment(monthData.month)}
                   style={{
-                    padding: '16px',
-                    borderRadius: '12px',
-                    border: isPaid ? '3px solid #10b981' : '3px solid #f87171',
+                    padding: '12px',
+                    borderRadius: '10px',
+                    border: isPaid ? '2px solid #10b981' : '2px solid #f87171',
                     backgroundColor: isPaid ? '#f0fdf4' : '#fef2f2',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
                     position: 'relative'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                    e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.15)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.12)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translateY(0)';
@@ -361,18 +361,18 @@ export default function FinancialStatusModal({ member, onClose }) {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    marginBottom: '12px'
+                    marginBottom: '8px'
                   }}>
                     <span style={{
-                      fontSize: '16px',
+                      fontSize: '14px',
                       fontWeight: '700',
                       color: '#0f172a'
                     }}>
                       {MONTHS[monthData.month - 1]}
                     </span>
                     <div style={{
-                      width: '28px',
-                      height: '28px',
+                      width: '22px',
+                      height: '22px',
                       borderRadius: '50%',
                       backgroundColor: isPaid ? '#10b981' : '#ef4444',
                       display: 'flex',
@@ -380,11 +380,11 @@ export default function FinancialStatusModal({ member, onClose }) {
                       justifyContent: 'center'
                     }}>
                       {isPaid ? (
-                        <svg style={{ width: '16px', height: '16px', color: 'white' }} fill="currentColor" viewBox="0 0 20 20">
+                        <svg style={{ width: '13px', height: '13px', color: 'white' }} fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       ) : (
-                        <svg style={{ width: '16px', height: '16px', color: 'white' }} fill="currentColor" viewBox="0 0 20 20">
+                        <svg style={{ width: '13px', height: '13px', color: 'white' }} fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                         </svg>
                       )}
@@ -393,7 +393,7 @@ export default function FinancialStatusModal({ member, onClose }) {
 
                   <div style={{ fontSize: '14px' }}>
                     <p style={{
-                      fontSize: '18px',
+                      fontSize: '15px',
                       fontWeight: '700',
                       color: isPaid ? '#059669' : '#dc2626',
                       margin: 0,
@@ -403,17 +403,17 @@ export default function FinancialStatusModal({ member, onClose }) {
                     </p>
                     {isPaid && monthData.paid_date && (
                       <p style={{
-                        fontSize: '12px',
+                        fontSize: '10px',
                         color: '#64748b',
                         margin: 0,
-                        marginTop: '4px'
+                        marginTop: '3px'
                       }}>
-                        📅 {new Date(monthData.paid_date).toLocaleDateString('fr-FR')}
+                        📅 {new Date(monthData.paid_date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })}
                       </p>
                     )}
                     {isPaid && monthData.payment_method && (
                       <p style={{
-                        fontSize: '12px',
+                        fontSize: '10px',
                         color: '#64748b',
                         margin: 0,
                         marginTop: '2px'
