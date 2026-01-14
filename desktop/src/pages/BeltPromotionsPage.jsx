@@ -207,6 +207,297 @@ function BeltPromotionsPage() {
     `${member.first_name} ${member.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handlePrintPromotionSheet = async () => {
+    const promotionsByBelt = {};
+
+    pendingPromotions.forEach(promotion => {
+      const beltKey = promotion.new_belt;
+      if (!promotionsByBelt[beltKey]) {
+        promotionsByBelt[beltKey] = [];
+      }
+      promotionsByBelt[beltKey].push(promotion);
+    });
+
+    const beltOrder = [
+      'white', 'white_yellow', 'yellow', 'yellow_orange', 'orange',
+      'orange_green', 'green', 'blue', 'brown', 'black',
+      'black_1dan', 'black_2dan', 'black_3dan', 'black_4dan', 'black_5dan'
+    ];
+
+    const sortedBelts = Object.keys(promotionsByBelt).sort((a, b) => {
+      return beltOrder.indexOf(a) - beltOrder.indexOf(b);
+    });
+
+    let clubInfo = null;
+    try {
+      clubInfo = await api.getClubInfo();
+    } catch (error) {
+      console.error('Error loading club info:', error);
+    }
+
+    const printWindow = window.open('', '', 'width=800,height=600');
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Fiche de Passage de Grade</title>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px;
+            line-height: 1.6;
+          }
+
+          .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #0f172a;
+          }
+
+          .club-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+          }
+
+          .club-info {
+            font-size: 14px;
+            color: #64748b;
+          }
+
+          .main-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+            text-align: center;
+            margin: 30px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+          }
+
+          .session-info {
+            background-color: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+          }
+
+          .session-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+          }
+
+          .session-info-label {
+            font-weight: 600;
+            color: #0f172a;
+          }
+
+          .session-info-value {
+            color: #64748b;
+          }
+
+          .belt-section {
+            margin-bottom: 40px;
+            page-break-inside: avoid;
+          }
+
+          .belt-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e2e8f0;
+          }
+
+          .belt-badge {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            border: 2px solid #e2e8f0;
+          }
+
+          .belt-count {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 600;
+          }
+
+          .candidates-table {
+            width: 100%;
+            border-collapse: collapse;
+          }
+
+          .candidates-table th {
+            background-color: #f8fafc;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+            font-size: 14px;
+          }
+
+          .candidates-table td {
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+            font-size: 14px;
+          }
+
+          .candidates-table tr:hover {
+            background-color: #f8fafc;
+          }
+
+          .previous-belt-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+          }
+
+          .result-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #cbd5e1;
+            display: inline-block;
+            margin: 0 8px;
+            vertical-align: middle;
+          }
+
+          .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+          }
+
+          @media print {
+            body {
+              padding: 20px;
+            }
+
+            .belt-section {
+              page-break-inside: avoid;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          ${clubInfo ? `
+            <div class="club-name">${clubInfo.name || 'Club de Judo'}</div>
+            <div class="club-info">
+              ${clubInfo.address || ''} ${clubInfo.address && clubInfo.city ? '•' : ''} ${clubInfo.city || ''}
+              ${clubInfo.phone ? `• ${clubInfo.phone}` : ''}
+            </div>
+          ` : '<div class="club-name">Club de Judo</div>'}
+        </div>
+
+        <h1 class="main-title">🥋 Fiche de Passage de Grade</h1>
+
+        <div class="session-info">
+          <div class="session-info-row">
+            <span class="session-info-label">Date:</span>
+            <span class="session-info-value">${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+          </div>
+          <div class="session-info-row">
+            <span class="session-info-label">Nombre total de candidats:</span>
+            <span class="session-info-value">${pendingPromotions.length}</span>
+          </div>
+          <div class="session-info-row">
+            <span class="session-info-label">Examinateur:</span>
+            <span class="session-info-value">_______________________________</span>
+          </div>
+        </div>
+
+        ${sortedBelts.map(beltKey => {
+          const candidates = promotionsByBelt[beltKey];
+          const beltColor = getBeltColor(beltKey);
+          const beltTextColor = getBeltTextColor(beltKey);
+
+          return `
+            <div class="belt-section">
+              <div class="belt-header">
+                <div class="belt-badge" style="background: ${beltColor}; color: ${beltTextColor}; ${beltKey === 'white' ? 'border-color: #94a3b8;' : ''}">
+                  ${getBeltLabel(beltKey)}
+                </div>
+                <span class="belt-count">${candidates.length} candidat${candidates.length > 1 ? 's' : ''}</span>
+              </div>
+
+              <table class="candidates-table">
+                <thead>
+                  <tr>
+                    <th style="width: 5%;">N°</th>
+                    <th style="width: 30%;">Nom et Prénom</th>
+                    <th style="width: 20%;">Ceinture actuelle</th>
+                    <th style="width: 15%;">Date d'examen</th>
+                    <th style="width: 15%; text-align: center;">Réussi</th>
+                    <th style="width: 15%; text-align: center;">Échoué</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${candidates.map((candidate, index) => {
+                    const prevBeltColor = getBeltColor(candidate.previous_belt);
+                    const prevBeltTextColor = getBeltTextColor(candidate.previous_belt);
+
+                    return `
+                      <tr>
+                        <td style="text-align: center; font-weight: 600;">${index + 1}</td>
+                        <td style="font-weight: 600;">${candidate.first_name} ${candidate.last_name}</td>
+                        <td>
+                          <span class="previous-belt-badge" style="background: ${prevBeltColor}; color: ${prevBeltTextColor};">
+                            ${getBeltLabel(candidate.previous_belt)}
+                          </span>
+                        </td>
+                        <td>${new Date(candidate.promotion_date).toLocaleDateString('fr-FR')}</td>
+                        <td style="text-align: center;">
+                          <span class="result-checkbox"></span>
+                        </td>
+                        <td style="text-align: center;">
+                          <span class="result-checkbox"></span>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          `;
+        }).join('')}
+
+        <div class="footer">
+          Document généré le ${new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })} à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+        </div>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+
+    printWindow.onload = () => {
+      setTimeout(() => {
+        printWindow.print();
+      }, 250);
+    };
+  };
+
   return (
     <div className="fade-in">
       <div style={{
@@ -483,10 +774,24 @@ function BeltPromotionsPage() {
 
       {activeTab === 'pending' && (
         <div className="card fade-in">
-          <div className="card-header">
+          <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
               ⏳ Passages de grade en attente
             </h2>
+            {pendingPromotions.length > 0 && (
+              <button
+                onClick={handlePrintPromotionSheet}
+                className="btn btn-secondary"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <span>🖨️</span>
+                <span>Imprimer la fiche</span>
+              </button>
+            )}
           </div>
 
           {pendingPromotions.length > 0 ? (
