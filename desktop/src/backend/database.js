@@ -276,6 +276,23 @@ function createTables() {
       FOREIGN KEY (member_id) REFERENCES members(id),
       FOREIGN KEY (club_id) REFERENCES clubs(id)
     );
+
+    CREATE TABLE IF NOT EXISTS monthly_fees (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      member_id INTEGER NOT NULL,
+      club_id INTEGER NOT NULL,
+      year INTEGER NOT NULL,
+      month INTEGER NOT NULL CHECK(month >= 1 AND month <= 12),
+      amount REAL NOT NULL,
+      paid_date DATE,
+      status TEXT DEFAULT 'unpaid' CHECK(status IN ('paid', 'unpaid', 'partial')),
+      payment_method TEXT,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (member_id) REFERENCES members(id),
+      FOREIGN KEY (club_id) REFERENCES clubs(id),
+      UNIQUE(member_id, year, month)
+    );
   `);
 
   console.log('Tables created successfully');

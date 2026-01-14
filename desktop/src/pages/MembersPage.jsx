@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 import CareerModal from '../components/CareerModal';
+import FinancialStatusModal from '../components/FinancialStatusModal';
 
 function MembersPage() {
   const [members, setMembers] = useState([]);
@@ -9,6 +10,7 @@ function MembersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingMember, setEditingMember] = useState(null);
   const [selectedMemberForCareer, setSelectedMemberForCareer] = useState(null);
+  const [selectedMemberForFinances, setSelectedMemberForFinances] = useState(null);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -608,6 +610,29 @@ function MembersPage() {
                             🏆
                           </button>
                           <button
+                            onClick={() => setSelectedMemberForFinances(member)}
+                            style={{
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              border: '1px solid #e2e8f0',
+                              backgroundColor: 'white',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.backgroundColor = '#d1fae5';
+                              e.target.style.borderColor = '#10b981';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.backgroundColor = 'white';
+                              e.target.style.borderColor = '#e2e8f0';
+                            }}
+                            title="État financier"
+                          >
+                            💰
+                          </button>
+                          <button
                             onClick={() => handleEdit(member)}
                             style={{
                               padding: '6px 12px',
@@ -686,6 +711,13 @@ function MembersPage() {
         <CareerModal
           member={selectedMemberForCareer}
           onClose={() => setSelectedMemberForCareer(null)}
+        />
+      )}
+
+      {selectedMemberForFinances && (
+        <FinancialStatusModal
+          member={selectedMemberForFinances}
+          onClose={() => setSelectedMemberForFinances(null)}
         />
       )}
     </>

@@ -361,4 +361,55 @@ export const api = {
 
     if (!response.ok) throw new Error('Erreur lors de la suppression du passage de grade');
   },
+
+  async getMemberMonthlyFees(memberId, year) {
+    const response = await fetch(`${API_URL}/monthly-fees/member/${memberId}?year=${year}`, {
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la récupération des cotisations');
+    return response.json();
+  },
+
+  async markMonthlyFeePaid(memberId, year, month, amount, paymentMethod, notes) {
+    const response = await fetch(`${API_URL}/monthly-fees/mark-paid`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({
+        member_id: memberId,
+        year,
+        month,
+        amount,
+        payment_method: paymentMethod,
+        notes
+      }),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors du marquage du paiement');
+    return response.json();
+  },
+
+  async markMonthlyFeeUnpaid(memberId, year, month) {
+    const response = await fetch(`${API_URL}/monthly-fees/mark-unpaid`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({
+        member_id: memberId,
+        year,
+        month
+      }),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors du marquage comme non payé');
+    return response.json();
+  },
+
+  async getMonthlyFeesStatistics(year) {
+    const response = await fetch(`${API_URL}/monthly-fees/statistics/${year}`, {
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la récupération des statistiques');
+    return response.json();
+  },
 };
