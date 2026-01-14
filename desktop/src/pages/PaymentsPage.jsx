@@ -12,6 +12,7 @@ function PaymentsPage() {
   const [displayLimit, setDisplayLimit] = useState(15);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [clubInfo, setClubInfo] = useState(null);
   const [formData, setFormData] = useState({
     member_id: '',
     amount: '',
@@ -24,7 +25,17 @@ function PaymentsPage() {
 
   useEffect(() => {
     loadData();
+    loadClubInfo();
   }, []);
+
+  const loadClubInfo = async () => {
+    try {
+      const club = await api.getClub();
+      setClubInfo(club);
+    } catch (error) {
+      console.error('Error loading club info:', error);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -82,6 +93,310 @@ function PaymentsPage() {
   const handleViewDetails = (payment) => {
     setSelectedPayment(payment);
     setShowDetailsModal(true);
+  };
+
+  const handlePrintReceipt = (payment) => {
+    const member = members.find(m => m.id === payment.member_id);
+
+    const printContent = document.createElement('div');
+    printContent.innerHTML = `
+      <html>
+        <head>
+          <title>Facture - ${member ? `${member.first_name} ${member.last_name}` : 'Paiement'}</title>
+          <style>
+            @page {
+              margin: 2cm;
+            }
+            body {
+              font-family: Arial, sans-serif;
+              color: #000;
+              line-height: 1.6;
+            }
+            .header {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+              margin-bottom: 40px;
+              border-bottom: 3px solid #3b82f6;
+              padding-bottom: 30px;
+            }
+            .logo-section {
+              display: flex;
+              flex-direction: column;
+              gap: 12px;
+            }
+            .logo {
+              max-width: 120px;
+              max-height: 120px;
+              object-fit: contain;
+            }
+            .club-name {
+              font-size: 24px;
+              font-weight: 700;
+              color: #1f2937;
+            }
+            .club-info {
+              font-size: 14px;
+              color: #6b7280;
+            }
+            .invoice-title {
+              text-align: right;
+            }
+            .invoice-title h1 {
+              font-size: 32px;
+              color: #3b82f6;
+              font-weight: 700;
+              margin-bottom: 8px;
+            }
+            .invoice-number {
+              font-size: 14px;
+              color: #6b7280;
+            }
+            .receipt-info {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 30px;
+              margin: 30px 0;
+            }
+            .info-section {
+              padding: 20px;
+              background: #f8fafc;
+              border-radius: 8px;
+              border-left: 4px solid #3b82f6;
+            }
+            .info-section h3 {
+              margin: 0 0 15px 0;
+              font-size: 16px;
+              color: #0f172a;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            .info-section p {
+              margin: 8px 0;
+              font-size: 14px;
+              color: #475569;
+            }
+            .info-section strong {
+              color: #0f172a;
+              font-weight: 600;
+            }
+            .amount-section {
+              margin: 40px 0;
+              padding: 30px;
+              background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+              border: 3px solid #10b981;
+              border-radius: 12px;
+              text-align: center;
+            }
+            .amount-section .label {
+              font-size: 16px;
+              color: #065f46;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              margin-bottom: 10px;
+            }
+            .amount-section .amount {
+              font-size: 48px;
+              font-weight: 800;
+              color: #059669;
+              margin: 10px 0;
+            }
+            .details-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 30px 0;
+            }
+            .details-table th {
+              background: #f3f4f6;
+              padding: 16px;
+              text-align: left;
+              font-size: 13px;
+              color: #374151;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+            }
+            .details-table td {
+              padding: 20px 16px;
+              border-bottom: 1px solid #e5e7eb;
+              font-size: 15px;
+              color: #1f2937;
+            }
+            .details-table tr:last-child td {
+              border-bottom: none;
+            }
+            .notes-section {
+              margin: 30px 0;
+              padding: 20px;
+              background: #fffbeb;
+              border-left: 4px solid #f59e0b;
+              border-radius: 4px;
+            }
+            .notes-section h4 {
+              margin: 0 0 10px 0;
+              font-size: 14px;
+              color: #92400e;
+              font-weight: 700;
+              text-transform: uppercase;
+            }
+            .notes-section p {
+              margin: 0;
+              font-size: 14px;
+              color: #78350f;
+              line-height: 1.6;
+            }
+            .total-section {
+              display: flex;
+              justify-content: flex-end;
+              margin-top: 30px;
+            }
+            .total-box {
+              background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+              color: white;
+              padding: 24px 40px;
+              border-radius: 12px;
+              min-width: 300px;
+            }
+            .total-label {
+              font-size: 14px;
+              opacity: 0.9;
+              margin-bottom: 8px;
+            }
+            .total-amount {
+              font-size: 36px;
+              font-weight: 700;
+            }
+            .footer {
+              margin-top: 50px;
+              padding-top: 20px;
+              border-top: 2px solid #e2e8f0;
+              text-align: center;
+            }
+            .footer .powered-by {
+              font-size: 13px;
+              color: #6b7280;
+              margin-top: 20px;
+              padding-top: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 12px;
+            }
+            .footer .date {
+              font-size: 12px;
+              color: #64748b;
+              margin-bottom: 5px;
+            }
+            @media print {
+              body {
+                padding: 0;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="logo-section">
+              ${clubInfo && clubInfo.logo_url ? `<img src="${clubInfo.logo_url}" alt="Logo" class="logo" />` : ''}
+              <div>
+                <div class="club-name">${clubInfo ? (clubInfo.name || clubInfo.club_name) : 'Mon Club'}</div>
+                <div class="club-info">
+                  ${clubInfo ? (clubInfo.city || '') : ''}
+                </div>
+              </div>
+            </div>
+            <div class="invoice-title">
+              <h1>FACTURE</h1>
+              <div class="invoice-number">N° ${payment.id.slice(0, 8).toUpperCase()}</div>
+            </div>
+          </div>
+
+          <div class="receipt-info">
+            <div class="info-section">
+              <h3>Adhérent</h3>
+              <p><strong>Nom:</strong> ${member ? `${member.first_name} ${member.last_name}` : 'Inconnu'}</p>
+              ${member && member.phone ? `<p><strong>Téléphone:</strong> ${member.phone}</p>` : ''}
+              ${member && member.email ? `<p><strong>Email:</strong> ${member.email}</p>` : ''}
+            </div>
+
+            <div class="info-section">
+              <h3>Informations de paiement</h3>
+              <p><strong>Date:</strong> ${new Date(payment.payment_date).toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+              })}</p>
+              <p><strong>Méthode:</strong> ${getPaymentMethodLabel(payment.payment_method)}</p>
+              <p><strong>Statut:</strong> <span style="color: #10b981; font-weight: 600;">Payé</span></p>
+            </div>
+          </div>
+
+          <table class="details-table">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Période</th>
+                <th style="text-align: right;">Montant</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>${getPaymentTypeLabel(payment.payment_type)}</strong>
+                </td>
+                <td>
+                  ${payment.month_year ? new Date(payment.month_year + '-01').toLocaleDateString('fr-FR', {
+                    month: 'long',
+                    year: 'numeric'
+                  }) : '-'}
+                </td>
+                <td style="text-align: right; font-weight: 700;">
+                  ${parseFloat(payment.amount).toLocaleString()} FCFA
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          ${payment.notes ? `
+            <div class="notes-section">
+              <h4>Notes</h4>
+              <p>${payment.notes}</p>
+            </div>
+          ` : ''}
+
+          <div class="total-section">
+            <div class="total-box">
+              <div class="total-label">MONTANT TOTAL</div>
+              <div class="total-amount">${parseFloat(payment.amount).toLocaleString()} FCFA</div>
+            </div>
+          </div>
+
+          <div class="footer">
+            <p>Merci pour votre paiement</p>
+            <p style="margin-top: 8px;">Cette facture a été générée le ${new Date().toLocaleDateString('fr-FR', {
+              day: '2-digit',
+              month: 'long',
+              year: 'numeric'
+            })}</p>
+            <div class="powered-by">
+              <span>Propulsé par</span>
+              <img src="${window.location.origin}/image.png" alt="Nova Company Technology" style="max-width: 180px; max-height: 60px; object-fit: contain; vertical-align: middle;" />
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(printContent.innerHTML);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
   };
 
   const getPaymentTypeLabel = (type) => {
@@ -496,6 +811,29 @@ function PaymentsPage() {
                             👁️
                           </button>
                           <button
+                            onClick={() => handlePrintReceipt(payment)}
+                            style={{
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              border: '1px solid #e2e8f0',
+                              backgroundColor: 'white',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.backgroundColor = '#eff6ff';
+                              e.target.style.borderColor = '#3b82f6';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.backgroundColor = 'white';
+                              e.target.style.borderColor = '#e2e8f0';
+                            }}
+                            title="Imprimer la facture"
+                          >
+                            🖨️
+                          </button>
+                          <button
                             onClick={() => handleDelete(payment)}
                             style={{
                               padding: '6px 12px',
@@ -663,7 +1001,35 @@ function PaymentsPage() {
                 )}
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px' }}>
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between', marginTop: '24px' }}>
+                <button
+                  onClick={() => handlePrintReceipt(selectedPayment)}
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: '#3b82f6',
+                    border: '2px solid #3b82f6',
+                    borderRadius: '8px',
+                    color: 'white',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#2563eb';
+                    e.target.style.borderColor = '#2563eb';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = '#3b82f6';
+                    e.target.style.borderColor = '#3b82f6';
+                  }}
+                >
+                  <span>🖨️</span>
+                  <span>Imprimer la facture</span>
+                </button>
                 <button
                   onClick={() => setShowDetailsModal(false)}
                   style={{
