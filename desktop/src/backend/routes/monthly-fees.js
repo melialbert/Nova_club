@@ -74,6 +74,7 @@ router.post('/mark-paid', authenticate, async (req, res) => {
     const { member_id, year, month, amount, payment_method, notes } = req.body;
     const db = getDb();
     const paid_date = new Date().toISOString().split('T')[0];
+    const month_year = `${year}-${String(month).padStart(2, '0')}`;
 
     const existing = db.prepare(
       'SELECT id FROM monthly_fees WHERE member_id = ? AND year = ? AND month = ?'
@@ -87,6 +88,24 @@ router.post('/mark-paid', authenticate, async (req, res) => {
       `).run(paid_date, payment_method, notes, amount, existing.id);
 
       const updated = db.prepare('SELECT * FROM monthly_fees WHERE id = ?').get(existing.id);
+
+      const existingPayment = db.prepare(
+        'SELECT id FROM payments WHERE member_id = ? AND month_year = ? AND payment_type = ?'
+      ).get(member_id, month_year, 'monthly_fee');
+
+      if (existingPayment) {
+        db.prepare(`
+          UPDATE payments
+          SET amount = ?, payment_date = ?, payment_method = ?
+          WHERE id = ?
+        `).run(amount, paid_date, payment_method, existingPayment.id);
+      } else {
+        db.prepare(`
+          INSERT INTO payments (club_id, member_id, amount, payment_date, payment_method, payment_type, month_year, description, status)
+          VALUES (?, ?, ?, ?, ?, 'monthly_fee', ?, ?, 'completed')
+        `).run(req.clubId, member_id, amount, paid_date, payment_method, month_year, notes || `Cotisation ${month_year}`);
+      }
+
       return res.json(updated);
     } else {
       const result = db.prepare(`
@@ -94,6 +113,11 @@ router.post('/mark-paid', authenticate, async (req, res) => {
         (member_id, club_id, year, month, amount, paid_date, status, payment_method, notes)
         VALUES (?, ?, ?, ?, ?, ?, 'paid', ?, ?)
       `).run(member_id, req.clubId, year, month, amount, paid_date, payment_method, notes);
+
+      db.prepare(`
+        INSERT INTO payments (club_id, member_id, amount, payment_date, payment_method, payment_type, month_year, description, status)
+        VALUES (?, ?, ?, ?, ?, 'monthly_fee', ?, ?, 'completed')
+      `).run(req.clubId, member_id, amount, paid_date, payment_method, month_year, notes || `Cotisation ${month_year}`);
 
       const inserted = db.prepare('SELECT * FROM monthly_fees WHERE id = ?').get(result.lastInsertRowid);
       res.json(inserted);
@@ -108,6 +132,7 @@ router.post('/mark-unpaid', authenticate, async (req, res) => {
   try {
     const { member_id, year, month } = req.body;
     const db = getDb();
+    const month_year = `${year}-${String(month).padStart(2, '0')}`;
 
     const existing = db.prepare(
       'SELECT id FROM monthly_fees WHERE member_id = ? AND year = ? AND month = ?'
@@ -119,6 +144,11 @@ router.post('/mark-unpaid', authenticate, async (req, res) => {
         SET status = 'unpaid', paid_date = NULL, payment_method = NULL
         WHERE id = ?
       `).run(existing.id);
+
+      db.prepare(`
+        DELETE FROM payments
+        WHERE member_id = ? AND month_year = ? AND payment_type = ?
+      `).run(member_id, month_year, 'monthly_fee');
 
       const updated = db.prepare('SELECT * FROM monthly_fees WHERE id = ?').get(existing.id);
       res.json(updated);
