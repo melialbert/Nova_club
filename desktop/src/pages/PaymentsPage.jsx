@@ -309,7 +309,7 @@ function PaymentsPage() {
             </div>
             <div class="invoice-title">
               <h1>FACTURE</h1>
-              <div class="invoice-number">N° ${payment.id.slice(0, 8).toUpperCase()}</div>
+              <div class="invoice-number">N° ${String(payment.id).padStart(8, '0')}</div>
             </div>
           </div>
 
