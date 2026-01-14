@@ -91,117 +91,179 @@ function SettingsPage() {
   return (
     <div className="fade-in">
       <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '32px'
+        marginBottom: '32px',
+        padding: '32px',
+        background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+        borderRadius: '20px',
+        color: 'white',
+        boxShadow: '0 10px 40px rgba(59, 130, 246, 0.3)'
       }}>
-        <div>
-          <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>
-            Gérez les informations de votre club
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          <div style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '50%',
+            background: 'rgba(255, 255, 255, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '36px',
+            backdropFilter: 'blur(10px)',
+            border: '3px solid rgba(255, 255, 255, 0.3)'
+          }}>
+            ⚙️
+          </div>
+          <div>
+            <h1 style={{ fontSize: '28px', fontWeight: '700', margin: '0 0 8px 0' }}>
+              Paramètres du club
+            </h1>
+            <p style={{ margin: 0, opacity: 0.9, fontSize: '15px' }}>
+              Gérez les informations et l'identité de votre club
+            </p>
+          </div>
         </div>
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="card" style={{ marginBottom: '24px' }}>
-          <div className="card-header">
-            <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
-              Logo du club
-            </h2>
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+          <div className="card" style={{ gridColumn: 'span 2' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '32px',
+              padding: '8px'
+            }}>
+              <div style={{ flex: 1 }}>
+                <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '24px' }}>🖼️</span>
+                  Logo du club
+                </h2>
+                <p style={{ fontSize: '14px', color: '#64748b', marginBottom: '24px', lineHeight: '1.6' }}>
+                  Téléchargez le logo de votre club. Il sera affiché sur tous vos documents et dans l'interface.
+                </p>
 
-          <div style={{ textAlign: 'center', padding: '24px 0' }}>
-            {logoPreview ? (
-              <div>
-                <img
-                  src={logoPreview}
-                  alt="Logo du club"
-                  style={{
-                    maxWidth: '200px',
-                    maxHeight: '200px',
+                {!logoPreview ? (
+                  <label style={{
+                    display: 'block',
+                    border: '2px dashed #cbd5e1',
                     borderRadius: '16px',
-                    border: '3px solid #e2e8f0',
-                    objectFit: 'contain',
-                    marginBottom: '16px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                    padding: '32px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    backgroundColor: '#f8fafc'
                   }}
-                />
-                <div>
-                  <button
-                    type="button"
-                    onClick={handleRemoveLogo}
-                    style={{
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = '#3b82f6';
+                    e.currentTarget.style.backgroundColor = '#eff6ff';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = '#cbd5e1';
+                    e.currentTarget.style.backgroundColor = '#f8fafc';
+                  }}
+                  >
+                    <div style={{ fontSize: '48px', marginBottom: '12px' }}>📤</div>
+                    <div style={{ fontSize: '15px', fontWeight: '600', color: '#0f172a', marginBottom: '4px' }}>
+                      Cliquez pour télécharger
+                    </div>
+                    <div style={{ fontSize: '13px', color: '#64748b' }}>
+                      JPG, PNG ou SVG (max. 5MB)
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoChange}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                ) : null}
+              </div>
+
+              {logoPreview && (
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '16px'
+                }}>
+                  <div style={{
+                    position: 'relative',
+                    padding: '24px',
+                    background: 'linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%)',
+                    borderRadius: '20px',
+                    border: '2px solid #e2e8f0'
+                  }}>
+                    <img
+                      src={logoPreview}
+                      alt="Logo du club"
+                      style={{
+                        width: '200px',
+                        height: '200px',
+                        borderRadius: '12px',
+                        objectFit: 'contain'
+                      }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <label style={{
                       padding: '10px 20px',
-                      backgroundColor: '#ef4444',
+                      backgroundColor: '#3b82f6',
                       color: 'white',
                       border: 'none',
-                      borderRadius: '8px',
+                      borderRadius: '10px',
                       cursor: 'pointer',
                       fontSize: '14px',
                       fontWeight: '600',
-                      transition: 'all 0.2s'
+                      transition: 'all 0.2s',
+                      display: 'inline-block'
                     }}
-                    onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
-                    onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
-                  >
-                    Supprimer le logo
-                  </button>
+                    onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
+                    onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
+                    >
+                      Modifier
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoChange}
+                        style={{ display: 'none' }}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleRemoveLogo}
+                      style={{
+                        padding: '10px 20px',
+                        backgroundColor: '#ef4444',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = '#dc2626'}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = '#ef4444'}
+                    >
+                      Supprimer
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div style={{
-                border: '3px dashed #cbd5e1',
-                borderRadius: '16px',
-                padding: '48px 24px',
-                backgroundColor: '#f8fafc',
-                margin: '0 auto',
-                maxWidth: '400px'
-              }}>
-                <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏢</div>
-                <div style={{ fontSize: '16px', fontWeight: '600', color: '#0f172a', marginBottom: '8px' }}>
-                  Ajouter le logo du club
-                </div>
-                <div style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px' }}>
-                  Formats acceptés : JPG, PNG, SVG
-                </div>
-                <label style={{
-                  display: 'inline-block',
-                  padding: '12px 24px',
-                  backgroundColor: '#3b82f6',
-                  color: 'white',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#2563eb'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#3b82f6'}
-                >
-                  Choisir un fichier
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleLogoChange}
-                    style={{ display: 'none' }}
-                  />
-                </label>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="card" style={{ marginBottom: '24px' }}>
-          <div className="card-header">
-            <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
-              Informations du club
+          <div className="card">
+            <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '24px' }}>🏛️</span>
+              Informations générales
             </h2>
-          </div>
 
-          <div style={{ display: 'grid', gap: '20px' }}>
             <div className="form-group">
-              <label>Nom du club *</label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>🏷️</span>
+                Nom du club *
+              </label>
               <input
                 type="text"
                 name="club_name"
@@ -213,34 +275,170 @@ function SettingsPage() {
             </div>
 
             <div className="form-group">
-              <label>Ville *</label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>📍</span>
+                Ville *
+              </label>
               <input
                 type="text"
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
                 required
-                placeholder="Paris"
+                placeholder="Ex: Paris"
               />
             </div>
+          </div>
+
+          <div className="card">
+            <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '24px' }}>💬</span>
+              Identité du club
+            </h2>
 
             <div className="form-group">
-              <label>Slogan</label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>✨</span>
+                Slogan
+              </label>
               <input
                 type="text"
                 name="slogan"
                 value={formData.slogan}
                 onChange={handleChange}
-                placeholder="Le slogan de votre club"
+                placeholder="Ex: L'esprit du combat, la force du respect"
               />
+              <div style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
+                Un slogan qui reflète les valeurs de votre club
+              </div>
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-          <button type="submit" className="btn btn-success" style={{ fontSize: '15px', padding: '14px 32px' }}>
+        {clubSettings && (
+          <div className="card" style={{
+            marginBottom: '24px',
+            background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+            border: '2px solid #bae6fd'
+          }}>
+            <h2 style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '24px' }}>👁️</span>
+              Aperçu
+            </h2>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '24px',
+              padding: '24px',
+              background: 'white',
+              borderRadius: '12px',
+              border: '1px solid #e2e8f0'
+            }}>
+              {logoPreview ? (
+                <img
+                  src={logoPreview}
+                  alt="Aperçu logo"
+                  style={{
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '12px',
+                    objectFit: 'contain',
+                    border: '2px solid #e2e8f0'
+                  }}
+                />
+              ) : (
+                <div style={{
+                  width: '80px',
+                  height: '80px',
+                  borderRadius: '12px',
+                  background: '#f1f5f9',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '32px',
+                  border: '2px solid #e2e8f0'
+                }}>
+                  🏢
+                </div>
+              )}
+              <div style={{ flex: 1 }}>
+                <h3 style={{ fontSize: '22px', fontWeight: '700', color: '#0f172a', margin: '0 0 4px 0' }}>
+                  {formData.club_name || 'Nom du club'}
+                </h3>
+                <p style={{ fontSize: '15px', color: '#64748b', margin: '0 0 4px 0' }}>
+                  📍 {formData.city || 'Ville'}
+                </p>
+                {formData.slogan && (
+                  <p style={{ fontSize: '14px', color: '#3b82f6', margin: 0, fontStyle: 'italic' }}>
+                    "{formData.slogan}"
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div style={{
+          display: 'flex',
+          gap: '12px',
+          justifyContent: 'flex-end',
+          padding: '24px',
+          background: 'white',
+          borderRadius: '16px',
+          border: '2px solid #e2e8f0',
+          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)'
+        }}>
+          <button
+            type="button"
+            onClick={loadSettings}
+            style={{
+              padding: '14px 28px',
+              backgroundColor: '#f1f5f9',
+              color: '#475569',
+              border: 'none',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontSize: '15px',
+              fontWeight: '600',
+              transition: 'all 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#e2e8f0'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#f1f5f9'}
+          >
+            <span>🔄</span>
+            <span>Annuler</span>
+          </button>
+          <button
+            type="submit"
+            style={{
+              padding: '14px 32px',
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              fontSize: '15px',
+              fontWeight: '600',
+              transition: 'all 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+            }}
+          >
             <span>💾</span>
-            <span>Enregistrer les paramètres</span>
+            <span>Enregistrer les modifications</span>
           </button>
         </div>
       </form>
