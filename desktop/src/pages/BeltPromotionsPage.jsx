@@ -795,123 +795,117 @@ function BeltPromotionsPage() {
           </div>
 
           {pendingPromotions.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {pendingPromotions.map(promotion => (
-                <div
-                  key={promotion.id}
-                  style={{
-                    padding: '20px',
-                    border: '2px solid #e2e8f0',
-                    borderRadius: '12px',
-                    backgroundColor: '#fef9f5',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '16px' }}>
-                    <div>
-                      <div style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', marginBottom: '4px' }}>
-                        {promotion.first_name} {promotion.last_name}
-                      </div>
-                      <div style={{ fontSize: '13px', color: '#64748b' }}>
-                        {new Date(promotion.promotion_date).toLocaleDateString('fr-FR')}
-                        {promotion.examiner && ` • Examinateur: ${promotion.examiner}`}
-                      </div>
-                    </div>
-                    <div style={{
-                      padding: '6px 12px',
-                      borderRadius: '6px',
-                      backgroundColor: '#fef3c7',
-                      color: '#92400e',
-                      fontSize: '13px',
-                      fontWeight: '600'
-                    }}>
-                      {getStatusLabel(promotion.status)}
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-                    <div style={{
-                      display: 'inline-flex',
-                      padding: '8px 16px',
-                      borderRadius: '8px',
-                      background: getBeltColor(promotion.previous_belt),
-                      color: getBeltTextColor(promotion.previous_belt),
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      border: '2px solid',
-                      borderColor: promotion.previous_belt === 'white' ? '#e2e8f0' : 'transparent'
-                    }}>
-                      {getBeltLabel(promotion.previous_belt)}
-                    </div>
-                    <span style={{ color: '#3b82f6', fontSize: '24px', fontWeight: '700' }}>→</span>
-                    <div style={{
-                      display: 'inline-flex',
-                      padding: '8px 16px',
-                      borderRadius: '8px',
-                      background: getBeltColor(promotion.new_belt),
-                      color: getBeltTextColor(promotion.new_belt),
-                      fontSize: '14px',
-                      fontWeight: '600',
-                      border: '2px solid',
-                      borderColor: promotion.new_belt === 'white' ? '#e2e8f0' : 'transparent'
-                    }}>
-                      {getBeltLabel(promotion.new_belt)}
-                    </div>
-                  </div>
-
-                  {promotion.notes && (
-                    <div style={{
-                      padding: '12px',
-                      backgroundColor: '#f8fafc',
-                      borderRadius: '6px',
-                      fontSize: '13px',
-                      color: '#64748b',
-                      marginBottom: '16px'
-                    }}>
-                      {promotion.notes}
-                    </div>
-                  )}
-
-                  <div style={{ display: 'flex', gap: '12px' }}>
-                    <button
-                      onClick={() => handleStatusChange(promotion.id, 'passed')}
-                      className="btn btn-success"
-                      style={{ flex: 1 }}
-                    >
-                      <span>✓</span>
-                      <span>Réussi</span>
-                    </button>
-                    <button
-                      onClick={() => handleStatusChange(promotion.id, 'failed')}
-                      className="btn"
-                      style={{
-                        flex: 1,
-                        backgroundColor: '#fef2f2',
-                        color: '#dc2626',
-                        border: '1px solid #fecaca'
-                      }}
-                    >
-                      <span>✕</span>
-                      <span>Échoué</span>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(promotion)}
-                      style={{
-                        padding: '10px 16px',
-                        borderRadius: '8px',
-                        border: '1px solid #e2e8f0',
-                        backgroundColor: 'white',
-                        cursor: 'pointer',
-                        color: '#64748b',
-                        fontSize: '16px'
-                      }}
-                      title="Supprimer"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              ))}
+            <div className="table-container">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Adhérent</th>
+                    <th>Ceinture actuelle</th>
+                    <th style={{ width: '60px', textAlign: 'center' }}>→</th>
+                    <th>Nouvelle ceinture</th>
+                    <th>Date</th>
+                    <th style={{ width: '300px' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingPromotions.map(promotion => (
+                    <tr key={promotion.id}>
+                      <td>
+                        <div style={{ fontWeight: '600', color: '#0f172a' }}>
+                          {promotion.first_name} {promotion.last_name}
+                        </div>
+                        {promotion.examiner && (
+                          <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
+                            Exam: {promotion.examiner}
+                          </div>
+                        )}
+                      </td>
+                      <td>
+                        <div style={{
+                          display: 'inline-flex',
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          background: getBeltColor(promotion.previous_belt),
+                          color: getBeltTextColor(promotion.previous_belt),
+                          fontWeight: '600',
+                          fontSize: '13px',
+                          border: '2px solid',
+                          borderColor: promotion.previous_belt === 'white' ? '#e2e8f0' : 'transparent'
+                        }}>
+                          {getBeltLabel(promotion.previous_belt)}
+                        </div>
+                      </td>
+                      <td style={{ textAlign: 'center', fontSize: '20px', color: '#3b82f6' }}>→</td>
+                      <td>
+                        <div style={{
+                          display: 'inline-flex',
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          background: getBeltColor(promotion.new_belt),
+                          color: getBeltTextColor(promotion.new_belt),
+                          fontWeight: '600',
+                          fontSize: '13px',
+                          border: '2px solid',
+                          borderColor: promotion.new_belt === 'white' ? '#e2e8f0' : 'transparent'
+                        }}>
+                          {getBeltLabel(promotion.new_belt)}
+                        </div>
+                      </td>
+                      <td>
+                        <div style={{ fontWeight: '500' }}>
+                          {new Date(promotion.promotion_date).toLocaleDateString('fr-FR')}
+                        </div>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            onClick={() => handleStatusChange(promotion.id, 'passed')}
+                            className="btn btn-success"
+                            style={{
+                              flex: 1,
+                              fontSize: '13px',
+                              padding: '8px 12px'
+                            }}
+                          >
+                            <span>✓</span>
+                            <span>Réussi</span>
+                          </button>
+                          <button
+                            onClick={() => handleStatusChange(promotion.id, 'failed')}
+                            className="btn"
+                            style={{
+                              flex: 1,
+                              backgroundColor: '#fef2f2',
+                              color: '#dc2626',
+                              border: '1px solid #fecaca',
+                              fontSize: '13px',
+                              padding: '8px 12px'
+                            }}
+                          >
+                            <span>✕</span>
+                            <span>Échoué</span>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(promotion)}
+                            style={{
+                              padding: '8px 12px',
+                              borderRadius: '8px',
+                              border: '1px solid #e2e8f0',
+                              backgroundColor: 'white',
+                              cursor: 'pointer',
+                              color: '#64748b',
+                              fontSize: '14px'
+                            }}
+                            title="Supprimer"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : (
             <div className="empty-state">
