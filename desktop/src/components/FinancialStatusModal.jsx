@@ -59,41 +59,159 @@ export default function FinancialStatusModal({ member, onClose }) {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-        <div className="bg-white rounded-lg p-6">
-          <p>Chargement...</p>
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        zIndex: 9999
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          padding: '32px',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+        }}>
+          <p style={{ fontSize: '18px', color: '#64748b' }}>Chargement...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-5xl w-full max-h-[90vh] overflow-hidden">
-        <div className="p-6 border-b flex items-center justify-between">
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '24px',
+      zIndex: 9999
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        borderRadius: '16px',
+        maxWidth: '1200px',
+        width: '100%',
+        maxHeight: '90vh',
+        overflow: 'hidden',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+        {/* Header */}
+        <div style={{
+          padding: '24px 32px',
+          borderBottom: '2px solid #f1f5f9',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
           <div>
-            <h2 className="text-2xl font-bold text-gray-800">État Financier</h2>
-            <p className="text-gray-600 mt-1">{financialData.member.name}</p>
-            <p className="text-sm text-gray-500">Cotisation mensuelle: {financialData.member.monthly_fee}€</p>
+            <h2 style={{
+              fontSize: '28px',
+              fontWeight: '800',
+              color: '#0f172a',
+              margin: 0,
+              marginBottom: '8px'
+            }}>
+              💰 État Financier
+            </h2>
+            <p style={{
+              fontSize: '18px',
+              color: '#475569',
+              margin: 0,
+              fontWeight: '600'
+            }}>
+              {financialData.member.name}
+            </p>
+            <p style={{
+              fontSize: '14px',
+              color: '#64748b',
+              margin: 0,
+              marginTop: '4px'
+            }}>
+              Cotisation: <strong style={{ color: '#10b981' }}>{financialData.member.monthly_fee} FCFA</strong> / mois
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl"
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '8px',
+              border: 'none',
+              backgroundColor: '#fee2e2',
+              color: '#dc2626',
+              fontSize: '24px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'all 0.2s',
+              fontWeight: 'bold'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#fecaca';
+              e.target.style.transform = 'scale(1.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = '#fee2e2';
+              e.target.style.transform = 'scale(1)';
+            }}
           >
             ×
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-          <div className="mb-6 flex items-center gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+        {/* Content */}
+        <div style={{
+          padding: '32px',
+          overflowY: 'auto',
+          flex: 1
+        }}>
+          {/* Filters */}
+          <div style={{
+            marginBottom: '32px',
+            display: 'flex',
+            gap: '20px',
+            alignItems: 'flex-end'
+          }}>
+            <div style={{ flex: '0 0 150px' }}>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#475569',
+                marginBottom: '8px'
+              }}>
                 Année
               </label>
               <select
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                className="border rounded px-3 py-2"
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  border: '2px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  color: '#0f172a',
+                  backgroundColor: 'white',
+                  cursor: 'pointer'
+                }}
               >
                 {years.map(year => (
                   <option key={year} value={year}>{year}</option>
@@ -101,14 +219,30 @@ export default function FinancialStatusModal({ member, onClose }) {
               </select>
             </div>
 
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Méthode de paiement (pour nouveaux paiements)
+            <div style={{ flex: 1 }}>
+              <label style={{
+                display: 'block',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#475569',
+                marginBottom: '8px'
+              }}>
+                Méthode de paiement
               </label>
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
-                className="border rounded px-3 py-2 w-full"
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  border: '2px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  color: '#0f172a',
+                  backgroundColor: 'white',
+                  cursor: 'pointer'
+                }}
               >
                 {PAYMENT_METHODS.map(method => (
                   <option key={method.value} value={method.value}>
@@ -119,75 +253,172 @@ export default function FinancialStatusModal({ member, onClose }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 mb-6">
-            <div className="grid grid-cols-4 gap-3 p-4 bg-gray-50 rounded-lg">
-              <div className="text-center">
-                <p className="text-sm text-gray-600">Total</p>
-                <p className="text-2xl font-bold text-gray-800">{financialData.stats.total}</p>
-                <p className="text-xs text-gray-500">{financialData.stats.totalAmount}€</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600">Payés</p>
-                <p className="text-2xl font-bold text-green-600">{financialData.stats.paid}</p>
-                <p className="text-xs text-gray-500">{financialData.stats.paidAmount}€</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600">Non payés</p>
-                <p className="text-2xl font-bold text-red-600">{financialData.stats.unpaid}</p>
-                <p className="text-xs text-gray-500">{financialData.stats.unpaidAmount}€</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-gray-600">Taux</p>
-                <p className="text-2xl font-bold text-blue-600">
-                  {Math.round((financialData.stats.paid / financialData.stats.total) * 100)}%
-                </p>
-              </div>
+          {/* Stats Cards */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '16px',
+            marginBottom: '32px'
+          }}>
+            <div style={{
+              padding: '20px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+              textAlign: 'center',
+              border: '2px solid #cbd5e1'
+            }}>
+              <p style={{ fontSize: '13px', color: '#64748b', margin: 0, fontWeight: '600' }}>Total</p>
+              <p style={{ fontSize: '32px', fontWeight: '800', color: '#0f172a', margin: '8px 0' }}>
+                {financialData.stats.total}
+              </p>
+              <p style={{ fontSize: '14px', color: '#64748b', margin: 0, fontWeight: '600' }}>
+                {financialData.stats.totalAmount} FCFA
+              </p>
+            </div>
+
+            <div style={{
+              padding: '20px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)',
+              textAlign: 'center',
+              border: '2px solid #10b981'
+            }}>
+              <p style={{ fontSize: '13px', color: '#065f46', margin: 0, fontWeight: '600' }}>Payés</p>
+              <p style={{ fontSize: '32px', fontWeight: '800', color: '#059669', margin: '8px 0' }}>
+                {financialData.stats.paid}
+              </p>
+              <p style={{ fontSize: '14px', color: '#065f46', margin: 0, fontWeight: '600' }}>
+                {financialData.stats.paidAmount} FCFA
+              </p>
+            </div>
+
+            <div style={{
+              padding: '20px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)',
+              textAlign: 'center',
+              border: '2px solid #ef4444'
+            }}>
+              <p style={{ fontSize: '13px', color: '#991b1b', margin: 0, fontWeight: '600' }}>Non payés</p>
+              <p style={{ fontSize: '32px', fontWeight: '800', color: '#dc2626', margin: '8px 0' }}>
+                {financialData.stats.unpaid}
+              </p>
+              <p style={{ fontSize: '14px', color: '#991b1b', margin: 0, fontWeight: '600' }}>
+                {financialData.stats.unpaidAmount} FCFA
+              </p>
+            </div>
+
+            <div style={{
+              padding: '20px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
+              textAlign: 'center',
+              border: '2px solid #3b82f6'
+            }}>
+              <p style={{ fontSize: '13px', color: '#1e3a8a', margin: 0, fontWeight: '600' }}>Taux</p>
+              <p style={{ fontSize: '32px', fontWeight: '800', color: '#2563eb', margin: '8px 0' }}>
+                {Math.round((financialData.stats.paid / financialData.stats.total) * 100)}%
+              </p>
+              <p style={{ fontSize: '14px', color: '#1e3a8a', margin: 0, fontWeight: '600' }}>
+                de paiement
+              </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          {/* Months Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
+            gap: '16px',
+            marginBottom: '24px'
+          }}>
             {financialData.months.map((monthData) => {
               const isPaid = monthData.status === 'paid';
 
               return (
                 <div
                   key={monthData.month}
-                  className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                    isPaid
-                      ? 'border-green-500 bg-green-50 hover:bg-green-100'
-                      : 'border-red-300 bg-red-50 hover:bg-red-100'
-                  }`}
                   onClick={() => handleTogglePayment(monthData.month)}
+                  style={{
+                    padding: '16px',
+                    borderRadius: '12px',
+                    border: isPaid ? '3px solid #10b981' : '3px solid #f87171',
+                    backgroundColor: isPaid ? '#f0fdf4' : '#fef2f2',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    position: 'relative'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = '0 12px 24px rgba(0, 0, 0, 0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-semibold text-gray-700">
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    marginBottom: '12px'
+                  }}>
+                    <span style={{
+                      fontSize: '16px',
+                      fontWeight: '700',
+                      color: '#0f172a'
+                    }}>
                       {MONTHS[monthData.month - 1]}
                     </span>
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                      isPaid ? 'bg-green-500' : 'bg-red-400'
-                    }`}>
+                    <div style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '50%',
+                      backgroundColor: isPaid ? '#10b981' : '#ef4444',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
                       {isPaid ? (
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <svg style={{ width: '16px', height: '16px', color: 'white' }} fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       ) : (
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <svg style={{ width: '16px', height: '16px', color: 'white' }} fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                         </svg>
                       )}
                     </div>
                   </div>
 
-                  <div className="text-sm">
-                    <p className="text-gray-600">{monthData.amount}€</p>
+                  <div style={{ fontSize: '14px' }}>
+                    <p style={{
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      color: isPaid ? '#059669' : '#dc2626',
+                      margin: 0,
+                      marginBottom: '4px'
+                    }}>
+                      {monthData.amount} FCFA
+                    </p>
                     {isPaid && monthData.paid_date && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        {new Date(monthData.paid_date).toLocaleDateString('fr-FR')}
+                      <p style={{
+                        fontSize: '12px',
+                        color: '#64748b',
+                        margin: 0,
+                        marginTop: '4px'
+                      }}>
+                        📅 {new Date(monthData.paid_date).toLocaleDateString('fr-FR')}
                       </p>
                     )}
                     {isPaid && monthData.payment_method && (
-                      <p className="text-xs text-gray-500">
-                        {PAYMENT_METHODS.find(m => m.value === monthData.payment_method)?.label}
+                      <p style={{
+                        fontSize: '12px',
+                        color: '#64748b',
+                        margin: 0,
+                        marginTop: '2px'
+                      }}>
+                        💳 {PAYMENT_METHODS.find(m => m.value === monthData.payment_method)?.label}
                       </p>
                     )}
                   </div>
@@ -196,17 +427,54 @@ export default function FinancialStatusModal({ member, onClose }) {
             })}
           </div>
 
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800">
+          {/* Info Box */}
+          <div style={{
+            padding: '16px 20px',
+            borderRadius: '12px',
+            backgroundColor: '#dbeafe',
+            border: '2px solid #3b82f6'
+          }}>
+            <p style={{
+              fontSize: '14px',
+              color: '#1e40af',
+              margin: 0,
+              fontWeight: '600'
+            }}>
               💡 Cliquez sur un mois pour basculer son statut de paiement
             </p>
           </div>
         </div>
 
-        <div className="p-6 border-t bg-gray-50 flex justify-end gap-3">
+        {/* Footer */}
+        <div style={{
+          padding: '20px 32px',
+          borderTop: '2px solid #f1f5f9',
+          backgroundColor: '#f8fafc',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          gap: '12px'
+        }}>
           <button
             onClick={onClose}
-            className="px-4 py-2 border rounded hover:bg-gray-100"
+            style={{
+              padding: '12px 32px',
+              borderRadius: '8px',
+              border: '2px solid #e2e8f0',
+              backgroundColor: 'white',
+              color: '#475569',
+              fontSize: '15px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#f1f5f9';
+              e.target.style.borderColor = '#cbd5e1';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'white';
+              e.target.style.borderColor = '#e2e8f0';
+            }}
           >
             Fermer
           </button>
