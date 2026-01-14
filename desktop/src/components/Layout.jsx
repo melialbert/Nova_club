@@ -213,13 +213,14 @@ function Layout({ children, onLogout }) {
         display: 'flex',
         flexDirection: 'column',
         height: '100vh',
-        backgroundColor: '#f8fafc'
+        backgroundColor: 'transparent'
       }}>
         <header style={{
-          backgroundColor: 'white',
-          borderBottom: '1px solid #e2e8f0',
+          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
           padding: '20px 32px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
         }}>
           <div style={{
             display: 'flex',
@@ -230,7 +231,7 @@ function Layout({ children, onLogout }) {
               <h1 style={{
                 fontSize: '24px',
                 fontWeight: '700',
-                color: '#0f172a',
+                color: '#f1f5f9',
                 margin: 0
               }}>
                 {menuItems.find(item => item.path === location.pathname)?.label || 'NovaClub'}
