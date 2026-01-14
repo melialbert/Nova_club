@@ -216,11 +216,11 @@ function Layout({ children, onLogout }) {
         backgroundColor: 'transparent'
       }}>
         <header style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
           backdropFilter: 'blur(10px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          borderBottom: '1px solid rgba(59, 130, 246, 0.1)',
           padding: '20px 32px',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
         }}>
           <div style={{
             display: 'flex',
@@ -231,7 +231,7 @@ function Layout({ children, onLogout }) {
               <h1 style={{
                 fontSize: '24px',
                 fontWeight: '700',
-                color: '#f1f5f9',
+                color: '#0f172a',
                 margin: 0
               }}>
                 {menuItems.find(item => item.path === location.pathname)?.label || 'NovaClub'}

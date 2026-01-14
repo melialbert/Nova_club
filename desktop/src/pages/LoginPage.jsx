@@ -29,7 +29,7 @@ function LoginPage({ onLogin }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
+      background: 'linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 50%, #f8fafc 100%)',
       padding: '20px',
       position: 'relative',
       overflow: 'hidden'
@@ -45,14 +45,14 @@ function LoginPage({ onLogin }) {
       }} />
 
       <div style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.08)',
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
         backdropFilter: 'blur(10px)',
         borderRadius: '20px',
         padding: '48px 40px',
         maxWidth: '440px',
         width: '100%',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1)',
+        border: '1px solid rgba(59, 130, 246, 0.1)',
         position: 'relative',
         zIndex: 1,
         animation: 'slideIn 0.5s ease-out'
@@ -106,14 +106,14 @@ function LoginPage({ onLogin }) {
           <h2 style={{
             fontSize: '24px',
             fontWeight: '600',
-            color: '#f1f5f9',
+            color: '#1e293b',
             marginBottom: '8px'
           }}>
             Connexion
           </h2>
           <p style={{
             fontSize: '14px',
-            color: '#cbd5e1'
+            color: '#64748b'
           }}>
             Connectez-vous pour accéder à votre espace
           </p>
@@ -157,7 +157,7 @@ function LoginPage({ onLogin }) {
               display: 'block',
               fontSize: '14px',
               fontWeight: '600',
-              color: '#e2e8f0',
+              color: '#334155',
               marginBottom: '8px'
             }}>
               Adresse email
@@ -182,20 +182,20 @@ function LoginPage({ onLogin }) {
                   width: '100%',
                   padding: '14px 16px 14px 48px',
                   fontSize: '15px',
-                  border: '2px solid rgba(255, 255, 255, 0.1)',
+                  border: '2px solid #e2e8f0',
                   borderRadius: '12px',
                   outline: 'none',
                   transition: 'all 0.2s ease',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  color: '#f1f5f9'
+                  backgroundColor: '#f8fafc',
+                  color: '#0f172a'
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = '#3b82f6';
-                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                  e.target.style.backgroundColor = '#ffffff';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                  e.target.style.borderColor = '#e2e8f0';
+                  e.target.style.backgroundColor = '#f8fafc';
                 }}
               />
             </div>
@@ -206,7 +206,7 @@ function LoginPage({ onLogin }) {
               display: 'block',
               fontSize: '14px',
               fontWeight: '600',
-              color: '#e2e8f0',
+              color: '#334155',
               marginBottom: '8px'
             }}>
               Mot de passe
@@ -231,20 +231,20 @@ function LoginPage({ onLogin }) {
                   width: '100%',
                   padding: '14px 48px 14px 48px',
                   fontSize: '15px',
-                  border: '2px solid rgba(255, 255, 255, 0.1)',
+                  border: '2px solid #e2e8f0',
                   borderRadius: '12px',
                   outline: 'none',
                   transition: 'all 0.2s ease',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  color: '#f1f5f9'
+                  backgroundColor: '#f8fafc',
+                  color: '#0f172a'
                 }}
                 onFocus={(e) => {
                   e.target.style.borderColor = '#3b82f6';
-                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                  e.target.style.backgroundColor = '#ffffff';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                  e.target.style.borderColor = '#e2e8f0';
+                  e.target.style.backgroundColor = '#f8fafc';
                 }}
               />
               <button
@@ -323,14 +323,14 @@ function LoginPage({ onLogin }) {
         <div style={{
           marginTop: '32px',
           padding: '20px',
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          backgroundColor: '#f8fafc',
           borderRadius: '12px',
-          border: '1px solid rgba(255, 255, 255, 0.1)'
+          border: '1px solid #e2e8f0'
         }}>
           <div style={{
             fontSize: '13px',
             fontWeight: '600',
-            color: '#cbd5e1',
+            color: '#64748b',
             marginBottom: '12px',
             textAlign: 'center'
           }}>
@@ -338,7 +338,7 @@ function LoginPage({ onLogin }) {
           </div>
           <div style={{
             fontSize: '12px',
-            color: '#e2e8f0',
+            color: '#475569',
             lineHeight: '1.6'
           }}>
             Email: <strong>admin@club.fr</strong><br />

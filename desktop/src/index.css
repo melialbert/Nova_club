@@ -10,7 +10,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 50%, #f8fafc 100%);
   min-height: 100vh;
 }
 
@@ -20,20 +20,21 @@ body {
 }
 
 .card {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   margin-bottom: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.1);
   transition: all 0.3s ease;
 }
 
 .card:hover {
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
 }
 
 .card-header {
@@ -42,13 +43,13 @@ body {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 16px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 2px solid rgba(59, 130, 246, 0.1);
 }
 
 .card-title {
   font-size: 20px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #0f172a;
   margin: 0;
 }
 
@@ -123,7 +124,7 @@ body {
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #1e293b;
   font-size: 14px;
 }
 
@@ -132,12 +133,12 @@ body {
 .form-group textarea {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid #e2e8f0;
   border-radius: 10px;
   font-size: 15px;
   transition: all 0.2s ease;
-  background-color: rgba(255, 255, 255, 0.05);
-  color: #f1f5f9;
+  background-color: #ffffff;
+  color: #0f172a;
 }
 
 .form-group input:focus,
@@ -145,32 +146,32 @@ body {
 .form-group textarea:focus {
   outline: none;
   border-color: #3b82f6;
-  background-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .table-container {
   overflow-x: auto;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid #e2e8f0;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: #ffffff;
 }
 
 .table thead {
-  background: rgba(255, 255, 255, 0.08);
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+  border-bottom: 2px solid #e2e8f0;
 }
 
 .table th {
   padding: 16px;
   text-align: left;
   font-weight: 700;
-  color: #cbd5e1;
+  color: #475569;
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -178,8 +179,8 @@ body {
 
 .table td {
   padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: #e2e8f0;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
   font-size: 14px;
 }
 
@@ -188,7 +189,7 @@ body {
 }
 
 .table tbody tr:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: #f8fafc;
 }
 
 .table tbody tr:last-child td {
@@ -248,12 +249,12 @@ body {
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   padding: 24px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -271,8 +272,8 @@ body {
 
 .stat-card:hover {
   transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15);
 }
 
 .stat-icon {
@@ -289,13 +290,13 @@ body {
 .stat-value {
   font-size: 32px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #0f172a;
   margin-bottom: 4px;
 }
 
 .stat-label {
   font-size: 14px;
-  color: #cbd5e1;
+  color: #64748b;
   font-weight: 500;
 }
 
@@ -380,15 +381,15 @@ body {
 
 .search-input {
   padding: 12px 16px 12px 44px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid #e2e8f0;
   border-radius: 10px;
   font-size: 15px;
   width: 100%;
   max-width: 400px;
   transition: all 0.2s ease;
-  background-color: rgba(255, 255, 255, 0.05);
-  color: #f1f5f9;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cpath d='m21 21-4.35-4.35'%3E%3C/path%3E%3C/svg%3E");
+  background-color: #ffffff;
+  color: #0f172a;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cpath d='m21 21-4.35-4.35'%3E%3C/path%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: 12px center;
 }
@@ -396,8 +397,8 @@ body {
 .search-input:focus {
   outline: none;
   border-color: #3b82f6;
-  background-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .badge {
@@ -442,12 +443,12 @@ body {
 .empty-state-title {
   font-size: 20px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: #1e293b;
   margin-bottom: 8px;
 }
 
 .empty-state-description {
   font-size: 14px;
-  color: #cbd5e1;
+  color: #64748b;
   margin-bottom: 24px;
 }
