@@ -226,6 +226,27 @@ export const api = {
     return response.json();
   },
 
+  async updateCompetition(id, competitionData) {
+    const response = await fetch(`${API_URL}/competitions/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(competitionData),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la mise à jour de la compétition');
+    return response.json();
+  },
+
+  async deleteCompetition(id) {
+    const response = await fetch(`${API_URL}/competitions/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la suppression de la compétition');
+    return response.json();
+  },
+
   async getMemberCareer(memberId) {
     const response = await fetch(`${API_URL}/career/member/${memberId}`, {
       headers: getHeaders(),

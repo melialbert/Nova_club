@@ -21,6 +21,7 @@ function Layout({ children, onLogout }) {
     { path: '/payments', label: 'Paiements', icon: '💳' },
     { path: '/licenses', label: 'Licences', icon: '🎫' },
     { path: '/belt-promotions', label: 'Passages de grade', icon: '🥋' },
+    { path: '/competitions', label: 'Compétitions', icon: '🏆' },
     { path: '/employees', label: 'Employés', icon: '👔' },
     { path: '/accounting', label: 'Comptabilité', icon: '💰' },
     { path: '/settings', label: 'Paramètres', icon: '⚙️' },
