@@ -15,7 +15,7 @@ function CompetitionsPage() {
     location: '',
     competition_date: new Date().toISOString().split('T')[0],
     description: '',
-    level: 'beginner'
+    level: 'minime'
   });
 
   useEffect(() => {
@@ -59,7 +59,7 @@ function CompetitionsPage() {
       location: competition.location || '',
       competition_date: competition.competition_date || new Date().toISOString().split('T')[0],
       description: competition.description || '',
-      level: competition.level || 'beginner'
+      level: competition.level || 'minime'
     });
     setShowForm(true);
   };
@@ -82,7 +82,7 @@ function CompetitionsPage() {
       location: '',
       competition_date: new Date().toISOString().split('T')[0],
       description: '',
-      level: 'beginner'
+      level: 'minime'
     });
     setEditingId(null);
     setShowForm(false);
@@ -107,10 +107,10 @@ function CompetitionsPage() {
 
   const getLevelLabel = (level) => {
     const labels = {
-      'beginner': 'Débutant',
-      'intermediate': 'Intermédiaire',
-      'advanced': 'Avancé',
-      'elite': 'Elite'
+      'minime': 'Minime',
+      'cadet': 'Cadet',
+      'junior': 'Junior',
+      'senior': 'Senior'
     };
     return labels[level] || level;
   };
@@ -310,10 +310,10 @@ function CompetitionsPage() {
                       cursor: 'pointer'
                     }}
                   >
-                    <option value="beginner">Débutant</option>
-                    <option value="intermediate">Intermédiaire</option>
-                    <option value="advanced">Avancé</option>
-                    <option value="elite">Elite</option>
+                    <option value="minime">Minime</option>
+                    <option value="cadet">Cadet</option>
+                    <option value="junior">Junior</option>
+                    <option value="senior">Senior</option>
                   </select>
                 </div>
 
