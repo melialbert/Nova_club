@@ -305,357 +305,188 @@ function MembersPage() {
             <title>États Financiers - Tous les adhérents</title>
             <style>
               @page {
-                margin: 1.5cm;
+                margin: 1cm;
+                size: landscape;
               }
               body {
                 font-family: Arial, sans-serif;
                 color: #000;
-                max-width: 100%;
+                font-size: 10px;
               }
-              .page-break {
-                page-break-after: always;
-              }
-              .main-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 20px;
-                padding: 12px 15px;
-                background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
-                border-radius: 8px;
+              .header {
+                text-align: center;
+                margin-bottom: 15px;
+                padding: 10px;
+                background: #0f172a;
                 color: white;
               }
-              .main-header-left h1 {
-                margin: 0;
-                font-size: 22px;
-                color: white;
+              .header h1 {
+                margin: 0 0 5px 0;
+                font-size: 18px;
                 font-weight: 900;
-                text-transform: uppercase;
-                letter-spacing: 1px;
               }
-              .main-header-left .club-name {
-                font-size: 12px;
-                color: #cbd5e1;
-                font-weight: 600;
-                margin-top: 4px;
-              }
-              .main-header-right {
-                text-align: right;
-              }
-              .main-header-right .date {
+              .header-info {
                 font-size: 10px;
                 color: #cbd5e1;
-                margin-bottom: 4px;
               }
-              .main-header-right .year {
-                font-size: 16px;
-                font-weight: 800;
-                color: #3b82f6;
-                background: white;
-                padding: 4px 12px;
-                border-radius: 4px;
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
               }
-              .main-header-right .count {
-                font-size: 11px;
-                color: #cbd5e1;
-                font-weight: 700;
-                margin-top: 4px;
-              }
-              .member-section {
-                margin-bottom: 25px;
-              }
-              .member-header {
-                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-                padding: 10px 12px;
-                border-left: 4px solid #3b82f6;
-                margin-bottom: 12px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-              }
-              .member-header h2 {
-                margin: 0;
-                font-size: 16px;
-                color: #0f172a;
-                font-weight: 800;
-              }
-              .member-header .monthly-fee {
-                font-size: 14px;
-                color: #3b82f6;
-                font-weight: 700;
-                background: white;
-                padding: 4px 10px;
-                border-radius: 4px;
-              }
-              .content-wrapper {
-                display: flex;
-                gap: 12px;
-                margin-bottom: 12px;
-              }
-              .stats-column {
-                flex: 0 0 180px;
-              }
-              .stat-card {
-                padding: 8px;
+              th {
+                background: #334155;
+                color: white;
+                padding: 6px 4px;
                 text-align: center;
-                border: 2px solid #e2e8f0;
-                border-radius: 6px;
-                margin-bottom: 6px;
-                background: #ffffff;
-              }
-              .stat-card .label {
                 font-size: 8px;
-                color: #64748b;
                 font-weight: 700;
-                text-transform: uppercase;
-                margin-bottom: 2px;
-                letter-spacing: 0.5px;
+                border: 1px solid #475569;
               }
-              .stat-card .value {
-                font-size: 20px;
-                font-weight: 900;
-                color: #0f172a;
-                margin: 2px 0;
-                line-height: 1;
+              th.member-col {
+                text-align: left;
+                width: 140px;
               }
-              .stat-card .amount {
+              th.fee-col {
+                width: 60px;
+              }
+              th.month-col {
+                width: 65px;
+              }
+              td {
+                padding: 5px 3px;
+                border: 1px solid #cbd5e1;
+                text-align: center;
+                font-size: 7px;
+              }
+              td.member-name {
+                text-align: left;
+                font-weight: 700;
+                background: #f8fafc;
                 font-size: 9px;
-                color: #64748b;
+              }
+              td.monthly-fee {
+                text-align: center;
                 font-weight: 600;
+                background: #f8fafc;
+                font-size: 8px;
               }
-              .stat-card.paid {
-                border-color: #10b981;
-                background: #f0fdf4;
+              .status-paid {
+                background: #dcfce7;
+                color: #166534;
+                font-weight: 700;
               }
-              .stat-card.paid .value {
-                color: #059669;
+              .status-partial {
+                background: #fef3c7;
+                color: #92400e;
+                font-weight: 700;
               }
-              .stat-card.unpaid {
-                border-color: #ef4444;
-                background: #fef2f2;
+              .status-unpaid {
+                background: #fee2e2;
+                color: #991b1b;
+                font-weight: 700;
               }
-              .stat-card.unpaid .value {
-                color: #dc2626;
-              }
-              .stat-card.rate {
-                border-color: #3b82f6;
-                background: #eff6ff;
-              }
-              .stat-card.rate .value {
-                color: #2563eb;
-              }
-              .months-column {
-                flex: 1;
-              }
-              .months-grid {
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 6px;
-              }
-              .month-card {
-                border: 2px solid #e2e8f0;
-                border-radius: 5px;
-                padding: 6px;
-                background: #ffffff;
-              }
-              .month-card.paid {
-                border-color: #10b981;
-                background: #f0fdf4;
-              }
-              .month-card.partial {
-                border-color: #f59e0b;
-                background: #fffbeb;
-              }
-              .month-card.unpaid {
-                border-color: #dc2626;
-                background: #fef2f2;
-              }
-              .month-card .month-name {
-                font-size: 9px;
+              .amount {
+                display: block;
+                font-size: 8px;
                 font-weight: 800;
-                color: #0f172a;
-                margin-bottom: 3px;
-                text-transform: uppercase;
               }
-              .month-card .month-amount {
-                font-size: 11px;
-                font-weight: 800;
-                margin-bottom: 2px;
+              .partial-info {
+                display: block;
+                font-size: 6px;
+                margin-top: 2px;
                 line-height: 1.2;
               }
-              .month-card.paid .month-amount {
-                color: #059669;
-              }
-              .month-card.partial .month-amount {
-                color: #d97706;
-              }
-              .month-card.unpaid .month-amount {
-                color: #dc2626;
-              }
-              .month-card .month-details {
-                font-size: 7px;
-                color: #64748b;
-                margin-top: 2px;
-              }
-              .month-card .month-status {
-                font-size: 7px;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.3px;
-                margin-top: 2px;
-              }
-              .month-card.paid .month-status {
-                color: #059669;
-              }
-              .month-card.partial .month-status {
-                color: #d97706;
-              }
-              .month-card.unpaid .month-status {
-                color: #dc2626;
-              }
-              .summary-section {
-                margin-top: 10px;
-                padding: 8px 10px;
-                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-                border: 2px solid #cbd5e1;
-                border-radius: 6px;
-              }
-              .summary-section h3 {
-                margin: 0 0 6px 0;
-                font-size: 10px;
-                font-weight: 800;
-                color: #0f172a;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-              }
-              .summary-row {
-                display: flex;
-                justify-content: space-between;
-                padding: 3px 0;
-                border-bottom: 1px solid #cbd5e1;
-                font-size: 10px;
-              }
-              .summary-row:last-child {
-                border-bottom: none;
-                padding-top: 5px;
-                margin-top: 3px;
-                border-top: 2px solid #475569;
-                font-weight: 800;
-                font-size: 11px;
-              }
-              .summary-row .label {
-                color: #475569;
-                font-weight: 600;
-              }
-              .summary-row .value {
-                color: #0f172a;
-                font-weight: 700;
-              }
               .footer {
-                margin-top: 25px;
-                padding-top: 12px;
-                border-top: 2px solid #e2e8f0;
                 text-align: center;
-                font-size: 10px;
+                margin-top: 10px;
+                padding-top: 5px;
+                border-top: 2px solid #cbd5e1;
+                font-size: 8px;
                 color: #64748b;
+              }
+              .legend {
+                margin-bottom: 10px;
+                padding: 5px;
+                background: #f8fafc;
+                border: 1px solid #cbd5e1;
+                font-size: 8px;
+              }
+              .legend span {
+                margin-right: 15px;
+              }
+              .legend .paid {
+                color: #166534;
+                font-weight: 700;
+              }
+              .legend .partial {
+                color: #92400e;
+                font-weight: 700;
+              }
+              .legend .unpaid {
+                color: #991b1b;
+                font-weight: 700;
               }
             </style>
           </head>
           <body>
-            <div class="main-header">
-              <div class="main-header-left">
-                <h1>ÉTATS FINANCIERS - TOUS LES ADHÉRENTS</h1>
-                ${clubInfo ? `<div class="club-name">${clubInfo.name || clubInfo.club_name} - ${clubInfo.city}</div>` : ''}
-              </div>
-              <div class="main-header-right">
-                <div class="date">Imprimé le ${new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
-                <div class="year">Année ${selectedYear}</div>
-                <div class="count">${validMembersData.length} adhérent(s)</div>
+            <div class="header">
+              <h1>ÉTATS FINANCIERS - ANNÉE ${selectedYear}</h1>
+              <div class="header-info">
+                ${clubInfo ? `${clubInfo.name || clubInfo.club_name} - ${clubInfo.city} | ` : ''}
+                Imprimé le ${new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })} |
+                ${validMembersData.length} adhérent(s) actif(s)
               </div>
             </div>
 
-            ${validMembersData.map((data, index) => {
-              const { financialData } = data;
-              return `
-                <div class="member-section ${index < validMembersData.length - 1 ? 'page-break' : ''}">
-                  <div class="member-header">
-                    <h2>${financialData.member.name}</h2>
-                    <div class="monthly-fee">${financialData.member.monthly_fee} FCFA / mois</div>
-                  </div>
+            <div class="legend">
+              <span class="paid">✓ Payé</span>
+              <span class="partial">⚠ Partiel</span>
+              <span class="unpaid">✗ Impayé</span>
+            </div>
 
-                  <div class="content-wrapper">
-                    <div class="stats-column">
-                      <div class="stat-card">
-                        <div class="label">Total</div>
-                        <div class="value">${financialData.stats.total}</div>
-                        <div class="amount">${financialData.stats.totalAmount.toLocaleString()} F</div>
-                      </div>
-                      <div class="stat-card paid">
-                        <div class="label">Payés</div>
-                        <div class="value">${financialData.stats.paid}</div>
-                        <div class="amount">${financialData.stats.paidAmount.toLocaleString()} F</div>
-                      </div>
-                      ${financialData.stats.partial > 0 ? `
-                        <div class="stat-card" style="border-color: #f59e0b; background: #fffbeb;">
-                          <div class="label">Partiels</div>
-                          <div class="value" style="color: #d97706;">${financialData.stats.partial}</div>
-                          <div class="amount">En cours</div>
-                        </div>
-                      ` : ''}
-                      <div class="stat-card unpaid">
-                        <div class="label">Impayés</div>
-                        <div class="value">${financialData.stats.unpaid}</div>
-                        <div class="amount">${financialData.stats.unpaidAmount.toLocaleString()} F</div>
-                      </div>
-                    </div>
+            <table>
+              <thead>
+                <tr>
+                  <th class="member-col">Adhérent</th>
+                  <th class="fee-col">Cotisation</th>
+                  ${MONTHS.map(month => `<th class="month-col">${month.substring(0, 3)}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${validMembersData.map(data => {
+                  const { financialData } = data;
+                  return `
+                    <tr>
+                      <td class="member-name">${financialData.member.name}</td>
+                      <td class="monthly-fee">${financialData.member.monthly_fee} F</td>
+                      ${financialData.months.map(monthData => {
+                        const isPaid = monthData.status === 'paid';
+                        const isPartial = monthData.status === 'partial';
+                        const hasPartialInfo = monthData.total_amount && monthData.paid_amount && monthData.remaining_amount > 0;
+                        const statusClass = isPaid ? 'status-paid' : (isPartial || hasPartialInfo ? 'status-partial' : 'status-unpaid');
 
-                    <div class="months-column">
-                      <div class="months-grid">
-                        ${financialData.months.map(monthData => {
-                          const isPaid = monthData.status === 'paid';
-                          const isPartial = monthData.status === 'partial';
-                          const hasPartialInfo = monthData.total_amount && monthData.paid_amount && monthData.remaining_amount > 0;
-                          const cardClass = isPaid ? 'paid' : (isPartial || hasPartialInfo ? 'partial' : 'unpaid');
-
-                          return `
-                          <div class="month-card ${cardClass}">
-                            <div class="month-name">${MONTHS[monthData.month - 1]}</div>
+                        return `
+                          <td class="${statusClass}">
                             ${hasPartialInfo ? `
-                              <div class="month-amount">${monthData.paid_amount.toLocaleString()} F</div>
-                              <div class="month-details">sur ${monthData.total_amount.toLocaleString()} F</div>
-                              <div class="month-status">Reste: ${monthData.remaining_amount.toLocaleString()} F</div>
+                              <span class="amount">${monthData.paid_amount.toLocaleString()} F</span>
+                              <span class="partial-info">sur ${monthData.total_amount.toLocaleString()} F</span>
+                              <span class="partial-info">Reste: ${monthData.remaining_amount.toLocaleString()} F</span>
                             ` : `
-                              <div class="month-amount">${monthData.amount.toLocaleString()} F</div>
-                              <div class="month-status">${isPaid ? '✓ Payé' : '✗ Non payé'}</div>
+                              <span class="amount">${monthData.amount.toLocaleString()} F</span>
+                              <span class="partial-info">${isPaid ? '✓ Payé' : '✗ Impayé'}</span>
                             `}
-                          </div>
+                          </td>
                         `;
-                        }).join('')}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="summary-section">
-                    <h3>Résumé</h3>
-                    <div class="summary-row">
-                      <span class="label">Total annuel :</span>
-                      <span class="value">${financialData.stats.totalAmount.toLocaleString()} FCFA</span>
-                    </div>
-                    <div class="summary-row">
-                      <span class="label">Payé :</span>
-                      <span class="value">${financialData.stats.paidAmount.toLocaleString()} FCFA</span>
-                    </div>
-                    <div class="summary-row">
-                      <span class="label">Reste à payer :</span>
-                      <span class="value" style="color: #dc2626;">${financialData.stats.unpaidAmount.toLocaleString()} FCFA</span>
-                    </div>
-                  </div>
-                </div>
-              `;
-            }).join('')}
+                      }).join('')}
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
 
             <div class="footer">
-              ${clubInfo ? `${clubInfo.name || clubInfo.club_name} - ${clubInfo.city}` : ''} | Document généré le ${new Date().toLocaleDateString('fr-FR')} | ${validMembersData.length} adhérent(s) actif(s)
+              Document généré automatiquement - ${clubInfo ? `${clubInfo.name || clubInfo.club_name}` : ''} - ${new Date().toLocaleDateString('fr-FR')}
             </div>
           </body>
         </html>
