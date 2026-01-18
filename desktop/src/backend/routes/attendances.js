@@ -26,10 +26,16 @@ router.post('/', authenticate, (req, res) => {
     const db = getDb();
     const { member_id, date, status, notes } = req.body;
 
+    if (!member_id || !date) {
+      return res.status(400).json({ error: 'member_id et date sont requis' });
+    }
+
+    const attendanceStatus = status || 'present';
+
     const result = db.prepare(`
       INSERT INTO attendances (club_id, member_id, date, status, notes)
       VALUES (?, ?, ?, ?, ?)
-    `).run(req.clubId, member_id, date, status, notes);
+    `).run(req.clubId, member_id, date, attendanceStatus, notes || null);
 
     const attendance = db.prepare('SELECT * FROM attendances WHERE id = ?').get(result.lastInsertRowid);
     res.status(201).json(attendance);
