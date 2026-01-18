@@ -8,6 +8,7 @@
     "dev:backend": "nodemon src/backend/server.js",
     "dev:frontend": "vite",
     "electron": "electron .",
+    "preelectron:dev": "node kill-port-3001.js",
     "electron:dev": "concurrently \"npm run dev:backend\" \"wait-on http://localhost:5174 && electron .\"",
     "build": "vite build",
     "build:win": "npm run build && electron-builder --win",

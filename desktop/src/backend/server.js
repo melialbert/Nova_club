@@ -41,10 +41,24 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Backend running' });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);
   if (process.send) {
     process.send({ status: 'ready', port: PORT });
+  }
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error('\n❌ ERREUR: Le port 3001 est déjà utilisé!\n');
+    console.log('Solutions:');
+    console.log('  1. Arrêtez l\'autre instance qui utilise ce port');
+    console.log('  2. Utilisez la commande: pkill -f "node.*server.js"');
+    console.log('  3. Ou redémarrez votre ordinateur\n');
+    process.exit(1);
+  } else {
+    console.error('Erreur serveur:', err);
+    process.exit(1);
   }
 });
 
