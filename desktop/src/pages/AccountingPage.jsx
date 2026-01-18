@@ -67,113 +67,333 @@ function AccountingPage() {
     expense: ['Loyer', 'Salaires', 'Équipements', 'Assurances', 'Entretien', 'Marketing', 'Déplacements', 'Autres']
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = async () => {
+    try {
+      const clubResponse = await api.getClub();
+      const clubInfo = clubResponse;
+
+      const printContent = document.createElement('div');
+      printContent.innerHTML = `
+        <html>
+          <head>
+            <title>Fiche Comptabilité</title>
+            <style>
+              @page {
+                margin: 1.5cm;
+              }
+              body {
+                font-family: Arial, sans-serif;
+                color: #000;
+                max-width: 100%;
+              }
+              .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 25px;
+                padding-bottom: 15px;
+                border-bottom: 3px solid #0f172a;
+              }
+              .header-left h1 {
+                margin: 0 0 5px 0;
+                font-size: 24px;
+                color: #0f172a;
+                font-weight: 800;
+              }
+              .header-left .club-name {
+                font-size: 14px;
+                color: #64748b;
+                font-weight: 600;
+              }
+              .header-right {
+                text-align: right;
+              }
+              .header-right .date {
+                font-size: 12px;
+                color: #64748b;
+                margin-bottom: 3px;
+              }
+              .header-right .period {
+                font-size: 18px;
+                font-weight: 800;
+                color: #0f172a;
+              }
+              .stats-section {
+                display: flex;
+                gap: 20px;
+                margin-bottom: 25px;
+              }
+              .stat-card {
+                flex: 1;
+                padding: 20px;
+                text-align: center;
+                border-radius: 8px;
+                background: #ffffff;
+              }
+              .stat-card.income {
+                border: 3px solid #10b981;
+                background: #f0fdf4;
+              }
+              .stat-card.expense {
+                border: 3px solid #ef4444;
+                background: #fef2f2;
+              }
+              .stat-card.balance {
+                border: 3px solid ${balance >= 0 ? '#10b981' : '#ef4444'};
+                background: ${balance >= 0 ? '#f0fdf4' : '#fef2f2'};
+              }
+              .stat-card .label {
+                font-size: 12px;
+                color: #64748b;
+                font-weight: 700;
+                text-transform: uppercase;
+                margin-bottom: 8px;
+                letter-spacing: 0.5px;
+              }
+              .stat-card .value {
+                font-size: 36px;
+                font-weight: 900;
+                margin: 5px 0;
+                line-height: 1;
+              }
+              .stat-card.income .value {
+                color: #059669;
+              }
+              .stat-card.expense .value {
+                color: #dc2626;
+              }
+              .stat-card.balance .value {
+                color: ${balance >= 0 ? '#059669' : '#dc2626'};
+              }
+              .stat-card .unit {
+                font-size: 14px;
+                color: #64748b;
+                font-weight: 600;
+              }
+              .transactions-section {
+                margin-bottom: 20px;
+              }
+              .transactions-section h2 {
+                font-size: 16px;
+                font-weight: 800;
+                color: #0f172a;
+                margin: 0 0 15px 0;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+              }
+              .transactions-table {
+                width: 100%;
+                border-collapse: collapse;
+                background: #ffffff;
+              }
+              .transactions-table thead {
+                background: #f8fafc;
+                border-bottom: 2px solid #e2e8f0;
+              }
+              .transactions-table th {
+                padding: 12px 10px;
+                text-align: left;
+                font-size: 11px;
+                font-weight: 700;
+                color: #64748b;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+              }
+              .transactions-table tbody tr {
+                border-bottom: 1px solid #e2e8f0;
+              }
+              .transactions-table tbody tr:hover {
+                background: #f8fafc;
+              }
+              .transactions-table td {
+                padding: 10px;
+                font-size: 12px;
+                color: #475569;
+              }
+              .type-badge {
+                display: inline-block;
+                padding: 4px 10px;
+                border-radius: 12px;
+                font-size: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+              }
+              .type-badge.income {
+                background: #d1fae5;
+                color: #059669;
+              }
+              .type-badge.expense {
+                background: #fee2e2;
+                color: #dc2626;
+              }
+              .amount-cell {
+                font-weight: 800;
+                font-size: 13px;
+              }
+              .amount-cell.income {
+                color: #10b981;
+              }
+              .amount-cell.expense {
+                color: #ef4444;
+              }
+              .summary-section {
+                margin-top: 25px;
+                padding: 15px;
+                background: #f8fafc;
+                border: 2px solid #e2e8f0;
+                border-radius: 8px;
+              }
+              .summary-section h3 {
+                margin: 0 0 12px 0;
+                font-size: 14px;
+                font-weight: 800;
+                color: #0f172a;
+                text-transform: uppercase;
+              }
+              .summary-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 8px 0;
+                border-bottom: 1px solid #e2e8f0;
+                font-size: 13px;
+              }
+              .summary-row:last-child {
+                border-bottom: none;
+                padding-top: 12px;
+                margin-top: 8px;
+                border-top: 2px solid #0f172a;
+                font-weight: 800;
+                font-size: 15px;
+              }
+              .summary-row .label {
+                color: #64748b;
+                font-weight: 600;
+              }
+              .summary-row .value {
+                font-weight: 700;
+              }
+              .summary-row.income .value {
+                color: #10b981;
+              }
+              .summary-row.expense .value {
+                color: #ef4444;
+              }
+              .summary-row.balance .value {
+                color: ${balance >= 0 ? '#10b981' : '#ef4444'};
+              }
+              .footer {
+                margin-top: 30px;
+                padding-top: 15px;
+                border-top: 2px solid #e2e8f0;
+                text-align: center;
+                font-size: 11px;
+                color: #64748b;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <div class="header-left">
+                <h1>FICHE COMPTABILITÉ</h1>
+                ${clubInfo ? `<div class="club-name">${clubInfo.name || clubInfo.club_name} - ${clubInfo.city}</div>` : ''}
+              </div>
+              <div class="header-right">
+                <div class="date">Imprimé le ${new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+                <div class="period">Période complète</div>
+              </div>
+            </div>
+
+            <div class="stats-section">
+              <div class="stat-card income">
+                <div class="label">Revenus Totaux</div>
+                <div class="value">${Math.round(income).toLocaleString()}</div>
+                <div class="unit">FCFA</div>
+              </div>
+              <div class="stat-card expense">
+                <div class="label">Dépenses Totales</div>
+                <div class="value">${Math.round(expense).toLocaleString()}</div>
+                <div class="unit">FCFA</div>
+              </div>
+              <div class="stat-card balance">
+                <div class="label">Solde Net</div>
+                <div class="value">${Math.round(balance).toLocaleString()}</div>
+                <div class="unit">FCFA</div>
+              </div>
+            </div>
+
+            <div class="transactions-section">
+              <h2>Historique des Transactions</h2>
+              <table class="transactions-table">
+                <thead>
+                  <tr>
+                    <th style="width: 10%">Type</th>
+                    <th style="width: 18%">Catégorie</th>
+                    <th style="width: 15%">Montant</th>
+                    <th style="width: 17%">Date</th>
+                    <th style="width: 40%">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${transactions.length > 0 ? transactions.map(transaction => `
+                    <tr>
+                      <td>
+                        <span class="type-badge ${transaction.type}">
+                          ${transaction.type === 'income' ? 'Revenu' : 'Dépense'}
+                        </span>
+                      </td>
+                      <td style="font-weight: 600;">${transaction.category || '-'}</td>
+                      <td class="amount-cell ${transaction.type}">
+                        ${Math.round(parseFloat(transaction.amount)).toLocaleString()} F
+                      </td>
+                      <td>
+                        ${new Date(transaction.transaction_date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </td>
+                      <td>${transaction.description || '-'}</td>
+                    </tr>
+                  `).join('') : '<tr><td colspan="5" style="text-align: center; padding: 40px; color: #94a3b8;">Aucune transaction enregistrée</td></tr>'}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="summary-section">
+              <h3>Résumé Financier</h3>
+              <div class="summary-row income">
+                <span class="label">Total des revenus :</span>
+                <span class="value">+ ${Math.round(income).toLocaleString()} FCFA</span>
+              </div>
+              <div class="summary-row expense">
+                <span class="label">Total des dépenses :</span>
+                <span class="value">- ${Math.round(expense).toLocaleString()} FCFA</span>
+              </div>
+              <div class="summary-row balance">
+                <span class="label">Solde net :</span>
+                <span class="value">${Math.round(balance).toLocaleString()} FCFA</span>
+              </div>
+            </div>
+
+            <div class="footer">
+              ${clubInfo ? `${clubInfo.name || clubInfo.club_name} - ${clubInfo.city}` : ''} | Document généré le ${new Date().toLocaleDateString('fr-FR')} | ${transactions.length} transaction(s)
+            </div>
+          </body>
+        </html>
+      `;
+
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(printContent.innerHTML);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+      }, 500);
+    } catch (error) {
+      console.error('Error printing accounting report:', error);
+      alert('Erreur lors de la génération du document d\'impression');
+    }
   };
 
   return (
     <div>
-      <style>{`
-        @media print {
-          * {
-            overflow: visible !important;
-          }
-
-          body, html {
-            background: white !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            overflow: visible !important;
-          }
-
-          /* Cache tous les éléments de navigation et interface */
-          .no-print,
-          nav,
-          aside,
-          .sidebar {
-            display: none !important;
-          }
-
-          /* Affiche l'en-tête d'impression */
-          .print-header {
-            display: block !important;
-            margin-bottom: 32px !important;
-            padding-bottom: 16px !important;
-            border-bottom: 2px solid #e2e8f0 !important;
-          }
-
-          /* Conteneur principal optimisé pour l'impression */
-          .print-container {
-            width: 100% !important;
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 20mm !important;
-            overflow: visible !important;
-          }
-
-          /* Optimisation des cards de statistiques */
-          .stats-grid {
-            display: grid !important;
-            grid-template-columns: repeat(3, 1fr) !important;
-            gap: 16px !important;
-            margin-bottom: 24px !important;
-            page-break-inside: avoid !important;
-          }
-
-          /* Table optimisée pour l'impression */
-          table {
-            width: 100% !important;
-            border-collapse: collapse !important;
-            page-break-inside: auto !important;
-            overflow: visible !important;
-          }
-
-          thead {
-            display: table-header-group !important;
-          }
-
-          tr {
-            page-break-inside: avoid !important;
-            page-break-after: auto !important;
-          }
-
-          th, td {
-            padding: 12px !important;
-            font-size: 12px !important;
-          }
-
-          /* Cache les ombres et effets */
-          * {
-            box-shadow: none !important;
-            text-shadow: none !important;
-          }
-
-          /* Optimisation des couleurs pour l'impression */
-          .print-optimize {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-        }
-
-        @media screen {
-          .print-header {
-            display: none;
-          }
-        }
-      `}</style>
-
-      <div className="print-header" style={{ marginBottom: '32px', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#1e293b', marginBottom: '8px' }}>
-          Fiche Comptabilité
-        </h1>
-        <p style={{ color: '#64748b', fontSize: '14px' }}>
-          Imprimé le {new Date().toLocaleDateString('fr-FR', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-          })}
-        </p>
-      </div>
 
       <div style={{
         display: 'flex',
