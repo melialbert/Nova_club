@@ -619,10 +619,11 @@ function PaymentsPage() {
               </div>
             </div>
 
-            <div className="form-group">
-              <label style={{ marginBottom: '12px', display: 'block', fontSize: '14px', fontWeight: '600', color: '#475569' }}>
-                Mois concernés {formData.payment_type === 'monthly_fee' ? '*' : ''}
-              </label>
+            {formData.payment_type === 'monthly_fee' && (
+              <div className="form-group">
+                <label style={{ marginBottom: '12px', display: 'block', fontSize: '14px', fontWeight: '600', color: '#475569' }}>
+                  Mois concernés *
+                </label>
                 <div style={{ marginBottom: '12px' }}>
                   <select
                     value={selectedYear}
@@ -698,6 +699,7 @@ function PaymentsPage() {
                   </div>
                 )}
               </div>
+            )}
 
             <div className="form-group">
               <label>Notes</label>
