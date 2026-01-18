@@ -472,9 +472,11 @@ function MembersPage() {
                               <span class="amount">${monthData.paid_amount.toLocaleString()} F</span>
                               <span class="partial-info">sur ${monthData.total_amount.toLocaleString()} F</span>
                               <span class="partial-info">Reste: ${monthData.remaining_amount.toLocaleString()} F</span>
-                            ` : `
+                            ` : isPaid ? `
                               <span class="amount">${monthData.amount.toLocaleString()} F</span>
-                              <span class="partial-info">${isPaid ? '✓ Payé' : '✗ Impayé'}</span>
+                              <span class="partial-info">✓ Payé</span>
+                            ` : `
+                              <span class="partial-info">✗ Impayé</span>
                             `}
                           </td>
                         `;
