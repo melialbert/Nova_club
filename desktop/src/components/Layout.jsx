@@ -89,7 +89,9 @@ function Layout({ children, onLogout }) {
           padding: '24px 16px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px'
+          gap: '8px',
+          overflowY: 'auto',
+          overflowX: 'hidden'
         }}>
           {menuItems.map((item) => (
             <Link
@@ -108,7 +110,8 @@ function Layout({ children, onLogout }) {
                 fontSize: '15px',
                 transition: 'all 0.2s ease',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                flexShrink: 0
               }}
               onMouseEnter={(e) => {
                 if (!isActive(item.path)) {
@@ -141,34 +144,35 @@ function Layout({ children, onLogout }) {
 
         <div style={{
           padding: '20px',
-          borderTop: '1px solid rgba(255,255,255,0.1)'
+          borderTop: '1px solid rgba(255,255,255,0.1)',
+          flexShrink: 0
         }}>
           {user && (
             <div style={{
-              padding: '16px',
+              padding: '12px',
               backgroundColor: 'rgba(59, 130, 246, 0.1)',
-              borderRadius: '12px',
-              marginBottom: '16px',
+              borderRadius: '10px',
+              marginBottom: '12px',
               border: '1px solid rgba(59, 130, 246, 0.2)'
             }}>
               <div style={{
-                fontSize: '14px',
+                fontSize: '13px',
                 fontWeight: '600',
                 color: 'white',
-                marginBottom: '4px'
+                marginBottom: '2px'
               }}>
                 {user.first_name} {user.last_name}
               </div>
               <div style={{
-                fontSize: '12px',
-                color: '#94a3b8'
+                fontSize: '11px',
+                color: '#94a3b8',
+                marginBottom: '4px'
               }}>
                 {user.email}
               </div>
               <div style={{
-                fontSize: '11px',
+                fontSize: '10px',
                 color: '#3b82f6',
-                marginTop: '8px',
                 fontWeight: '600'
               }}>
                 {user.role?.toUpperCase() === 'ADMIN' ? 'Admin' : user.role?.toUpperCase() === 'SECRETARY' ? 'Secrétaire' : 'Coach'}
@@ -180,27 +184,30 @@ function Layout({ children, onLogout }) {
             onClick={onLogout}
             style={{
               width: '100%',
-              padding: '12px',
-              backgroundColor: 'transparent',
-              border: '1px solid rgba(248, 113, 113, 0.3)',
+              padding: '14px',
+              backgroundColor: '#ef4444',
+              border: 'none',
               borderRadius: '10px',
-              color: '#f87171',
+              color: 'white',
               fontSize: '14px',
-              fontWeight: '600',
+              fontWeight: '700',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '8px'
+              gap: '8px',
+              boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)'
             }}
             onMouseEnter={(e) => {
-              e.target.style.backgroundColor = 'rgba(248, 113, 113, 0.1)';
-              e.target.style.borderColor = '#f87171';
+              e.target.style.backgroundColor = '#dc2626';
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.4)';
             }}
             onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'transparent';
-              e.target.style.borderColor = 'rgba(248, 113, 113, 0.3)';
+              e.target.style.backgroundColor = '#ef4444';
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 2px 8px rgba(239, 68, 68, 0.3)';
             }}
           >
             <span>🚪</span>
