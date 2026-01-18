@@ -318,94 +318,108 @@ function MembersPage() {
               .main-header {
                 display: flex;
                 justify-content: space-between;
-                align-items: flex-start;
-                margin-bottom: 30px;
-                padding-bottom: 15px;
-                border-bottom: 4px solid #0f172a;
+                align-items: center;
+                margin-bottom: 20px;
+                padding: 12px 15px;
+                background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+                border-radius: 8px;
+                color: white;
               }
               .main-header-left h1 {
-                margin: 0 0 5px 0;
-                font-size: 26px;
-                color: #0f172a;
+                margin: 0;
+                font-size: 22px;
+                color: white;
                 font-weight: 900;
+                text-transform: uppercase;
+                letter-spacing: 1px;
               }
               .main-header-left .club-name {
-                font-size: 14px;
-                color: #64748b;
+                font-size: 12px;
+                color: #cbd5e1;
                 font-weight: 600;
+                margin-top: 4px;
               }
               .main-header-right {
                 text-align: right;
               }
               .main-header-right .date {
-                font-size: 11px;
-                color: #64748b;
-                margin-bottom: 3px;
+                font-size: 10px;
+                color: #cbd5e1;
+                margin-bottom: 4px;
               }
               .main-header-right .year {
-                font-size: 18px;
+                font-size: 16px;
                 font-weight: 800;
-                color: #0f172a;
+                color: #3b82f6;
+                background: white;
+                padding: 4px 12px;
+                border-radius: 4px;
               }
               .main-header-right .count {
-                font-size: 13px;
-                color: #3b82f6;
+                font-size: 11px;
+                color: #cbd5e1;
                 font-weight: 700;
-                margin-top: 3px;
+                margin-top: 4px;
               }
               .member-section {
-                margin-bottom: 30px;
+                margin-bottom: 25px;
               }
               .member-header {
-                background: #f8fafc;
-                padding: 12px 15px;
-                border-left: 5px solid #3b82f6;
-                margin-bottom: 15px;
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+                padding: 10px 12px;
+                border-left: 4px solid #3b82f6;
+                margin-bottom: 12px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
               }
               .member-header h2 {
-                margin: 0 0 5px 0;
-                font-size: 18px;
+                margin: 0;
+                font-size: 16px;
                 color: #0f172a;
                 font-weight: 800;
               }
-              .member-header p {
-                margin: 0;
-                font-size: 12px;
-                color: #475569;
+              .member-header .monthly-fee {
+                font-size: 14px;
+                color: #3b82f6;
+                font-weight: 700;
+                background: white;
+                padding: 4px 10px;
+                border-radius: 4px;
               }
               .content-wrapper {
                 display: flex;
-                gap: 15px;
-                margin-bottom: 15px;
+                gap: 12px;
+                margin-bottom: 12px;
               }
               .stats-column {
-                flex: 0 0 200px;
+                flex: 0 0 180px;
               }
               .stat-card {
-                padding: 10px;
+                padding: 8px;
                 text-align: center;
                 border: 2px solid #e2e8f0;
                 border-radius: 6px;
-                margin-bottom: 8px;
+                margin-bottom: 6px;
                 background: #ffffff;
               }
               .stat-card .label {
-                font-size: 9px;
+                font-size: 8px;
                 color: #64748b;
                 font-weight: 700;
                 text-transform: uppercase;
-                margin-bottom: 3px;
+                margin-bottom: 2px;
                 letter-spacing: 0.5px;
               }
               .stat-card .value {
-                font-size: 24px;
+                font-size: 20px;
                 font-weight: 900;
                 color: #0f172a;
-                margin: 3px 0;
+                margin: 2px 0;
                 line-height: 1;
               }
               .stat-card .amount {
-                font-size: 10px;
+                font-size: 9px;
                 color: #64748b;
                 font-weight: 600;
               }
@@ -436,7 +450,7 @@ function MembersPage() {
               .months-grid {
                 display: grid;
                 grid-template-columns: repeat(4, 1fr);
-                gap: 8px;
+                gap: 6px;
               }
               .month-card {
                 border: 2px solid #e2e8f0;
@@ -448,71 +462,89 @@ function MembersPage() {
                 border-color: #10b981;
                 background: #f0fdf4;
               }
+              .month-card.partial {
+                border-color: #f59e0b;
+                background: #fffbeb;
+              }
               .month-card.unpaid {
                 border-color: #dc2626;
                 background: #fef2f2;
               }
               .month-card .month-name {
-                font-size: 10px;
+                font-size: 9px;
                 font-weight: 800;
                 color: #0f172a;
-                margin-bottom: 4px;
+                margin-bottom: 3px;
                 text-transform: uppercase;
               }
               .month-card .month-amount {
-                font-size: 13px;
+                font-size: 11px;
                 font-weight: 800;
                 margin-bottom: 2px;
+                line-height: 1.2;
               }
               .month-card.paid .month-amount {
                 color: #059669;
               }
+              .month-card.partial .month-amount {
+                color: #d97706;
+              }
               .month-card.unpaid .month-amount {
                 color: #dc2626;
               }
+              .month-card .month-details {
+                font-size: 7px;
+                color: #64748b;
+                margin-top: 2px;
+              }
               .month-card .month-status {
-                font-size: 8px;
+                font-size: 7px;
                 font-weight: 700;
                 text-transform: uppercase;
                 letter-spacing: 0.3px;
+                margin-top: 2px;
               }
               .month-card.paid .month-status {
                 color: #059669;
+              }
+              .month-card.partial .month-status {
+                color: #d97706;
               }
               .month-card.unpaid .month-status {
                 color: #dc2626;
               }
               .summary-section {
-                margin-top: 12px;
-                padding: 10px 12px;
-                background: #f8fafc;
-                border: 2px solid #e2e8f0;
+                margin-top: 10px;
+                padding: 8px 10px;
+                background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+                border: 2px solid #cbd5e1;
                 border-radius: 6px;
               }
               .summary-section h3 {
-                margin: 0 0 8px 0;
-                font-size: 11px;
+                margin: 0 0 6px 0;
+                font-size: 10px;
                 font-weight: 800;
                 color: #0f172a;
                 text-transform: uppercase;
+                letter-spacing: 0.5px;
               }
               .summary-row {
                 display: flex;
                 justify-content: space-between;
-                padding: 4px 0;
-                border-bottom: 1px solid #e2e8f0;
-                font-size: 11px;
+                padding: 3px 0;
+                border-bottom: 1px solid #cbd5e1;
+                font-size: 10px;
               }
               .summary-row:last-child {
                 border-bottom: none;
-                padding-top: 6px;
-                margin-top: 4px;
-                border-top: 2px solid #0f172a;
+                padding-top: 5px;
+                margin-top: 3px;
+                border-top: 2px solid #475569;
                 font-weight: 800;
-                font-size: 12px;
+                font-size: 11px;
               }
               .summary-row .label {
-                color: #64748b;
+                color: #475569;
                 font-weight: 600;
               }
               .summary-row .value {
@@ -548,7 +580,7 @@ function MembersPage() {
                 <div class="member-section ${index < validMembersData.length - 1 ? 'page-break' : ''}">
                   <div class="member-header">
                     <h2>${financialData.member.name}</h2>
-                    <p><strong>Cotisation mensuelle:</strong> ${financialData.member.monthly_fee} FCFA</p>
+                    <div class="monthly-fee">${financialData.member.monthly_fee} FCFA / mois</div>
                   </div>
 
                   <div class="content-wrapper">
@@ -563,27 +595,42 @@ function MembersPage() {
                         <div class="value">${financialData.stats.paid}</div>
                         <div class="amount">${financialData.stats.paidAmount.toLocaleString()} F</div>
                       </div>
+                      ${financialData.stats.partial > 0 ? `
+                        <div class="stat-card" style="border-color: #f59e0b; background: #fffbeb;">
+                          <div class="label">Partiels</div>
+                          <div class="value" style="color: #d97706;">${financialData.stats.partial}</div>
+                          <div class="amount">En cours</div>
+                        </div>
+                      ` : ''}
                       <div class="stat-card unpaid">
                         <div class="label">Impayés</div>
                         <div class="value">${financialData.stats.unpaid}</div>
                         <div class="amount">${financialData.stats.unpaidAmount.toLocaleString()} F</div>
                       </div>
-                      <div class="stat-card rate">
-                        <div class="label">Taux</div>
-                        <div class="value">${Math.round((financialData.stats.paid / financialData.stats.total) * 100)}%</div>
-                        <div class="amount">complété</div>
-                      </div>
                     </div>
 
                     <div class="months-column">
                       <div class="months-grid">
-                        ${financialData.months.map(monthData => `
-                          <div class="month-card ${monthData.status === 'paid' ? 'paid' : 'unpaid'}">
+                        ${financialData.months.map(monthData => {
+                          const isPaid = monthData.status === 'paid';
+                          const isPartial = monthData.status === 'partial';
+                          const hasPartialInfo = monthData.total_amount && monthData.paid_amount && monthData.remaining_amount > 0;
+                          const cardClass = isPaid ? 'paid' : (isPartial || hasPartialInfo ? 'partial' : 'unpaid');
+
+                          return `
+                          <div class="month-card ${cardClass}">
                             <div class="month-name">${MONTHS[monthData.month - 1]}</div>
-                            <div class="month-amount">${monthData.amount.toLocaleString()} F</div>
-                            <div class="month-status">${monthData.status === 'paid' ? '✓ Payé' : '✗ Non payé'}</div>
+                            ${hasPartialInfo ? `
+                              <div class="month-amount">${monthData.paid_amount.toLocaleString()} F</div>
+                              <div class="month-details">sur ${monthData.total_amount.toLocaleString()} F</div>
+                              <div class="month-status">Reste: ${monthData.remaining_amount.toLocaleString()} F</div>
+                            ` : `
+                              <div class="month-amount">${monthData.amount.toLocaleString()} F</div>
+                              <div class="month-status">${isPaid ? '✓ Payé' : '✗ Non payé'}</div>
+                            `}
                           </div>
-                        `).join('')}
+                        `;
+                        }).join('')}
                       </div>
                     </div>
                   </div>

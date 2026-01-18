@@ -25,11 +25,19 @@ router.get('/member/:memberId', authenticate, async (req, res) => {
 
     const monthlyFeeAmount = member.monthly_fee || 50;
 
+    const payments = db.prepare(`
+      SELECT total_amount, paid_amount, month_year
+      FROM payments
+      WHERE member_id = ? AND payment_type = 'monthly_fee' AND month_year LIKE ?
+    `).all(memberId, `${currentYear}-%`);
+
     const allMonths = Array.from({ length: 12 }, (_, i) => {
       const month = i + 1;
       const existingFee = fees.find(f => f.month === month);
+      const monthYear = `${currentYear}-${String(month).padStart(2, '0')}`;
+      const payment = payments.find(p => p.month_year === monthYear);
 
-      return existingFee || {
+      const monthData = existingFee || {
         id: null,
         member_id: parseInt(memberId),
         club_id: req.clubId,
@@ -41,6 +49,14 @@ router.get('/member/:memberId', authenticate, async (req, res) => {
         payment_method: null,
         notes: null
       };
+
+      if (payment) {
+        monthData.total_amount = payment.total_amount || monthData.amount;
+        monthData.paid_amount = payment.paid_amount || monthData.amount;
+        monthData.remaining_amount = (payment.total_amount || monthData.amount) - (payment.paid_amount || monthData.amount);
+      }
+
+      return monthData;
     });
 
     const stats = {
