@@ -23,11 +23,14 @@ function PaymentsPage() {
   const [formData, setFormData] = useState({
     member_id: '',
     amount: '',
+    total_amount: '',
+    paid_amount: '',
     payment_type: 'monthly_fee',
     payment_method: 'cash',
     payment_date: new Date().toISOString().split('T')[0],
     month_year: new Date().toISOString().slice(0, 7),
-    notes: ''
+    notes: '',
+    is_partial: false
   });
 
   useEffect(() => {
@@ -58,7 +61,22 @@ function PaymentsPage() {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+
+    if (type === 'checkbox') {
+      setFormData({ ...formData, [name]: checked });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const calculateRemainingAmount = () => {
+    if (formData.is_partial) {
+      const total = parseFloat(formData.total_amount) || 0;
+      const paid = parseFloat(formData.paid_amount) || 0;
+      return Math.max(0, total - paid);
+    }
+    return 0;
   };
 
   const handleSubmit = async (e) => {
@@ -69,27 +87,66 @@ function PaymentsPage() {
       return;
     }
 
+    if (formData.is_partial) {
+      const total = parseFloat(formData.total_amount) || 0;
+      const paid = parseFloat(formData.paid_amount) || 0;
+
+      if (total <= 0) {
+        alert('Veuillez saisir un montant total valide');
+        return;
+      }
+
+      if (paid <= 0) {
+        alert('Veuillez saisir un montant payé valide');
+        return;
+      }
+
+      if (paid > total) {
+        alert('Le montant payé ne peut pas dépasser le montant total');
+        return;
+      }
+    } else if (!formData.amount || parseFloat(formData.amount) <= 0) {
+      alert('Veuillez saisir un montant valide');
+      return;
+    }
+
     try {
+      const paymentData = formData.is_partial
+        ? {
+            ...formData,
+            total_amount: parseFloat(formData.total_amount),
+            paid_amount: parseFloat(formData.paid_amount),
+            amount: parseFloat(formData.paid_amount)
+          }
+        : {
+            ...formData,
+            total_amount: parseFloat(formData.amount),
+            paid_amount: parseFloat(formData.amount)
+          };
+
       if (selectedMonths.length > 0) {
         for (const month of selectedMonths) {
           const monthYear = `${selectedYear}-${String(month).padStart(2, '0')}`;
           await api.createPayment({
-            ...formData,
+            ...paymentData,
             month_year: monthYear
           });
         }
       } else {
-        await api.createPayment(formData);
+        await api.createPayment(paymentData);
       }
 
       setFormData({
         member_id: '',
         amount: '',
+        total_amount: '',
+        paid_amount: '',
         payment_type: 'monthly_fee',
         payment_method: 'cash',
         payment_date: new Date().toISOString().split('T')[0],
         month_year: new Date().toISOString().slice(0, 7),
-        notes: ''
+        notes: '',
+        is_partial: false
       });
       setSelectedMonths([]);
       setShowForm(false);
@@ -361,7 +418,9 @@ function PaymentsPage() {
                 year: 'numeric'
               })}</p>
               <p><strong>Méthode:</strong> ${getPaymentMethodLabel(payment.payment_method)}</p>
-              <p><strong>Statut:</strong> <span style="color: #10b981; font-weight: 600;">Payé</span></p>
+              <p><strong>Statut:</strong> <span style="color: ${payment.status === 'completed' ? '#10b981' : payment.status === 'partial' ? '#f59e0b' : '#ef4444'}; font-weight: 600;">
+                ${payment.status === 'completed' ? 'Payé' : payment.status === 'partial' ? 'Paiement partiel' : 'Impayé'}
+              </span></p>
             </div>
           </div>
 
@@ -398,12 +457,31 @@ function PaymentsPage() {
             </div>
           ` : ''}
 
-          <div class="total-section">
-            <div class="total-box">
-              <div class="total-label">MONTANT TOTAL</div>
-              <div class="total-amount">${parseFloat(payment.amount).toLocaleString()} FCFA</div>
+          ${payment.status === 'partial' || (payment.remaining_amount && payment.remaining_amount > 0) ? `
+            <div style="background: #eff6ff; border: 3px solid #3b82f6; border-radius: 12px; padding: 24px; margin: 30px 0;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; text-align: center;">
+                <div>
+                  <div style="font-size: 13px; color: #475569; text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Montant Total</div>
+                  <div style="font-size: 24px; font-weight: 700; color: #1e40af;">${parseFloat(payment.total_amount || payment.amount).toLocaleString()} FCFA</div>
+                </div>
+                <div>
+                  <div style="font-size: 13px; color: #475569; text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Montant Payé</div>
+                  <div style="font-size: 24px; font-weight: 700; color: #10b981;">${parseFloat(payment.paid_amount || payment.amount).toLocaleString()} FCFA</div>
+                </div>
+                <div>
+                  <div style="font-size: 13px; color: #475569; text-transform: uppercase; font-weight: 600; margin-bottom: 8px;">Reste à Payer</div>
+                  <div style="font-size: 24px; font-weight: 700; color: #f59e0b;">${parseFloat(payment.remaining_amount || 0).toLocaleString()} FCFA</div>
+                </div>
+              </div>
             </div>
-          </div>
+          ` : `
+            <div class="total-section">
+              <div class="total-box">
+                <div class="total-label">MONTANT TOTAL</div>
+                <div class="total-amount">${parseFloat(payment.amount).toLocaleString()} FCFA</div>
+              </div>
+            </div>
+          `}
 
           <div class="footer">
             <p>Merci pour votre paiement</p>
@@ -592,10 +670,6 @@ function PaymentsPage() {
                 </select>
               </div>
               <div className="form-group">
-                <label>Montant (FCFA) *</label>
-                <input type="number" name="amount" value={formData.amount} onChange={handleChange} required />
-              </div>
-              <div className="form-group">
                 <label>Type de paiement</label>
                 <select name="payment_type" value={formData.payment_type} onChange={handleChange}>
                   <option value="monthly_fee">Cotisation mensuelle</option>
@@ -617,6 +691,99 @@ function PaymentsPage() {
                 <label>Date de paiement *</label>
                 <input type="date" name="payment_date" value={formData.payment_date} onChange={handleChange} required />
               </div>
+            </div>
+
+            <div className="form-group" style={{ marginTop: '20px' }}>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                cursor: 'pointer',
+                padding: '12px',
+                backgroundColor: '#f8fafc',
+                borderRadius: '8px',
+                border: '2px solid #e2e8f0',
+                transition: 'all 0.2s'
+              }}>
+                <input
+                  type="checkbox"
+                  name="is_partial"
+                  checked={formData.is_partial}
+                  onChange={handleChange}
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    cursor: 'pointer',
+                    accentColor: '#3b82f6'
+                  }}
+                />
+                <span style={{ fontWeight: '600', color: '#0f172a' }}>
+                  Paiement partiel (avance)
+                </span>
+              </label>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: formData.is_partial ? 'repeat(auto-fit, minmax(250px, 1fr))' : '1fr', gap: '20px', marginTop: '20px' }}>
+              {formData.is_partial ? (
+                <>
+                  <div className="form-group">
+                    <label>Montant total (FCFA) *</label>
+                    <input
+                      type="number"
+                      name="total_amount"
+                      value={formData.total_amount}
+                      onChange={handleChange}
+                      required={formData.is_partial}
+                      min="0"
+                      step="0.01"
+                      placeholder="Ex: 50000"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Montant payé / Avance (FCFA) *</label>
+                    <input
+                      type="number"
+                      name="paid_amount"
+                      value={formData.paid_amount}
+                      onChange={handleChange}
+                      required={formData.is_partial}
+                      min="0"
+                      step="0.01"
+                      placeholder="Ex: 20000"
+                    />
+                  </div>
+                  {formData.total_amount && formData.paid_amount && (
+                    <div className="form-group">
+                      <label>Montant restant</label>
+                      <div style={{
+                        padding: '12px 16px',
+                        backgroundColor: calculateRemainingAmount() > 0 ? '#fef3c7' : '#d1fae5',
+                        borderRadius: '8px',
+                        border: `2px solid ${calculateRemainingAmount() > 0 ? '#f59e0b' : '#10b981'}`,
+                        fontSize: '18px',
+                        fontWeight: '700',
+                        color: calculateRemainingAmount() > 0 ? '#92400e' : '#065f46'
+                      }}>
+                        {calculateRemainingAmount().toLocaleString()} FCFA
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="form-group">
+                  <label>Montant (FCFA) *</label>
+                  <input
+                    type="number"
+                    name="amount"
+                    value={formData.amount}
+                    onChange={handleChange}
+                    required={!formData.is_partial}
+                    min="0"
+                    step="0.01"
+                    placeholder="Ex: 50000"
+                  />
+                </div>
+              )}
             </div>
 
             {formData.payment_type === 'monthly_fee' && (
@@ -838,6 +1005,7 @@ function PaymentsPage() {
                   <th>Adhérent</th>
                   <th>Type</th>
                   <th>Montant</th>
+                  <th>Statut</th>
                   <th>Méthode</th>
                   <th>Mois</th>
                   <th>Actions</th>
@@ -874,9 +1042,34 @@ function PaymentsPage() {
                         </span>
                       </td>
                       <td>
-                        <div style={{ fontWeight: '700', color: '#10b981', fontSize: '15px' }}>
-                          {parseFloat(payment.amount || 0).toLocaleString()} FCFA
-                        </div>
+                        {payment.status === 'partial' || (payment.remaining_amount && payment.remaining_amount > 0) ? (
+                          <div>
+                            <div style={{ fontWeight: '700', color: '#3b82f6', fontSize: '15px' }}>
+                              {parseFloat(payment.paid_amount || payment.amount || 0).toLocaleString()} FCFA
+                            </div>
+                            <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px' }}>
+                              sur {parseFloat(payment.total_amount || payment.amount || 0).toLocaleString()} FCFA
+                            </div>
+                            {payment.remaining_amount > 0 && (
+                              <div style={{ fontSize: '12px', color: '#f59e0b', fontWeight: '600', marginTop: '2px' }}>
+                                Reste: {parseFloat(payment.remaining_amount).toLocaleString()} FCFA
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div style={{ fontWeight: '700', color: '#10b981', fontSize: '15px' }}>
+                            {parseFloat(payment.amount || 0).toLocaleString()} FCFA
+                          </div>
+                        )}
+                      </td>
+                      <td>
+                        {payment.status === 'completed' ? (
+                          <span className="badge badge-green">Payé</span>
+                        ) : payment.status === 'partial' ? (
+                          <span className="badge badge-yellow">Partiel</span>
+                        ) : (
+                          <span className="badge badge-red">Impayé</span>
+                        )}
                       </td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1044,16 +1237,50 @@ function PaymentsPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-                  <div>
-                    <label style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Montant
-                    </label>
-                    <div style={{ marginTop: '8px', fontSize: '24px', fontWeight: '700', color: '#10b981' }}>
-                      {parseFloat(selectedPayment.amount).toLocaleString()} FCFA
+                {selectedPayment.status === 'partial' || (selectedPayment.remaining_amount && selectedPayment.remaining_amount > 0) ? (
+                  <div style={{ backgroundColor: '#eff6ff', padding: '20px', borderRadius: '12px', border: '2px solid #3b82f6', marginBottom: '12px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', textAlign: 'center' }}>
+                      <div>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>
+                          Montant Total
+                        </label>
+                        <div style={{ fontSize: '20px', fontWeight: '700', color: '#1e40af' }}>
+                          {parseFloat(selectedPayment.total_amount || selectedPayment.amount || 0).toLocaleString()} FCFA
+                        </div>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>
+                          Montant Payé
+                        </label>
+                        <div style={{ fontSize: '20px', fontWeight: '700', color: '#10b981' }}>
+                          {parseFloat(selectedPayment.paid_amount || selectedPayment.amount || 0).toLocaleString()} FCFA
+                        </div>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>
+                          Reste à Payer
+                        </label>
+                        <div style={{ fontSize: '20px', fontWeight: '700', color: '#f59e0b' }}>
+                          {parseFloat(selectedPayment.remaining_amount || 0).toLocaleString()} FCFA
+                        </div>
+                      </div>
                     </div>
                   </div>
+                ) : (
+                  <div style={{ backgroundColor: '#d1fae5', padding: '20px', borderRadius: '12px', border: '2px solid #10b981', marginBottom: '12px', textAlign: 'center' }}>
+                    <label style={{ fontSize: '12px', fontWeight: '600', color: '#064e3b', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>
+                      Montant
+                    </label>
+                    <div style={{ fontSize: '28px', fontWeight: '700', color: '#065f46' }}>
+                      {parseFloat(selectedPayment.amount || 0).toLocaleString()} FCFA
+                    </div>
+                    <div style={{ fontSize: '13px', fontWeight: '600', color: '#059669', marginTop: '6px' }}>
+                      Payé intégralement
+                    </div>
+                  </div>
+                )}
 
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                   <div>
                     <label style={{ fontSize: '13px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       Date

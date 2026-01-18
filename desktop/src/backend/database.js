@@ -99,6 +99,18 @@ function migratePaymentsTable() {
       db.exec("ALTER TABLE payments ADD COLUMN month_year TEXT");
       console.log('Added month_year column to payments table');
     }
+
+    if (!columns.includes('total_amount')) {
+      db.exec("ALTER TABLE payments ADD COLUMN total_amount REAL");
+      db.exec("UPDATE payments SET total_amount = amount WHERE total_amount IS NULL");
+      console.log('Added total_amount column to payments table');
+    }
+
+    if (!columns.includes('paid_amount')) {
+      db.exec("ALTER TABLE payments ADD COLUMN paid_amount REAL");
+      db.exec("UPDATE payments SET paid_amount = amount WHERE paid_amount IS NULL");
+      console.log('Added paid_amount column to payments table');
+    }
   } catch (error) {
     console.log('payments table does not exist yet, will be created');
   }
@@ -234,6 +246,8 @@ function createTables() {
       member_id INTEGER NOT NULL,
       club_id INTEGER NOT NULL,
       amount REAL NOT NULL,
+      total_amount REAL,
+      paid_amount REAL,
       payment_date DATE NOT NULL,
       payment_method TEXT,
       payment_type TEXT DEFAULT 'other',

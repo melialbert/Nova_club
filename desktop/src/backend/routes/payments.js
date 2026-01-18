@@ -15,11 +15,20 @@ router.get('/', authenticate, (req, res) => {
       ORDER BY p.payment_date DESC
     `).all(req.clubId);
 
-    const paymentsWithDefaults = payments.map(p => ({
-      ...p,
-      payment_type: p.payment_type || 'other',
-      month_year: p.month_year || null
-    }));
+    const paymentsWithDefaults = payments.map(p => {
+      const totalAmount = p.total_amount || p.amount;
+      const paidAmount = p.paid_amount || p.amount;
+      const remainingAmount = totalAmount - paidAmount;
+
+      return {
+        ...p,
+        payment_type: p.payment_type || 'other',
+        month_year: p.month_year || null,
+        total_amount: totalAmount,
+        paid_amount: paidAmount,
+        remaining_amount: remainingAmount
+      };
+    });
 
     res.json(paymentsWithDefaults);
   } catch (error) {
@@ -31,12 +40,28 @@ router.get('/', authenticate, (req, res) => {
 router.post('/', authenticate, (req, res) => {
   try {
     const db = getDb();
-    const { member_id, amount, payment_date, payment_method, description, status, payment_type, month_year } = req.body;
+    const { member_id, amount, total_amount, paid_amount, payment_date, payment_method, description, status, payment_type, month_year, notes } = req.body;
+
+    const finalTotalAmount = total_amount || amount;
+    const finalPaidAmount = paid_amount || amount;
+    const finalStatus = finalPaidAmount >= finalTotalAmount ? 'completed' : (finalPaidAmount > 0 ? 'partial' : 'unpaid');
 
     const result = db.prepare(`
-      INSERT INTO payments (club_id, member_id, amount, payment_date, payment_method, payment_type, month_year, description, status)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(req.clubId, member_id, amount, payment_date, payment_method, payment_type || 'other', month_year, description, status || 'completed');
+      INSERT INTO payments (club_id, member_id, amount, total_amount, paid_amount, payment_date, payment_method, payment_type, month_year, description, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      req.clubId,
+      member_id,
+      finalPaidAmount,
+      finalTotalAmount,
+      finalPaidAmount,
+      payment_date,
+      payment_method,
+      payment_type || 'other',
+      month_year,
+      notes || description,
+      status || finalStatus
+    );
 
     const payment = db.prepare('SELECT * FROM payments WHERE id = ?').get(result.lastInsertRowid);
 
@@ -48,17 +73,19 @@ router.post('/', authenticate, (req, res) => {
       ).get(member_id, year, month);
 
       if (existing) {
+        const feeStatus = finalPaidAmount >= finalTotalAmount ? 'paid' : (finalPaidAmount > 0 ? 'partial' : 'unpaid');
         db.prepare(`
           UPDATE monthly_fees
-          SET status = 'paid', paid_date = ?, payment_method = ?, amount = ?
+          SET status = ?, paid_date = ?, payment_method = ?, amount = ?
           WHERE id = ?
-        `).run(payment_date, payment_method, amount, existing.id);
+        `).run(feeStatus, payment_date, payment_method, finalTotalAmount, existing.id);
       } else {
+        const feeStatus = finalPaidAmount >= finalTotalAmount ? 'paid' : (finalPaidAmount > 0 ? 'partial' : 'unpaid');
         db.prepare(`
           INSERT INTO monthly_fees
           (member_id, club_id, year, month, amount, paid_date, status, payment_method)
-          VALUES (?, ?, ?, ?, ?, ?, 'paid', ?)
-        `).run(member_id, req.clubId, year, month, amount, payment_date, payment_method);
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(member_id, req.clubId, year, month, finalTotalAmount, payment_date, feeStatus, payment_method);
       }
     }
 
