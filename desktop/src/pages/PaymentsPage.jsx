@@ -70,7 +70,7 @@ function PaymentsPage() {
     }
 
     try {
-      if (formData.payment_type === 'monthly_fee' && selectedMonths.length > 0) {
+      if (selectedMonths.length > 0) {
         for (const month of selectedMonths) {
           const monthYear = `${selectedYear}-${String(month).padStart(2, '0')}`;
           await api.createPayment({
@@ -617,19 +617,12 @@ function PaymentsPage() {
                 <label>Date de paiement *</label>
                 <input type="date" name="payment_date" value={formData.payment_date} onChange={handleChange} required />
               </div>
-              {formData.payment_type !== 'monthly_fee' && (
-                <div className="form-group">
-                  <label>Mois concerné</label>
-                  <input type="month" name="month_year" value={formData.month_year} onChange={handleChange} />
-                </div>
-              )}
             </div>
 
-            {formData.payment_type === 'monthly_fee' && (
-              <div className="form-group">
-                <label style={{ marginBottom: '12px', display: 'block', fontSize: '14px', fontWeight: '600', color: '#475569' }}>
-                  Mois concernés *
-                </label>
+            <div className="form-group">
+              <label style={{ marginBottom: '12px', display: 'block', fontSize: '14px', fontWeight: '600', color: '#475569' }}>
+                Mois concernés {formData.payment_type === 'monthly_fee' ? '*' : ''}
+              </label>
                 <div style={{ marginBottom: '12px' }}>
                   <select
                     value={selectedYear}
@@ -705,7 +698,6 @@ function PaymentsPage() {
                   </div>
                 )}
               </div>
-            )}
 
             <div className="form-group">
               <label>Notes</label>
