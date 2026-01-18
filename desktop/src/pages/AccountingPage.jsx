@@ -67,36 +67,100 @@ function AccountingPage() {
     expense: ['Loyer', 'Salaires', 'Équipements', 'Assurances', 'Entretien', 'Marketing', 'Déplacements', 'Autres']
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div>
+      <style>{`
+        @media print {
+          .no-print {
+            display: none !important;
+          }
+          .print-header {
+            display: block !important;
+          }
+          body {
+            background: white !important;
+          }
+          table {
+            page-break-inside: auto;
+          }
+          tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
+        }
+        @media screen {
+          .print-header {
+            display: none;
+          }
+        }
+      `}</style>
+
+      <div className="print-header" style={{ marginBottom: '32px', textAlign: 'center' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#1e293b', marginBottom: '8px' }}>
+          Fiche Comptabilité
+        </h1>
+        <p style={{ color: '#64748b', fontSize: '14px' }}>
+          Imprimé le {new Date().toLocaleDateString('fr-FR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          })}
+        </p>
+      </div>
+
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: '32px'
-      }}>
+      }} className="no-print">
         <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#1e293b', margin: 0 }}>
           Comptabilité
         </h1>
-        <button
-          onClick={() => setShowModal(true)}
-          style={{
-            backgroundColor: '#3b82f6',
-            color: 'white',
-            padding: '12px 24px',
-            borderRadius: '8px',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: '600',
-            fontSize: '14px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
-        >
-          <span style={{ fontSize: '18px' }}>+</span>
-          Nouvelle Transaction
-        </button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button
+            onClick={handlePrint}
+            style={{
+              backgroundColor: '#10b981',
+              color: 'white',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <span style={{ fontSize: '18px' }}>🖨️</span>
+            Imprimer
+          </button>
+          <button
+            onClick={() => setShowModal(true)}
+            style={{
+              backgroundColor: '#3b82f6',
+              color: 'white',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <span style={{ fontSize: '18px' }}>+</span>
+            Nouvelle Transaction
+          </button>
+        </div>
       </div>
 
       <div style={{
@@ -169,7 +233,7 @@ function AccountingPage() {
           <h2 style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', margin: 0 }}>
             Historique des transactions
           </h2>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px' }} className="no-print">
             <button
               onClick={() => setFilterType('all')}
               style={{
