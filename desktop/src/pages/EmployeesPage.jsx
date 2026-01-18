@@ -308,20 +308,23 @@ function EmployeesPage() {
                   </select>
                 </div>
 
-                {!editingEmployee && (
-                  <div className="form-group">
-                    <label>Mot de passe *</label>
-                    <input
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                      placeholder="Minimum 8 caractères"
-                      minLength="8"
-                    />
-                  </div>
-                )}
+                <div className="form-group">
+                  <label>Mot de passe {!editingEmployee && '*'}</label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required={!editingEmployee}
+                    placeholder={editingEmployee ? "Laisser vide pour ne pas changer" : "Minimum 8 caractères"}
+                    minLength={formData.password ? "8" : undefined}
+                  />
+                  {editingEmployee && (
+                    <small style={{ color: '#64748b', fontSize: '13px', marginTop: '4px', display: 'block' }}>
+                      Laissez vide pour conserver le mot de passe actuel
+                    </small>
+                  )}
+                </div>
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '24px' }}>

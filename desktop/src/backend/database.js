@@ -33,6 +33,7 @@ function initDatabase() {
   migratePaymentsTable();
   migrateLicensesTable();
   migrateClubsTable();
+  migrateUsersTable();
   createDefaultData();
 
   return db;
@@ -154,6 +155,19 @@ function migrateClubsTable() {
   }
 }
 
+function migrateUsersTable() {
+  try {
+    const columns = db.pragma("table_info(users)").map(col => col.name);
+
+    if (!columns.includes('phone')) {
+      db.exec("ALTER TABLE users ADD COLUMN phone TEXT");
+      console.log('Added phone column to users table');
+    }
+  } catch (error) {
+    console.log('users table does not exist yet, will be created');
+  }
+}
+
 function createTables() {
   db.exec(`
     CREATE TABLE IF NOT EXISTS clubs (
@@ -171,9 +185,10 @@ function createTables() {
       club_id INTEGER NOT NULL,
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
-      role TEXT NOT NULL CHECK(role IN ('admin', 'coach', 'member')),
+      role TEXT NOT NULL CHECK(role IN ('admin', 'coach', 'secretary', 'member')),
       first_name TEXT,
       last_name TEXT,
+      phone TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (club_id) REFERENCES clubs(id)
     );

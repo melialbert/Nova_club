@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
 const { getDb } = require('../database');
 const { authenticate } = require('../middleware/auth');
 
@@ -7,8 +8,13 @@ const router = express.Router();
 router.get('/', authenticate, (req, res) => {
   try {
     const db = getDb();
-    const employees = db.prepare('SELECT * FROM employees WHERE club_id = ? ORDER BY last_name, first_name').all(req.clubId);
-    res.json(employees);
+    const users = db.prepare(`
+      SELECT id, email, first_name, last_name, role, phone, created_at
+      FROM users
+      WHERE club_id = ? AND role IN ('admin', 'coach', 'secretary')
+      ORDER BY last_name, first_name
+    `).all(req.clubId);
+    res.json(users);
   } catch (error) {
     console.error('Get employees error:', error);
     res.status(500).json({ error: 'Erreur serveur' });
@@ -18,15 +24,31 @@ router.get('/', authenticate, (req, res) => {
 router.post('/', authenticate, (req, res) => {
   try {
     const db = getDb();
-    const { first_name, last_name, position, email, phone, salary, hire_date } = req.body;
+    const { first_name, last_name, email, phone, role, password } = req.body;
+
+    if (!first_name || !last_name || !email || !role || !password) {
+      return res.status(400).json({ error: 'Tous les champs requis doivent être remplis' });
+    }
+
+    const existingUser = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+    if (existingUser) {
+      return res.status(400).json({ error: 'Cet email est déjà utilisé' });
+    }
+
+    const passwordHash = bcrypt.hashSync(password, 10);
+    const normalizedRole = role.toLowerCase();
 
     const result = db.prepare(`
-      INSERT INTO employees (club_id, first_name, last_name, position, email, phone, salary, hire_date)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(req.clubId, first_name, last_name, position, email, phone, salary, hire_date);
+      INSERT INTO users (club_id, email, password_hash, role, first_name, last_name, phone)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).run(req.clubId, email, passwordHash, normalizedRole, first_name, last_name, phone || null);
 
-    const employee = db.prepare('SELECT * FROM employees WHERE id = ?').get(result.lastInsertRowid);
-    res.status(201).json(employee);
+    const user = db.prepare(`
+      SELECT id, email, first_name, last_name, role, phone, created_at
+      FROM users WHERE id = ?
+    `).get(result.lastInsertRowid);
+
+    res.status(201).json(user);
   } catch (error) {
     console.error('Create employee error:', error);
     res.status(500).json({ error: 'Erreur serveur' });
@@ -36,16 +58,40 @@ router.post('/', authenticate, (req, res) => {
 router.put('/:id', authenticate, (req, res) => {
   try {
     const db = getDb();
-    const { first_name, last_name, position, email, phone, salary, hire_date, is_active } = req.body;
+    const { first_name, last_name, email, phone, role, password } = req.body;
 
-    db.prepare(`
-      UPDATE employees
-      SET first_name = ?, last_name = ?, position = ?, email = ?, phone = ?, salary = ?, hire_date = ?, is_active = ?
-      WHERE id = ? AND club_id = ?
-    `).run(first_name, last_name, position, email, phone, salary, hire_date, is_active, req.params.id, req.clubId);
+    if (!first_name || !last_name || !email || !role) {
+      return res.status(400).json({ error: 'Tous les champs requis doivent être remplis' });
+    }
 
-    const employee = db.prepare('SELECT * FROM employees WHERE id = ?').get(req.params.id);
-    res.json(employee);
+    const existingUser = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(email, req.params.id);
+    if (existingUser) {
+      return res.status(400).json({ error: 'Cet email est déjà utilisé' });
+    }
+
+    const normalizedRole = role.toLowerCase();
+
+    if (password && password.trim() !== '') {
+      const passwordHash = bcrypt.hashSync(password, 10);
+      db.prepare(`
+        UPDATE users
+        SET first_name = ?, last_name = ?, email = ?, phone = ?, role = ?, password_hash = ?
+        WHERE id = ? AND club_id = ?
+      `).run(first_name, last_name, email, phone || null, normalizedRole, passwordHash, req.params.id, req.clubId);
+    } else {
+      db.prepare(`
+        UPDATE users
+        SET first_name = ?, last_name = ?, email = ?, phone = ?, role = ?
+        WHERE id = ? AND club_id = ?
+      `).run(first_name, last_name, email, phone || null, normalizedRole, req.params.id, req.clubId);
+    }
+
+    const user = db.prepare(`
+      SELECT id, email, first_name, last_name, role, phone, created_at
+      FROM users WHERE id = ?
+    `).get(req.params.id);
+
+    res.json(user);
   } catch (error) {
     console.error('Update employee error:', error);
     res.status(500).json({ error: 'Erreur serveur' });
@@ -55,7 +101,17 @@ router.put('/:id', authenticate, (req, res) => {
 router.delete('/:id', authenticate, (req, res) => {
   try {
     const db = getDb();
-    db.prepare('DELETE FROM employees WHERE id = ? AND club_id = ?').run(req.params.id, req.clubId);
+
+    const user = db.prepare('SELECT role FROM users WHERE id = ? AND club_id = ?').get(req.params.id, req.clubId);
+    if (!user) {
+      return res.status(404).json({ error: 'Utilisateur introuvable' });
+    }
+
+    if (user.role === 'admin') {
+      return res.status(403).json({ error: 'Impossible de supprimer un administrateur' });
+    }
+
+    db.prepare('DELETE FROM users WHERE id = ? AND club_id = ?').run(req.params.id, req.clubId);
     res.status(204).send();
   } catch (error) {
     console.error('Delete employee error:', error);

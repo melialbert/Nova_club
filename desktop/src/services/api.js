@@ -187,6 +187,26 @@ export const api = {
     return response.json();
   },
 
+  async updateEmployee(id, employeeData) {
+    const response = await fetch(`${API_URL}/employees/${id}`, {
+      method: 'PUT',
+      headers: getHeaders(),
+      body: JSON.stringify(employeeData),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la mise à jour de l\'employé');
+    return response.json();
+  },
+
+  async deleteEmployee(id) {
+    const response = await fetch(`${API_URL}/employees/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la suppression de l\'employé');
+  },
+
   async getTransactions() {
     const response = await fetch(`${API_URL}/transactions`, {
       headers: getHeaders(),
