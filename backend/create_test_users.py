@@ -109,38 +109,6 @@ def create_test_users():
         })
         print("✅ Secrétaire créée: secretaire@club.com / password123")
 
-        # Créer le coach
-        print("👤 Création du coach...")
-        coach_query = text("""
-            INSERT INTO users (id, club_id, email, hashed_password, first_name, last_name, phone, role, is_active, sync_version, created_at, updated_at)
-            VALUES (
-                :id,
-                :club_id,
-                :email,
-                :hashed_password,
-                :first_name,
-                :last_name,
-                :phone,
-                :role,
-                true,
-                1,
-                NOW(),
-                NOW()
-            )
-            ON CONFLICT (email) DO UPDATE SET hashed_password = :hashed_password
-        """)
-        session.execute(coach_query, {
-            'id': 'a0000000-0000-0000-0000-000000000003',
-            'club_id': 'c1111111-1111-1111-1111-111111111111',
-            'email': 'coach@club.com',
-            'hashed_password': hashed_password,
-            'first_name': 'Pierre',
-            'last_name': 'Martin',
-            'phone': '+33123456787',
-            'role': 'COACH'
-        })
-        print("✅ Coach créé: coach@club.com / password123")
-
         session.commit()
 
         print()
@@ -151,7 +119,6 @@ def create_test_users():
         print("📝 Comptes de test disponibles:")
         print("   • Admin:      admin@club.com / password123")
         print("   • Secrétaire: secretaire@club.com / password123")
-        print("   • Coach:      coach@club.com / password123")
         print()
         print("🌐 Connectez-vous sur: http://localhost:3000/login")
         print()

@@ -152,10 +152,10 @@ function EmployeesPage() {
                       borderRadius: '6px',
                       fontSize: '13px',
                       fontWeight: '600',
-                      backgroundColor: employee.role?.toUpperCase() === 'ADMIN' ? '#dbeafe' : employee.role?.toUpperCase() === 'SECRETARY' ? '#fef3c7' : '#dcfce7',
-                      color: employee.role?.toUpperCase() === 'ADMIN' ? '#1e40af' : employee.role?.toUpperCase() === 'SECRETARY' ? '#92400e' : '#166534'
+                      backgroundColor: employee.role?.toUpperCase() === 'ADMIN' ? '#dbeafe' : '#fef3c7',
+                      color: employee.role?.toUpperCase() === 'ADMIN' ? '#1e40af' : '#92400e'
                     }}>
-                      {employee.role?.toUpperCase() === 'ADMIN' ? 'Admin' : employee.role?.toUpperCase() === 'SECRETARY' ? 'Secrétaire' : 'Coach'}
+                      {employee.role?.toUpperCase() === 'ADMIN' ? 'Admin' : 'Secrétaire'}
                     </span>
                   </td>
                   <td style={{ padding: '16px' }}>
@@ -308,7 +308,6 @@ function EmployeesPage() {
                     }}
                   >
                     <option value="SECRETARY">Secrétaire</option>
-                    <option value="COACH">Coach</option>
                     <option value="ADMIN">Admin</option>
                   </select>
                 </div>

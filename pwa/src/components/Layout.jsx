@@ -12,10 +12,10 @@ function Layout({ children }) {
   const isActive = (path) => location.pathname === path;
 
   const allMenuItems = [
-    { path: '/dashboard', label: 'Tableau de bord', icon: '📊', roles: ['ADMIN', 'SECRETARY', 'COACH'] },
-    { path: '/members', label: 'Adhérents', icon: '👥', roles: ['ADMIN', 'SECRETARY', 'COACH'] },
+    { path: '/dashboard', label: 'Tableau de bord', icon: '📊', roles: ['ADMIN', 'SECRETARY'] },
+    { path: '/members', label: 'Adhérents', icon: '👥', roles: ['ADMIN', 'SECRETARY'] },
     { path: '/licenses', label: 'Licences', icon: '🎫', roles: ['ADMIN', 'SECRETARY'] },
-    { path: '/attendances', label: 'Présences', icon: '📋', roles: ['ADMIN', 'SECRETARY', 'COACH'] },
+    { path: '/attendances', label: 'Présences', icon: '📋', roles: ['ADMIN', 'SECRETARY'] },
     { path: '/payments', label: 'Paiements', icon: '💳', roles: ['ADMIN', 'SECRETARY'] },
     { path: '/accounting', label: 'Comptabilité', icon: '💰', roles: ['ADMIN', 'SECRETARY'] },
     { path: '/employees', label: 'Employés', icon: '👔', roles: ['ADMIN'] },
@@ -171,7 +171,7 @@ function Layout({ children }) {
               color: '#3b82f6',
               fontWeight: '600'
             }}>
-              {user?.role === 'ADMIN' ? 'Administrateur' : user?.role === 'SECRETARY' ? 'Secrétaire' : 'Coach'}
+              {user?.role === 'ADMIN' ? 'Administrateur' : 'Secrétaire'}
             </div>
           </div>
 

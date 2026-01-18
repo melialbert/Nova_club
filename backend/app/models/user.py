@@ -6,7 +6,6 @@ import enum
 class UserRole(str, enum.Enum):
     ADMIN = "ADMIN"
     SECRETARY = "SECRETARY"
-    COACH = "COACH"
 
 class User(BaseModel):
     __tablename__ = "users"

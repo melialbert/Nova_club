@@ -175,6 +175,37 @@ function migrateUsersTable() {
       db.exec("ALTER TABLE users ADD COLUMN phone TEXT");
       console.log('Added phone column to users table');
     }
+
+    const tableInfo = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='users'").get();
+    if (tableInfo && tableInfo.sql.includes("'coach'")) {
+      console.log('Removing coach role from users table...');
+
+      db.exec(`
+        CREATE TABLE users_new (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          club_id INTEGER NOT NULL,
+          email TEXT UNIQUE NOT NULL,
+          password_hash TEXT NOT NULL,
+          role TEXT NOT NULL CHECK(role IN ('admin', 'secretary', 'member')),
+          first_name TEXT,
+          last_name TEXT,
+          phone TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (club_id) REFERENCES clubs(id)
+        );
+
+        INSERT INTO users_new (id, club_id, email, password_hash, role, first_name, last_name, phone, created_at)
+        SELECT id, club_id, email, password_hash,
+               CASE WHEN role = 'coach' THEN 'secretary' ELSE role END,
+               first_name, last_name, phone, created_at
+        FROM users;
+
+        DROP TABLE users;
+        ALTER TABLE users_new RENAME TO users;
+      `);
+
+      console.log('Successfully removed coach role from users table');
+    }
   } catch (error) {
     console.log('users table does not exist yet, will be created');
   }
@@ -197,7 +228,7 @@ function createTables() {
       club_id INTEGER NOT NULL,
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
-      role TEXT NOT NULL CHECK(role IN ('admin', 'coach', 'secretary', 'member')),
+      role TEXT NOT NULL CHECK(role IN ('admin', 'secretary', 'member')),
       first_name TEXT,
       last_name TEXT,
       phone TEXT,

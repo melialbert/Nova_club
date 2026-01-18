@@ -13,7 +13,7 @@ Ou sur Windows :
 creer-utilisateurs.bat
 ```
 
-Ce script va insérer automatiquement les 3 utilisateurs de test dans votre base de données PostgreSQL locale.
+Ce script va insérer automatiquement les 2 utilisateurs de test dans votre base de données PostgreSQL locale.
 
 ---
 
@@ -31,12 +31,6 @@ Ce script va insérer automatiquement les 3 utilisateurs de test dans votre base
 - **Rôle:** Secrétaire
 - **Accès:** Tableau de bord, Adhérents, Licences, Présences, Paiements
 
-## Coach
-- **Email:** coach@club.com
-- **Mot de passe:** password123
-- **Rôle:** Coach
-- **Accès:** Tableau de bord, Adhérents, Présences
-
 ## Gestion des employés
 
 Seul l'administrateur peut créer, modifier et supprimer des employés depuis la page "Employés".
@@ -44,7 +38,6 @@ Seul l'administrateur peut créer, modifier et supprimer des employés depuis la
 Les rôles disponibles sont :
 - **Admin** : Accès complet à toutes les fonctionnalités
 - **Secrétaire** : Gestion des adhérents, licences, présences et paiements
-- **Coach** : Consultation des adhérents et gestion des présences
 
 ## Notes importantes
 
