@@ -12,6 +12,7 @@ function MembersPage() {
   const [editingMember, setEditingMember] = useState(null);
   const [selectedMemberForCareer, setSelectedMemberForCareer] = useState(null);
   const [selectedMemberForFinances, setSelectedMemberForFinances] = useState(null);
+  const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -36,6 +37,10 @@ function MembersPage() {
 
   useEffect(() => {
     loadMembers();
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
   }, []);
 
   const loadMembers = async () => {
@@ -1052,29 +1057,31 @@ function MembersPage() {
                           >
                             ✏️
                           </button>
-                          <button
-                            onClick={() => handleDelete(member)}
-                            style={{
-                              padding: '6px 12px',
-                              borderRadius: '6px',
-                              border: '1px solid #e2e8f0',
-                              backgroundColor: 'white',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.target.style.backgroundColor = '#fef2f2';
-                              e.target.style.borderColor = '#ef4444';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.target.style.backgroundColor = 'white';
-                              e.target.style.borderColor = '#e2e8f0';
-                            }}
-                            title="Supprimer"
-                          >
-                            🗑️
-                          </button>
+                          {user?.role?.toUpperCase() !== 'SECRETARY' && (
+                            <button
+                              onClick={() => handleDelete(member)}
+                              style={{
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                border: '1px solid #e2e8f0',
+                                backgroundColor: 'white',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                transition: 'all 0.2s'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = '#fef2f2';
+                                e.target.style.borderColor = '#ef4444';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = 'white';
+                                e.target.style.borderColor = '#e2e8f0';
+                              }}
+                              title="Supprimer"
+                            >
+                              🗑️
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

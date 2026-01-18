@@ -5,6 +5,7 @@ function EmployeesPage() {
   const [employees, setEmployees] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
+  const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -16,6 +17,10 @@ function EmployeesPage() {
 
   useEffect(() => {
     loadEmployees();
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
   }, []);
 
   const loadEmployees = async () => {
@@ -173,7 +178,7 @@ function EmployeesPage() {
                       >
                         Modifier
                       </button>
-                      {employee.role?.toUpperCase() !== 'ADMIN' && (
+                      {employee.role?.toUpperCase() !== 'ADMIN' && user?.role?.toUpperCase() !== 'SECRETARY' && (
                         <button
                           onClick={() => handleDelete(employee.id)}
                           style={{

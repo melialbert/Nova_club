@@ -11,6 +11,7 @@ function LicensesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
     member_id: '',
     license_number: '',
@@ -25,6 +26,10 @@ function LicensesPage() {
 
   useEffect(() => {
     loadData();
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
   }, []);
 
   useEffect(() => {
@@ -547,19 +552,21 @@ function LicensesPage() {
                           <span>✏️</span>
                           <span>Modifier</span>
                         </button>
-                        <button
-                          className="btn btn-danger"
-                          style={{
-                            flex: 1,
-                            padding: '10px',
-                            fontSize: '13px',
-                            fontWeight: '600'
-                          }}
-                          onClick={() => handleDelete(license)}
-                        >
-                          <span>🗑️</span>
-                          <span>Supprimer</span>
-                        </button>
+                        {user?.role?.toUpperCase() !== 'SECRETARY' && (
+                          <button
+                            className="btn btn-danger"
+                            style={{
+                              flex: 1,
+                              padding: '10px',
+                              fontSize: '13px',
+                              fontWeight: '600'
+                            }}
+                            onClick={() => handleDelete(license)}
+                          >
+                            <span>🗑️</span>
+                            <span>Supprimer</span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

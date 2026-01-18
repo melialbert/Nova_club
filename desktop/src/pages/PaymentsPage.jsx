@@ -20,6 +20,7 @@ function PaymentsPage() {
   const [clubInfo, setClubInfo] = useState(null);
   const [selectedMonths, setSelectedMonths] = useState([]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
     member_id: '',
     amount: '',
@@ -36,6 +37,10 @@ function PaymentsPage() {
   useEffect(() => {
     loadData();
     loadClubInfo();
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
   }, []);
 
   const loadClubInfo = async () => {
@@ -1137,29 +1142,31 @@ function PaymentsPage() {
                           >
                             🖨️
                           </button>
-                          <button
-                            onClick={() => handleDelete(payment)}
-                            style={{
-                              padding: '6px 12px',
-                              borderRadius: '6px',
-                              border: '1px solid #e2e8f0',
-                              backgroundColor: 'white',
-                              cursor: 'pointer',
-                              fontSize: '14px',
-                              transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.target.style.backgroundColor = '#fef2f2';
-                              e.target.style.borderColor = '#ef4444';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.target.style.backgroundColor = 'white';
-                              e.target.style.borderColor = '#e2e8f0';
-                            }}
-                            title="Supprimer"
-                          >
-                            🗑️
-                          </button>
+                          {user?.role?.toUpperCase() !== 'SECRETARY' && (
+                            <button
+                              onClick={() => handleDelete(payment)}
+                              style={{
+                                padding: '6px 12px',
+                                borderRadius: '6px',
+                                border: '1px solid #e2e8f0',
+                                backgroundColor: 'white',
+                                cursor: 'pointer',
+                                fontSize: '14px',
+                                transition: 'all 0.2s'
+                              }}
+                              onMouseEnter={(e) => {
+                                e.target.style.backgroundColor = '#fef2f2';
+                                e.target.style.borderColor = '#ef4444';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.target.style.backgroundColor = 'white';
+                                e.target.style.borderColor = '#e2e8f0';
+                              }}
+                              title="Supprimer"
+                            >
+                              🗑️
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

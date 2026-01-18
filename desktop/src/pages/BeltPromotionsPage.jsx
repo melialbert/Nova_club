@@ -7,6 +7,7 @@ function BeltPromotionsPage() {
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMembers, setSelectedMembers] = useState([]);
+  const [user, setUser] = useState(null);
   const [sessionData, setSessionData] = useState({
     promotion_date: new Date().toISOString().split('T')[0],
     examiner: '',
@@ -18,6 +19,10 @@ function BeltPromotionsPage() {
   useEffect(() => {
     loadPromotions();
     loadMembers();
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
   }, []);
 
   const loadPromotions = async () => {
@@ -894,21 +899,23 @@ function BeltPromotionsPage() {
                             <span>✕</span>
                             <span>Échoué</span>
                           </button>
-                          <button
-                            onClick={() => handleDelete(promotion)}
-                            style={{
-                              padding: '8px 12px',
-                              borderRadius: '8px',
-                              border: '1px solid #e2e8f0',
-                              backgroundColor: 'white',
-                              cursor: 'pointer',
-                              color: '#64748b',
-                              fontSize: '14px'
-                            }}
-                            title="Supprimer"
-                          >
-                            🗑️
-                          </button>
+                          {user?.role?.toUpperCase() !== 'SECRETARY' && (
+                            <button
+                              onClick={() => handleDelete(promotion)}
+                              style={{
+                                padding: '8px 12px',
+                                borderRadius: '8px',
+                                border: '1px solid #e2e8f0',
+                                backgroundColor: 'white',
+                                cursor: 'pointer',
+                                color: '#64748b',
+                                fontSize: '14px'
+                              }}
+                              title="Supprimer"
+                            >
+                              🗑️
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -1010,20 +1017,22 @@ function BeltPromotionsPage() {
                         </div>
                       </td>
                       <td>
-                        <button
-                          onClick={() => handleDelete(promotion)}
-                          style={{
-                            padding: '6px 12px',
-                            borderRadius: '6px',
-                            border: '1px solid #e2e8f0',
-                            backgroundColor: 'white',
-                            cursor: 'pointer',
-                            fontSize: '14px'
-                          }}
-                          title="Supprimer"
-                        >
-                          🗑️
-                        </button>
+                        {user?.role?.toUpperCase() !== 'SECRETARY' ? (
+                          <button
+                            onClick={() => handleDelete(promotion)}
+                            style={{
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              border: '1px solid #e2e8f0',
+                              backgroundColor: 'white',
+                              cursor: 'pointer',
+                              fontSize: '14px'
+                            }}
+                            title="Supprimer"
+                          >
+                            🗑️
+                          </button>
+                        ) : null}
                       </td>
                     </tr>
                   ))}

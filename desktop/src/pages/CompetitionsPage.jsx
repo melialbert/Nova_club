@@ -8,6 +8,7 @@ function CompetitionsPage() {
   const [editingId, setEditingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all');
+  const [user, setUser] = useState(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -20,6 +21,10 @@ function CompetitionsPage() {
 
   useEffect(() => {
     loadCompetitions();
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
   }, []);
 
   const loadCompetitions = async () => {
@@ -505,25 +510,27 @@ function CompetitionsPage() {
               >
                 Modifier
               </button>
-              <button
-                onClick={() => handleDelete(competition.id)}
-                style={{
-                  flex: 1,
-                  padding: '10px',
-                  backgroundColor: '#fef2f2',
-                  color: '#dc2626',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#fee2e2'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = '#fef2f2'}
-              >
-                Supprimer
-              </button>
+              {user?.role?.toUpperCase() !== 'SECRETARY' && (
+                <button
+                  onClick={() => handleDelete(competition.id)}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    backgroundColor: '#fef2f2',
+                    color: '#dc2626',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#fee2e2'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#fef2f2'}
+                >
+                  Supprimer
+                </button>
+              )}
             </div>
           </div>
         ))}
