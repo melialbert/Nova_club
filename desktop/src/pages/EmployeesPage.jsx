@@ -39,18 +39,25 @@ function EmployeesPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!editingEmployee && formData.password.length < 8) {
+      alert('Le mot de passe doit contenir au moins 8 caractères.');
+      return;
+    }
+
     try {
       if (editingEmployee) {
         await api.updateEmployee(editingEmployee.id, formData);
+        alert(`Employé ${formData.first_name} ${formData.last_name} mis à jour avec succès.`);
       } else {
         await api.createEmployee(formData);
+        alert(`✅ Secrétaire créé avec succès !\n\n📧 Email: ${formData.email}\n🔑 Mot de passe: ${formData.password}\n\nLe secrétaire peut maintenant se connecter avec ces identifiants.`);
       }
       setShowModal(false);
       resetForm();
       loadEmployees();
     } catch (error) {
       console.error('Error saving employee:', error);
-      alert('Erreur lors de la sauvegarde');
+      alert(error.message || 'Erreur lors de la sauvegarde de l\'employé. Vérifiez que tous les champs sont correctement remplis.');
     }
   };
 
@@ -59,10 +66,11 @@ function EmployeesPage() {
 
     try {
       await api.deleteEmployee(id);
+      alert('Employé supprimé avec succès.');
       loadEmployees();
     } catch (error) {
       console.error('Error deleting employee:', error);
-      alert('Erreur lors de la suppression');
+      alert(error.message || 'Erreur lors de la suppression de l\'employé.');
     }
   };
 
