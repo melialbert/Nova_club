@@ -539,23 +539,13 @@ export default function FinancialStatusModal({ member, onClose }) {
               return (
                 <div
                   key={monthData.month}
-                  onClick={() => handleTogglePayment(monthData.month)}
                   style={{
                     padding: '12px',
                     borderRadius: '10px',
                     border: isPaid ? '2px solid #10b981' : '2px solid #f87171',
                     backgroundColor: isPaid ? '#f0fdf4' : '#fef2f2',
-                    cursor: 'pointer',
                     transition: 'all 0.2s',
                     position: 'relative'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 8px 16px rgba(0, 0, 0, 0.12)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
                   }}
                 >
                   <div style={{
@@ -641,7 +631,7 @@ export default function FinancialStatusModal({ member, onClose }) {
               margin: 0,
               fontWeight: '600'
             }}>
-              💡 Cliquez sur un mois pour basculer son statut de paiement
+              💡 Pour enregistrer un paiement, utilisez la page "Paiements"
             </p>
           </div>
         </div>

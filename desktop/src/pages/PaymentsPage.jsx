@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { api } from '../services/api';
 
+const MONTHS = [
+  'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+];
+
 function PaymentsPage() {
   const [payments, setPayments] = useState([]);
   const [members, setMembers] = useState([]);
@@ -13,6 +18,8 @@ function PaymentsPage() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [clubInfo, setClubInfo] = useState(null);
+  const [selectedMonths, setSelectedMonths] = useState([]);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [formData, setFormData] = useState({
     member_id: '',
     amount: '',
@@ -57,8 +64,24 @@ function PaymentsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (formData.payment_type === 'monthly_fee' && selectedMonths.length === 0) {
+      alert('Veuillez sélectionner au moins un mois');
+      return;
+    }
+
     try {
-      await api.createPayment(formData);
+      if (formData.payment_type === 'monthly_fee' && selectedMonths.length > 0) {
+        for (const month of selectedMonths) {
+          const monthYear = `${selectedYear}-${String(month).padStart(2, '0')}`;
+          await api.createPayment({
+            ...formData,
+            month_year: monthYear
+          });
+        }
+      } else {
+        await api.createPayment(formData);
+      }
+
       setFormData({
         member_id: '',
         amount: '',
@@ -68,12 +91,21 @@ function PaymentsPage() {
         month_year: new Date().toISOString().slice(0, 7),
         notes: ''
       });
+      setSelectedMonths([]);
       setShowForm(false);
       loadData();
     } catch (error) {
       console.error('Error creating payment:', error);
       alert("Erreur lors de l\'enregistrement du paiement");
     }
+  };
+
+  const toggleMonth = (month) => {
+    setSelectedMonths(prev =>
+      prev.includes(month)
+        ? prev.filter(m => m !== month)
+        : [...prev, month].sort((a, b) => a - b)
+    );
   };
 
   const handleDelete = async (payment) => {
@@ -585,11 +617,96 @@ function PaymentsPage() {
                 <label>Date de paiement *</label>
                 <input type="date" name="payment_date" value={formData.payment_date} onChange={handleChange} required />
               </div>
-              <div className="form-group">
-                <label>Mois concerné</label>
-                <input type="month" name="month_year" value={formData.month_year} onChange={handleChange} />
-              </div>
+              {formData.payment_type !== 'monthly_fee' && (
+                <div className="form-group">
+                  <label>Mois concerné</label>
+                  <input type="month" name="month_year" value={formData.month_year} onChange={handleChange} />
+                </div>
+              )}
             </div>
+
+            {formData.payment_type === 'monthly_fee' && (
+              <div className="form-group">
+                <label style={{ marginBottom: '12px', display: 'block', fontSize: '14px', fontWeight: '600', color: '#475569' }}>
+                  Mois concernés *
+                </label>
+                <div style={{ marginBottom: '12px' }}>
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                    style={{
+                      padding: '10px 14px',
+                      border: '2px solid #e2e8f0',
+                      borderRadius: '8px',
+                      fontSize: '15px',
+                      fontWeight: '600',
+                      color: '#0f172a',
+                      backgroundColor: 'white',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {Array.from({ length: 3 }, (_, i) => new Date().getFullYear() - 1 + i).map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
+                  gap: '10px',
+                  padding: '16px',
+                  backgroundColor: '#f8fafc',
+                  borderRadius: '10px',
+                  border: '2px solid #e2e8f0'
+                }}>
+                  {MONTHS.map((monthName, index) => {
+                    const monthNumber = index + 1;
+                    const isSelected = selectedMonths.includes(monthNumber);
+
+                    return (
+                      <div
+                        key={monthNumber}
+                        onClick={() => toggleMonth(monthNumber)}
+                        style={{
+                          padding: '10px 12px',
+                          borderRadius: '8px',
+                          border: isSelected ? '2px solid #10b981' : '2px solid #e2e8f0',
+                          backgroundColor: isSelected ? '#d1fae5' : 'white',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          textAlign: 'center',
+                          fontSize: '13px',
+                          fontWeight: '600',
+                          color: isSelected ? '#059669' : '#64748b',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px'
+                        }}
+                      >
+                        {isSelected && <span style={{ fontSize: '16px' }}>✓</span>}
+                        <span>{monthName}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                {selectedMonths.length > 0 && (
+                  <div style={{
+                    marginTop: '12px',
+                    padding: '12px',
+                    backgroundColor: '#dbeafe',
+                    borderRadius: '8px',
+                    border: '1px solid #3b82f6',
+                    fontSize: '14px',
+                    color: '#1e40af',
+                    fontWeight: '600'
+                  }}>
+                    {selectedMonths.length} mois sélectionné{selectedMonths.length > 1 ? 's' : ''} : {selectedMonths.map(m => MONTHS[m - 1]).join(', ')}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="form-group">
               <label>Notes</label>
               <textarea name="notes" value={formData.notes} onChange={handleChange} rows="3" placeholder="Informations complémentaires..."></textarea>
