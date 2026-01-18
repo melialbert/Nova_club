@@ -287,6 +287,17 @@ function MembersPage() {
         return;
       }
 
+      let totalEncaisse = 0;
+      validMembersData.forEach(data => {
+        data.financialData.months.forEach(monthData => {
+          if (monthData.status === 'paid') {
+            totalEncaisse += monthData.amount || 0;
+          } else if (monthData.paid_amount && monthData.paid_amount > 0) {
+            totalEncaisse += monthData.paid_amount;
+          }
+        });
+      });
+
       const MONTHS = [
         'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
         'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
@@ -400,10 +411,20 @@ function MembersPage() {
               .footer {
                 text-align: center;
                 margin-top: 10px;
-                padding-top: 5px;
+                padding-top: 10px;
                 border-top: 2px solid #cbd5e1;
                 font-size: 8px;
                 color: #64748b;
+              }
+              .total-encaisse {
+                font-size: 14px;
+                font-weight: 900;
+                color: #166534;
+                margin-bottom: 8px;
+                padding: 8px;
+                background: #f0fdf4;
+                border: 2px solid #166534;
+                border-radius: 4px;
               }
               .legend {
                 margin-bottom: 10px;
@@ -488,7 +509,12 @@ function MembersPage() {
             </table>
 
             <div class="footer">
-              Document généré automatiquement - ${clubInfo ? `${clubInfo.name || clubInfo.club_name}` : ''} - ${new Date().toLocaleDateString('fr-FR')}
+              <div class="total-encaisse">
+                MONTANT TOTAL ENCAISSÉ : ${totalEncaisse.toLocaleString()} F
+              </div>
+              <div>
+                Document généré automatiquement - ${clubInfo ? `${clubInfo.name || clubInfo.club_name}` : ''} - ${new Date().toLocaleDateString('fr-FR')}
+              </div>
             </div>
           </body>
         </html>
