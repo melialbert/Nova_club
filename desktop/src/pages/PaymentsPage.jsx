@@ -158,7 +158,7 @@ function PaymentsPage() {
       loadData();
     } catch (error) {
       console.error('Error creating payment:', error);
-      alert("Erreur lors de l\'enregistrement du paiement");
+      alert(error.message || "Erreur lors de l'enregistrement du paiement. Vérifiez que tous les champs sont correctement remplis et que le membre existe.");
     }
   };
 
@@ -177,10 +177,11 @@ function PaymentsPage() {
 
     try {
       await api.deletePayment(payment.id);
+      alert('Paiement supprimé avec succès');
       loadData();
     } catch (error) {
       console.error('Error deleting payment:', error);
-      alert('Erreur lors de la suppression du paiement');
+      alert(error.message || 'Erreur lors de la suppression du paiement. Le paiement n\'existe peut-être plus ou vous n\'avez pas les permissions nécessaires.');
     }
   };
 

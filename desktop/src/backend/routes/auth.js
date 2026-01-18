@@ -11,20 +11,20 @@ router.post('/login', (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email et mot de passe requis' });
+      return res.status(400).json({ error: 'Email et mot de passe requis. Veuillez remplir tous les champs.' });
     }
 
     const db = getDb();
     const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
 
     if (!user) {
-      return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
+      return res.status(401).json({ error: 'Email ou mot de passe incorrect. Veuillez vérifier vos identifiants.' });
     }
 
     const isValidPassword = bcrypt.compareSync(password, user.password_hash);
 
     if (!isValidPassword) {
-      return res.status(401).json({ error: 'Email ou mot de passe incorrect' });
+      return res.status(401).json({ error: 'Email ou mot de passe incorrect. Veuillez vérifier vos identifiants.' });
     }
 
     const token = jwt.sign(
@@ -47,7 +47,7 @@ router.post('/login', (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Erreur serveur' });
+    res.status(500).json({ error: 'Erreur lors de la connexion. Veuillez vérifier votre connexion internet et réessayer.' });
   }
 });
 

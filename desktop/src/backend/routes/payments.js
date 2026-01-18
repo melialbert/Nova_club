@@ -33,7 +33,7 @@ router.get('/', authenticate, (req, res) => {
     res.json(paymentsWithDefaults);
   } catch (error) {
     console.error('Get payments error:', error);
-    res.status(500).json({ error: 'Erreur serveur' });
+    res.status(500).json({ error: 'Erreur lors de la récupération des paiements depuis la base de données.' });
   }
 });
 
@@ -92,7 +92,13 @@ router.post('/', authenticate, (req, res) => {
     res.status(201).json(payment);
   } catch (error) {
     console.error('Create payment error:', error);
-    res.status(500).json({ error: 'Erreur serveur' });
+    if (error.message && error.message.includes('FOREIGN KEY')) {
+      res.status(400).json({ error: 'Membre introuvable. Veuillez sélectionner un membre valide.' });
+    } else if (error.message && error.message.includes('NOT NULL')) {
+      res.status(400).json({ error: 'Tous les champs obligatoires doivent être remplis.' });
+    } else {
+      res.status(500).json({ error: 'Erreur lors de la création du paiement. Vérifiez les données saisies.' });
+    }
   }
 });
 
@@ -102,7 +108,11 @@ router.delete('/:id', authenticate, (req, res) => {
 
     const payment = db.prepare('SELECT * FROM payments WHERE id = ? AND club_id = ?').get(req.params.id, req.clubId);
 
-    if (payment && payment.payment_type === 'monthly_fee' && payment.month_year) {
+    if (!payment) {
+      return res.status(404).json({ error: 'Paiement introuvable. Il a peut-être déjà été supprimé.' });
+    }
+
+    if (payment.payment_type === 'monthly_fee' && payment.month_year) {
       const [year, month] = payment.month_year.split('-').map(Number);
 
       db.prepare(`
@@ -112,11 +122,16 @@ router.delete('/:id', authenticate, (req, res) => {
       `).run(payment.member_id, year, month);
     }
 
-    db.prepare('DELETE FROM payments WHERE id = ? AND club_id = ?').run(req.params.id, req.clubId);
+    const result = db.prepare('DELETE FROM payments WHERE id = ? AND club_id = ?').run(req.params.id, req.clubId);
+
+    if (result.changes === 0) {
+      return res.status(404).json({ error: 'Paiement introuvable ou vous n\'avez pas les permissions nécessaires.' });
+    }
+
     res.status(204).send();
   } catch (error) {
     console.error('Delete payment error:', error);
-    res.status(500).json({ error: 'Erreur serveur' });
+    res.status(500).json({ error: 'Erreur lors de la suppression du paiement. Veuillez réessayer.' });
   }
 });
 

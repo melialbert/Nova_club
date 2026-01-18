@@ -11,7 +11,7 @@ router.get('/', authenticate, (req, res) => {
     res.json(members);
   } catch (error) {
     console.error('Get members error:', error);
-    res.status(500).json({ error: 'Erreur serveur' });
+    res.status(500).json({ error: 'Erreur lors de la récupération de la liste des membres depuis la base de données.' });
   }
 });
 
@@ -21,13 +21,13 @@ router.get('/:id', authenticate, (req, res) => {
     const member = db.prepare('SELECT * FROM members WHERE id = ? AND club_id = ?').get(req.params.id, req.clubId);
 
     if (!member) {
-      return res.status(404).json({ error: 'Membre non trouvé' });
+      return res.status(404).json({ error: 'Membre introuvable. Il a peut-être été supprimé ou n\'existe pas.' });
     }
 
     res.json(member);
   } catch (error) {
     console.error('Get member error:', error);
-    res.status(500).json({ error: 'Erreur serveur' });
+    res.status(500).json({ error: 'Erreur lors de la récupération des informations du membre.' });
   }
 });
 
@@ -70,7 +70,13 @@ router.post('/', authenticate, (req, res) => {
     res.status(201).json(member);
   } catch (error) {
     console.error('Create member error:', error);
-    res.status(500).json({ error: 'Erreur serveur' });
+    if (error.message && error.message.includes('NOT NULL')) {
+      res.status(400).json({ error: 'Tous les champs obligatoires doivent être remplis (prénom, nom, date de naissance).' });
+    } else if (error.message && error.message.includes('UNIQUE')) {
+      res.status(400).json({ error: 'Un membre avec cet email existe déjà dans le système.' });
+    } else {
+      res.status(500).json({ error: 'Erreur lors de la création du membre. Vérifiez que tous les champs sont correctement remplis.' });
+    }
   }
 });
 
@@ -115,7 +121,11 @@ router.put('/:id', authenticate, (req, res) => {
     res.json(member);
   } catch (error) {
     console.error('Update member error:', error);
-    res.status(500).json({ error: 'Erreur serveur' });
+    if (error.message && error.message.includes('NOT NULL')) {
+      res.status(400).json({ error: 'Tous les champs obligatoires doivent être remplis.' });
+    } else {
+      res.status(500).json({ error: 'Erreur lors de la mise à jour du membre. Vérifiez les données saisies.' });
+    }
   }
 });
 
@@ -148,7 +158,7 @@ router.delete('/:id', authenticate, (req, res) => {
 
     const member = db.prepare('SELECT * FROM members WHERE id = ? AND club_id = ?').get(memberId, req.clubId);
     if (!member) {
-      return res.status(404).json({ error: 'Membre non trouvé' });
+      return res.status(404).json({ error: 'Membre introuvable. Il a peut-être déjà été supprimé.' });
     }
 
     const deleteInTransaction = db.transaction(() => {
@@ -166,7 +176,7 @@ router.delete('/:id', authenticate, (req, res) => {
     res.status(204).send();
   } catch (error) {
     console.error('Delete member error:', error);
-    res.status(500).json({ error: 'Erreur lors de la suppression du membre' });
+    res.status(500).json({ error: 'Erreur lors de la suppression du membre et de ses données associées. Veuillez réessayer.' });
   }
 });
 

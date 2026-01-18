@@ -32,8 +32,11 @@ export const api = {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Erreur de connexion');
+      const error = await response.json().catch(() => ({}));
+      if (response.status === 401) {
+        throw new Error('Email ou mot de passe incorrect. Veuillez vérifier vos identifiants.');
+      }
+      throw new Error(error.error || 'Erreur de connexion. Vérifiez votre connexion internet.');
     }
 
     const data = await response.json();
@@ -51,7 +54,12 @@ export const api = {
       headers: getHeaders(),
     });
 
-    if (!response.ok) throw new Error('Erreur lors de la récupération des membres');
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('Session expirée. Veuillez vous reconnecter.');
+      }
+      throw new Error('Erreur lors de la récupération de la liste des membres. Vérifiez votre connexion.');
+    }
     return response.json();
   },
 
@@ -62,7 +70,13 @@ export const api = {
       body: JSON.stringify(memberData),
     });
 
-    if (!response.ok) throw new Error('Erreur lors de la création du membre');
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      if (response.status === 400) {
+        throw new Error('Données invalides. Vérifiez que tous les champs obligatoires sont remplis correctement.');
+      }
+      throw new Error(error.error || 'Erreur lors de la création du membre. Vérifiez les données saisies.');
+    }
     return response.json();
   },
 
@@ -83,7 +97,13 @@ export const api = {
       headers: getHeaders(),
     });
 
-    if (!response.ok) throw new Error('Erreur lors de la suppression du membre');
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      if (response.status === 404) {
+        throw new Error('Membre introuvable. Il a peut-être déjà été supprimé.');
+      }
+      throw new Error(error.error || 'Erreur lors de la suppression du membre. Vérifiez qu\'il n\'a pas de données associées.');
+    }
   },
 
   async toggleMemberActive(id) {
@@ -132,8 +152,23 @@ export const api = {
       body: JSON.stringify(paymentData),
     });
 
-    if (!response.ok) throw new Error('Erreur lors de la création du paiement');
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || 'Erreur lors de la création du paiement. Vérifiez les données saisies.');
+    }
     return response.json();
+  },
+
+  async deletePayment(id) {
+    const response = await fetch(`${API_URL}/payments/${id}`, {
+      method: 'DELETE',
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || 'Erreur lors de la suppression du paiement. Veuillez réessayer.');
+    }
   },
 
   async getLicenses() {
