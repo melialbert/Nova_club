@@ -75,23 +75,86 @@ function AccountingPage() {
     <div>
       <style>{`
         @media print {
-          .no-print {
+          * {
+            overflow: visible !important;
+          }
+
+          body, html {
+            background: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+          }
+
+          /* Cache tous les éléments de navigation et interface */
+          .no-print,
+          nav,
+          aside,
+          .sidebar {
             display: none !important;
           }
+
+          /* Affiche l'en-tête d'impression */
           .print-header {
             display: block !important;
+            margin-bottom: 32px !important;
+            padding-bottom: 16px !important;
+            border-bottom: 2px solid #e2e8f0 !important;
           }
-          body {
-            background: white !important;
+
+          /* Conteneur principal optimisé pour l'impression */
+          .print-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 20mm !important;
+            overflow: visible !important;
           }
+
+          /* Optimisation des cards de statistiques */
+          .stats-grid {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 16px !important;
+            margin-bottom: 24px !important;
+            page-break-inside: avoid !important;
+          }
+
+          /* Table optimisée pour l'impression */
           table {
-            page-break-inside: auto;
+            width: 100% !important;
+            border-collapse: collapse !important;
+            page-break-inside: auto !important;
+            overflow: visible !important;
           }
+
+          thead {
+            display: table-header-group !important;
+          }
+
           tr {
-            page-break-inside: avoid;
-            page-break-after: auto;
+            page-break-inside: avoid !important;
+            page-break-after: auto !important;
+          }
+
+          th, td {
+            padding: 12px !important;
+            font-size: 12px !important;
+          }
+
+          /* Cache les ombres et effets */
+          * {
+            box-shadow: none !important;
+            text-shadow: none !important;
+          }
+
+          /* Optimisation des couleurs pour l'impression */
+          .print-optimize {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
         }
+
         @media screen {
           .print-header {
             display: none;
@@ -163,7 +226,7 @@ function AccountingPage() {
         </div>
       </div>
 
-      <div style={{
+      <div className="stats-grid print-optimize" style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)',
         gap: '24px',
@@ -217,7 +280,7 @@ function AccountingPage() {
         </div>
       </div>
 
-      <div style={{
+      <div className="print-optimize" style={{
         backgroundColor: 'white',
         borderRadius: '12px',
         overflow: 'hidden',

@@ -28,7 +28,7 @@ function Layout({ children }) {
     <>
       <ToastContainer toasts={toast.toasts} removeToast={toast.removeToast} />
       <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-        <aside style={{
+        <aside className="no-print" style={{
         width: '280px',
         backgroundColor: '#1e293b',
         color: 'white',
@@ -219,7 +219,7 @@ function Layout({ children }) {
         height: '100vh',
         backgroundColor: '#f8fafc'
       }}>
-        <header style={{
+        <header className="no-print" style={{
           backgroundColor: 'white',
           borderBottom: '1px solid #e2e8f0',
           padding: '20px 32px',

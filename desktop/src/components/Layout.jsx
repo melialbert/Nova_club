@@ -31,7 +31,7 @@ function Layout({ children, onLogout }) {
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      <aside style={{
+      <aside className="no-print" style={{
         width: '280px',
         backgroundColor: '#1e293b',
         color: 'white',
@@ -224,7 +224,7 @@ function Layout({ children, onLogout }) {
         height: '100vh',
         backgroundColor: 'transparent'
       }}>
-        <header style={{
+        <header className="no-print" style={{
           backgroundColor: 'rgba(255, 255, 255, 0.8)',
           backdropFilter: 'blur(10px)',
           borderBottom: '1px solid rgba(59, 130, 246, 0.1)',

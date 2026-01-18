@@ -452,3 +452,104 @@ body {
   color: #64748b;
   margin-bottom: 24px;
 }
+
+/* Styles d'impression professionnels */
+@media print {
+  /* Reset global pour l'impression */
+  * {
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body, html {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Cache tous les éléments d'interface */
+  .no-print,
+  nav,
+  aside,
+  header,
+  button,
+  .btn,
+  .sidebar,
+  input[type="text"],
+  input[type="search"],
+  select {
+    display: none !important;
+  }
+
+  /* Container principal optimisé */
+  main {
+    margin: 0 !important;
+    padding: 20mm !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Optimisation des pages */
+  div[style*="marginLeft: 280px"] {
+    margin-left: 0 !important;
+  }
+
+  /* Cache les barres de défilement */
+  *::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Tables optimisées */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: auto !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tbody {
+    display: table-row-group !important;
+  }
+
+  tr {
+    page-break-inside: avoid !important;
+    page-break-after: auto !important;
+  }
+
+  th, td {
+    padding: 8px 12px !important;
+    font-size: 11px !important;
+  }
+
+  /* Cards et conteneurs */
+  .card, .stat-card {
+    page-break-inside: avoid !important;
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  /* Cache les effets visuels */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Optimisation des grilles */
+  .stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Cache les animations */
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
