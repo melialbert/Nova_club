@@ -3,6 +3,7 @@ import { api } from '../services/api';
 
 function AccountingPage() {
   const [transactions, setTransactions] = useState([]);
+  const [payments, setPayments] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [filterType, setFilterType] = useState('all');
   const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ function AccountingPage() {
 
   useEffect(() => {
     loadTransactions();
+    loadPayments();
   }, []);
 
   const loadTransactions = async () => {
@@ -23,6 +25,15 @@ function AccountingPage() {
       setTransactions(data);
     } catch (error) {
       console.error('Error:', error);
+    }
+  };
+
+  const loadPayments = async () => {
+    try {
+      const data = await api.getPayments();
+      setPayments(data);
+    } catch (error) {
+      console.error('Error loading payments:', error);
     }
   };
 
@@ -52,9 +63,14 @@ function AccountingPage() {
     filterType === 'all' || t.type === filterType
   );
 
-  const income = transactions
+  const transactionIncome = transactions
     .filter(t => t.type === 'income')
     .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+
+  const paymentsIncome = payments
+    .reduce((sum, p) => sum + parseFloat(p.paid_amount || p.amount || 0), 0);
+
+  const income = transactionIncome + paymentsIncome;
 
   const expense = transactions
     .filter(t => t.type === 'expense')
@@ -169,6 +185,11 @@ function AccountingPage() {
                 font-size: 14px;
                 color: #64748b;
                 font-weight: 600;
+              }
+              .stat-card .detail {
+                font-size: 10px;
+                color: #64748b;
+                margin-top: 5px;
               }
               .transactions-section {
                 margin-bottom: 20px;
@@ -309,6 +330,8 @@ function AccountingPage() {
                 <div class="label">Revenus Totaux</div>
                 <div class="value">${Math.round(income).toLocaleString()}</div>
                 <div class="unit">FCFA</div>
+                <div class="detail">Cotisations: ${Math.round(paymentsIncome).toLocaleString()} F</div>
+                <div class="detail">Autres: ${Math.round(transactionIncome).toLocaleString()} F</div>
               </div>
               <div class="stat-card expense">
                 <div class="label">Dépenses Totales</div>
@@ -361,6 +384,14 @@ function AccountingPage() {
               <div class="summary-row income">
                 <span class="label">Total des revenus :</span>
                 <span class="value">+ ${Math.round(income).toLocaleString()} FCFA</span>
+              </div>
+              <div class="summary-row" style="padding-left: 20px; font-size: 11px;">
+                <span class="label">• Cotisations mensuelles :</span>
+                <span class="value">${Math.round(paymentsIncome).toLocaleString()} FCFA</span>
+              </div>
+              <div class="summary-row" style="padding-left: 20px; font-size: 11px;">
+                <span class="label">• Autres revenus :</span>
+                <span class="value">${Math.round(transactionIncome).toLocaleString()} FCFA</span>
               </div>
               <div class="summary-row expense">
                 <span class="label">Total des dépenses :</span>
@@ -464,6 +495,12 @@ function AccountingPage() {
           </div>
           <div style={{ fontSize: '32px', fontWeight: '700', color: '#10b981' }}>
             {Math.round(income).toLocaleString()} FCFA
+          </div>
+          <div style={{ fontSize: '11px', color: '#64748b', marginTop: '8px' }}>
+            Cotisations: {Math.round(paymentsIncome).toLocaleString()} F
+          </div>
+          <div style={{ fontSize: '11px', color: '#64748b' }}>
+            Autres: {Math.round(transactionIncome).toLocaleString()} F
           </div>
         </div>
         <div style={{
