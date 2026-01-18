@@ -257,6 +257,255 @@ function MembersPage() {
   const activeCount = members.filter(m => m.is_active === 1).length;
   const inactiveCount = members.filter(m => m.is_active === 0).length;
 
+  const handlePrintAllFinancialStatuses = async () => {
+    const selectedYear = new Date().getFullYear();
+    const activeMembers = members.filter(m => m.is_active === 1);
+
+    if (activeMembers.length === 0) {
+      alert('Aucun adhérent actif à imprimer');
+      return;
+    }
+
+    try {
+      const clubInfo = await api.getClub();
+      const allMembersData = await Promise.all(
+        activeMembers.map(async (member) => {
+          try {
+            const financialData = await api.getMemberMonthlyFees(member.id, selectedYear);
+            return { member, financialData };
+          } catch (error) {
+            console.error(`Error loading data for member ${member.id}:`, error);
+            return null;
+          }
+        })
+      );
+
+      const validMembersData = allMembersData.filter(data => data !== null);
+
+      if (validMembersData.length === 0) {
+        alert('Aucune donnée financière disponible');
+        return;
+      }
+
+      const MONTHS = [
+        'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+        'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+      ];
+
+      const PAYMENT_METHODS = {
+        'cash': 'Espèces',
+        'card': 'Carte bancaire',
+        'check': 'Chèque',
+        'transfer': 'Virement'
+      };
+
+      const printContent = `
+        <html>
+          <head>
+            <title>États Financiers - Tous les adhérents</title>
+            <style>
+              @page {
+                margin: 2cm;
+              }
+              body {
+                font-family: Arial, sans-serif;
+                color: #000;
+              }
+              .page-break {
+                page-break-after: always;
+              }
+              .main-header {
+                text-align: center;
+                margin-bottom: 40px;
+                border-bottom: 4px solid #0f172a;
+                padding-bottom: 20px;
+              }
+              .main-header h1 {
+                margin: 0;
+                font-size: 32px;
+                color: #0f172a;
+              }
+              .main-header .club-name {
+                font-size: 18px;
+                color: #64748b;
+                margin-top: 8px;
+              }
+              .main-header .date {
+                font-size: 14px;
+                color: #64748b;
+                margin-top: 5px;
+              }
+              .member-section {
+                margin-bottom: 50px;
+              }
+              .member-header {
+                background: #f8fafc;
+                padding: 20px;
+                border-left: 5px solid #3b82f6;
+                margin-bottom: 20px;
+              }
+              .member-header h2 {
+                margin: 0 0 10px 0;
+                font-size: 24px;
+                color: #0f172a;
+              }
+              .member-header p {
+                margin: 5px 0;
+                font-size: 14px;
+                color: #475569;
+              }
+              .stats {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 15px;
+                margin: 20px 0;
+              }
+              .stat-card {
+                padding: 15px;
+                text-align: center;
+                border: 2px solid #e2e8f0;
+                border-radius: 8px;
+              }
+              .stat-card .label {
+                font-size: 11px;
+                color: #64748b;
+                font-weight: 600;
+                margin-bottom: 5px;
+                text-transform: uppercase;
+              }
+              .stat-card .value {
+                font-size: 22px;
+                font-weight: 800;
+                color: #0f172a;
+                margin: 5px 0;
+              }
+              .stat-card .amount {
+                font-size: 11px;
+                color: #64748b;
+                font-weight: 600;
+              }
+              .months-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 15px 0;
+                font-size: 12px;
+              }
+              .months-table th,
+              .months-table td {
+                padding: 8px 10px;
+                text-align: left;
+                border: 1px solid #e2e8f0;
+              }
+              .months-table th {
+                background: #f8fafc;
+                font-weight: 700;
+                color: #0f172a;
+              }
+              .status-paid {
+                color: #059669;
+                font-weight: 700;
+              }
+              .status-unpaid {
+                color: #dc2626;
+                font-weight: 700;
+              }
+              .footer {
+                margin-top: 30px;
+                padding-top: 15px;
+                border-top: 2px solid #e2e8f0;
+                text-align: center;
+                font-size: 11px;
+                color: #64748b;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="main-header">
+              <h1>ÉTATS FINANCIERS - TOUS LES ADHÉRENTS</h1>
+              ${clubInfo ? `<div class="club-name">${clubInfo.name || clubInfo.club_name} - ${clubInfo.city}</div>` : ''}
+              <div class="date">Année ${selectedYear} - Imprimé le ${new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+            </div>
+
+            ${validMembersData.map((data, index) => {
+              const { financialData } = data;
+              return `
+                <div class="member-section ${index < validMembersData.length - 1 ? 'page-break' : ''}">
+                  <div class="member-header">
+                    <h2>${financialData.member.name}</h2>
+                    <p><strong>Cotisation mensuelle:</strong> ${financialData.member.monthly_fee} FCFA</p>
+                  </div>
+
+                  <div class="stats">
+                    <div class="stat-card">
+                      <div class="label">Total</div>
+                      <div class="value">${financialData.stats.total}</div>
+                      <div class="amount">${financialData.stats.totalAmount} FCFA</div>
+                    </div>
+                    <div class="stat-card">
+                      <div class="label">Payés</div>
+                      <div class="value">${financialData.stats.paid}</div>
+                      <div class="amount">${financialData.stats.paidAmount} FCFA</div>
+                    </div>
+                    <div class="stat-card">
+                      <div class="label">Non payés</div>
+                      <div class="value">${financialData.stats.unpaid}</div>
+                      <div class="amount">${financialData.stats.unpaidAmount} FCFA</div>
+                    </div>
+                    <div class="stat-card">
+                      <div class="label">Taux</div>
+                      <div class="value">${Math.round((financialData.stats.paid / financialData.stats.total) * 100)}%</div>
+                      <div class="amount">complété</div>
+                    </div>
+                  </div>
+
+                  <table class="months-table">
+                    <thead>
+                      <tr>
+                        <th>Mois</th>
+                        <th>Montant</th>
+                        <th>Statut</th>
+                        <th>Date paiement</th>
+                        <th>Méthode</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${financialData.months.map(monthData => `
+                        <tr>
+                          <td>${MONTHS[monthData.month - 1]}</td>
+                          <td>${monthData.amount} FCFA</td>
+                          <td class="${monthData.status === 'paid' ? 'status-paid' : 'status-unpaid'}">
+                            ${monthData.status === 'paid' ? '✓ Payé' : '✗ Non payé'}
+                          </td>
+                          <td>${monthData.paid_date ? new Date(monthData.paid_date).toLocaleDateString('fr-FR') : '-'}</td>
+                          <td>${monthData.payment_method ? PAYMENT_METHODS[monthData.payment_method] || monthData.payment_method : '-'}</td>
+                        </tr>
+                      `).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              `;
+            }).join('')}
+
+            <div class="footer">
+              ${clubInfo ? `${clubInfo.name || clubInfo.club_name} - ${clubInfo.city}` : ''} | Document généré le ${new Date().toLocaleDateString('fr-FR')} | ${validMembersData.length} adhérent(s) actif(s)
+            </div>
+          </body>
+        </html>
+      `;
+
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+      }, 500);
+    } catch (error) {
+      console.error('Error printing all financial statuses:', error);
+      alert('Erreur lors de la génération du document d\'impression');
+    }
+  };
+
   return (
     <>
       <div className="fade-in">
@@ -273,19 +522,29 @@ function MembersPage() {
               {members.length} membre{members.length > 1 ? 's' : ''} enregistré{members.length > 1 ? 's' : ''}
             </p>
           </div>
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              if (showForm) {
-                handleCancelEdit();
-              } else {
-                setShowForm(true);
-              }
-            }}
-          >
-            <span>{showForm ? '✕' : '+'}</span>
-            <span>{showForm ? 'Annuler' : 'Nouvel adhérent'}</span>
-          </button>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button
+              className="btn btn-success"
+              onClick={handlePrintAllFinancialStatuses}
+              title="Imprimer les états financiers de tous les adhérents actifs"
+            >
+              <span>🖨️</span>
+              <span>Imprimer tous les états</span>
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                if (showForm) {
+                  handleCancelEdit();
+                } else {
+                  setShowForm(true);
+                }
+              }}
+            >
+              <span>{showForm ? '✕' : '+'}</span>
+              <span>{showForm ? 'Annuler' : 'Nouvel adhérent'}</span>
+            </button>
+          </div>
         </div>
 
         {showForm && (
