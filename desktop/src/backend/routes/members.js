@@ -122,11 +122,29 @@ router.put('/:id', authenticate, (req, res) => {
 router.delete('/:id', authenticate, (req, res) => {
   try {
     const db = getDb();
-    db.prepare('DELETE FROM members WHERE id = ? AND club_id = ?').run(req.params.id, req.clubId);
+    const memberId = req.params.id;
+
+    const member = db.prepare('SELECT * FROM members WHERE id = ? AND club_id = ?').get(memberId, req.clubId);
+    if (!member) {
+      return res.status(404).json({ error: 'Membre non trouvé' });
+    }
+
+    const deleteInTransaction = db.transaction(() => {
+      db.prepare('DELETE FROM attendances WHERE member_id = ?').run(memberId);
+      db.prepare('DELETE FROM payments WHERE member_id = ?').run(memberId);
+      db.prepare('DELETE FROM licenses WHERE member_id = ?').run(memberId);
+      db.prepare('DELETE FROM member_competitions WHERE member_id = ?').run(memberId);
+      db.prepare('DELETE FROM career_events WHERE member_id = ?').run(memberId);
+      db.prepare('DELETE FROM belt_promotions WHERE member_id = ?').run(memberId);
+      db.prepare('DELETE FROM monthly_fees WHERE member_id = ?').run(memberId);
+      db.prepare('DELETE FROM members WHERE id = ?').run(memberId);
+    });
+
+    deleteInTransaction();
     res.status(204).send();
   } catch (error) {
     console.error('Delete member error:', error);
-    res.status(500).json({ error: 'Erreur serveur' });
+    res.status(500).json({ error: 'Erreur lors de la suppression du membre' });
   }
 });
 
