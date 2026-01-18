@@ -119,6 +119,28 @@ router.put('/:id', authenticate, (req, res) => {
   }
 });
 
+router.patch('/:id/toggle-active', authenticate, (req, res) => {
+  try {
+    const db = getDb();
+    const memberId = req.params.id;
+
+    const member = db.prepare('SELECT * FROM members WHERE id = ? AND club_id = ?').get(memberId, req.clubId);
+    if (!member) {
+      return res.status(404).json({ error: 'Membre non trouvé' });
+    }
+
+    const newActiveState = member.is_active === 1 ? 0 : 1;
+    db.prepare('UPDATE members SET is_active = ? WHERE id = ? AND club_id = ?')
+      .run(newActiveState, memberId, req.clubId);
+
+    const updatedMember = db.prepare('SELECT * FROM members WHERE id = ?').get(memberId);
+    res.json(updatedMember);
+  } catch (error) {
+    console.error('Toggle member active error:', error);
+    res.status(500).json({ error: 'Erreur lors de la modification du statut' });
+  }
+});
+
 router.delete('/:id', authenticate, (req, res) => {
   try {
     const db = getDb();

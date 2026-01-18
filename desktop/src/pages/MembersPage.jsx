@@ -8,6 +8,7 @@ function MembersPage() {
   const [members, setMembers] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeFilter, setActiveFilter] = useState('all');
   const [editingMember, setEditingMember] = useState(null);
   const [selectedMemberForCareer, setSelectedMemberForCareer] = useState(null);
   const [selectedMemberForFinances, setSelectedMemberForFinances] = useState(null);
@@ -158,6 +159,16 @@ function MembersPage() {
     }
   };
 
+  const handleToggleActive = async (member) => {
+    try {
+      await api.toggleMemberActive(member.id);
+      loadMembers();
+    } catch (error) {
+      console.error('Error toggling member active state:', error);
+      alert('Erreur lors de la modification du statut');
+    }
+  };
+
   const handleCancelEdit = () => {
     setEditingMember(null);
     setFormData({
@@ -230,11 +241,21 @@ function MembersPage() {
     return lightBelts.includes(beltCode) ? '#0f172a' : '#ffffff';
   };
 
-  const filteredMembers = members.filter(member =>
-    `${member.first_name} ${member.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (member.category && member.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (member.discipline && member.discipline.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredMembers = members.filter(member => {
+    const matchesSearch = `${member.first_name} ${member.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (member.category && member.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (member.discipline && member.discipline.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    const matchesActiveFilter =
+      activeFilter === 'all' ? true :
+      activeFilter === 'active' ? member.is_active === 1 :
+      member.is_active === 0;
+
+    return matchesSearch && matchesActiveFilter;
+  });
+
+  const activeCount = members.filter(m => m.is_active === 1).length;
+  const inactiveCount = members.filter(m => m.is_active === 0).length;
 
   return (
     <>
@@ -483,17 +504,72 @@ function MembersPage() {
         )}
 
         <div className="card">
-          <div className="card-header">
-            <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
-              👥 Liste des adhérents
-            </h2>
-            <input
-              type="text"
-              placeholder="Rechercher un adhérent..."
-              className="search-input"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <div className="card-header" style={{ flexDirection: 'column', alignItems: 'stretch', gap: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: '700', color: '#0f172a', margin: 0 }}>
+                👥 Liste des adhérents
+              </h2>
+              <input
+                type="text"
+                placeholder="Rechercher un adhérent..."
+                className="search-input"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => setActiveFilter('all')}
+                style={{
+                  padding: '8px 16px',
+                  border: '2px solid',
+                  borderColor: activeFilter === 'all' ? '#3b82f6' : '#e2e8f0',
+                  borderRadius: '8px',
+                  backgroundColor: activeFilter === 'all' ? '#eff6ff' : 'white',
+                  color: activeFilter === 'all' ? '#3b82f6' : '#64748b',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Tous ({members.length})
+              </button>
+              <button
+                onClick={() => setActiveFilter('active')}
+                style={{
+                  padding: '8px 16px',
+                  border: '2px solid',
+                  borderColor: activeFilter === 'active' ? '#10b981' : '#e2e8f0',
+                  borderRadius: '8px',
+                  backgroundColor: activeFilter === 'active' ? '#d1fae5' : 'white',
+                  color: activeFilter === 'active' ? '#10b981' : '#64748b',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Actifs ({activeCount})
+              </button>
+              <button
+                onClick={() => setActiveFilter('inactive')}
+                style={{
+                  padding: '8px 16px',
+                  border: '2px solid',
+                  borderColor: activeFilter === 'inactive' ? '#f97316' : '#e2e8f0',
+                  borderRadius: '8px',
+                  backgroundColor: activeFilter === 'inactive' ? '#ffedd5' : 'white',
+                  color: activeFilter === 'inactive' ? '#f97316' : '#64748b',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Inactifs ({inactiveCount})
+              </button>
+            </div>
           </div>
 
           {filteredMembers.length > 0 ? (
@@ -505,7 +581,7 @@ function MembersPage() {
                     <th>Catégorie</th>
                     <th>Discipline</th>
                     <th>Ceinture</th>
-                    <th>Statut</th>
+                    <th>État</th>
                     <th>Cotisation</th>
                     <th>Actions</th>
                   </tr>
@@ -562,15 +638,39 @@ function MembersPage() {
                         </div>
                       </td>
                       <td>
-                        <span className={`status-badge status-${member.status || 'active'}`}>
-                          {member.status === 'active' ? 'Actif' : member.status === 'pending' ? 'En attente' : 'Suspendu'}
+                        <span style={{
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          fontSize: '13px',
+                          fontWeight: '600',
+                          backgroundColor: member.is_active === 1 ? '#d1fae5' : '#fee2e2',
+                          color: member.is_active === 1 ? '#059669' : '#dc2626'
+                        }}>
+                          {member.is_active === 1 ? '✓ Actif' : '✗ Inactif'}
                         </span>
                       </td>
                       <td style={{ fontWeight: '600', color: '#10b981' }}>
                         {parseFloat(member.monthly_fee || 0).toLocaleString()} FCFA
                       </td>
                       <td>
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                          <button
+                            onClick={() => handleToggleActive(member)}
+                            style={{
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              border: '1px solid #e2e8f0',
+                              backgroundColor: member.is_active === 1 ? '#fee2e2' : '#d1fae5',
+                              cursor: 'pointer',
+                              fontSize: '14px',
+                              transition: 'all 0.2s',
+                              fontWeight: '600',
+                              color: member.is_active === 1 ? '#dc2626' : '#059669'
+                            }}
+                            title={member.is_active === 1 ? 'Désactiver' : 'Activer'}
+                          >
+                            {member.is_active === 1 ? '⏸' : '▶'}
+                          </button>
                           <Link
                             to="/licenses"
                             state={{ memberId: member.id }}

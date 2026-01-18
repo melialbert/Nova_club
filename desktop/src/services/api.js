@@ -86,6 +86,16 @@ export const api = {
     if (!response.ok) throw new Error('Erreur lors de la suppression du membre');
   },
 
+  async toggleMemberActive(id) {
+    const response = await fetch(`${API_URL}/members/${id}/toggle-active`, {
+      method: 'PATCH',
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) throw new Error('Erreur lors de la modification du statut');
+    return response.json();
+  },
+
   async getAttendances() {
     const response = await fetch(`${API_URL}/attendances`, {
       headers: getHeaders(),
