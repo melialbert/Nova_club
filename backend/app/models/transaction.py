@@ -26,7 +26,7 @@ class Transaction(BaseModel):
     club_id = Column(String(36), ForeignKey("clubs.id"), nullable=False)
     transaction_type = Column(Enum(TransactionType), nullable=False)
     category = Column(Enum(TransactionCategory), nullable=False)
-    amount = Column(Numeric(10, 2), nullable=False)
+    amount = Column(Numeric(15, 2), nullable=False)
     transaction_date = Column(Date, nullable=False)
     description = Column(Text, nullable=True)
     reference = Column(String(100), nullable=True)

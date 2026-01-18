@@ -608,7 +608,16 @@ function PaymentsPage() {
                 </div>
                 <div className="form-group">
                   <label>Montant (FCFA) *</label>
-                  <input type="number" name="amount" value={formData.amount} onChange={handleChange} required />
+                  <input
+                    type="number"
+                    name="amount"
+                    value={formData.amount}
+                    onChange={handleChange}
+                    min="0"
+                    step="0.01"
+                    max="99999999"
+                    required
+                  />
                 </div>
                 <div className="form-group">
                   <label>Type de paiement</label>

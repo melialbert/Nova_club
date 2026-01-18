@@ -17,7 +17,7 @@ class License(BaseModel):
     season = Column(String(20), nullable=False)
     issue_date = Column(Date, nullable=False)
     expiry_date = Column(Date, nullable=False)
-    amount = Column(Numeric(10, 2), nullable=False)
+    amount = Column(Numeric(15, 2), nullable=False)
     status = Column(Enum(LicenseStatus), default=LicenseStatus.ACTIVE, nullable=False)
 
     member = relationship("Member", back_populates="licenses")

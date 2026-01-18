@@ -741,6 +741,7 @@ function PaymentsPage() {
                       required={formData.is_partial}
                       min="0"
                       step="0.01"
+                      max="9999999999.99"
                       placeholder="Ex: 50000"
                     />
                   </div>
@@ -754,6 +755,7 @@ function PaymentsPage() {
                       required={formData.is_partial}
                       min="0"
                       step="0.01"
+                      max="9999999999.99"
                       placeholder="Ex: 20000"
                     />
                   </div>
@@ -785,6 +787,7 @@ function PaymentsPage() {
                     required={!formData.is_partial}
                     min="0"
                     step="0.01"
+                    max="9999999999.99"
                     placeholder="Ex: 50000"
                   />
                 </div>

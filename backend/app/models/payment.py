@@ -26,7 +26,7 @@ class Payment(BaseModel):
 
     club_id = Column(String(36), ForeignKey("clubs.id"), nullable=False)
     member_id = Column(String(36), ForeignKey("members.id"), nullable=False)
-    amount = Column(Numeric(10, 2), nullable=False)
+    amount = Column(Numeric(15, 2), nullable=False)
     payment_type = Column(Enum(PaymentType), nullable=False)
     payment_method = Column(Enum(PaymentMethod), default=PaymentMethod.CASH, nullable=False)
     payment_date = Column(Date, nullable=False)

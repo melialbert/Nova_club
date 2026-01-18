@@ -53,8 +53,8 @@ class Member(BaseModel):
     medical_certificate_url = Column(String(500), nullable=True)
     medical_certificate_expiry = Column(Date, nullable=True)
 
-    monthly_fee = Column(Numeric(10, 2), nullable=False)
-    registration_fee = Column(Numeric(10, 2), nullable=True)
+    monthly_fee = Column(Numeric(15, 2), nullable=False)
+    registration_fee = Column(Numeric(15, 2), nullable=True)
     has_discount = Column(Boolean, default=False)
     discount_percentage = Column(Numeric(5, 2), default=0)
 

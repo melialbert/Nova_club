@@ -18,7 +18,7 @@ class Equipment(BaseModel):
     name = Column(String(200), nullable=False)
     equipment_type = Column(Enum(EquipmentType), nullable=False)
     size = Column(String(50), nullable=True)
-    price = Column(Numeric(10, 2), nullable=False)
+    price = Column(Numeric(15, 2), nullable=False)
     stock_quantity = Column(Integer, default=0, nullable=False)
     description = Column(Text, nullable=True)
 
@@ -32,8 +32,8 @@ class EquipmentPurchase(BaseModel):
     member_id = Column(String(36), ForeignKey("members.id"), nullable=False)
     equipment_id = Column(String(36), ForeignKey("equipment.id"), nullable=False)
     quantity = Column(Integer, default=1, nullable=False)
-    unit_price = Column(Numeric(10, 2), nullable=False)
-    total_amount = Column(Numeric(10, 2), nullable=False)
+    unit_price = Column(Numeric(15, 2), nullable=False)
+    total_amount = Column(Numeric(15, 2), nullable=False)
     purchase_date = Column(Date, nullable=False)
     notes = Column(Text, nullable=True)
 
