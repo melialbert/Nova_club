@@ -71,7 +71,30 @@ function PaymentsPage() {
     if (type === 'checkbox') {
       setFormData({ ...formData, [name]: checked });
     } else {
-      setFormData({ ...formData, [name]: value });
+      const updatedFormData = { ...formData, [name]: value };
+
+      if (name === 'member_id' && updatedFormData.payment_type === 'monthly_fee' && value) {
+        const selectedMember = members.find(m => m.id === parseInt(value));
+        if (selectedMember && selectedMember.monthly_fee) {
+          updatedFormData.amount = selectedMember.monthly_fee.toString();
+          updatedFormData.total_amount = selectedMember.monthly_fee.toString();
+        }
+      }
+
+      if (name === 'payment_type' && value === 'monthly_fee' && updatedFormData.member_id) {
+        const selectedMember = members.find(m => m.id === parseInt(updatedFormData.member_id));
+        if (selectedMember && selectedMember.monthly_fee) {
+          updatedFormData.amount = selectedMember.monthly_fee.toString();
+          updatedFormData.total_amount = selectedMember.monthly_fee.toString();
+        }
+      }
+
+      if (name === 'payment_type' && value !== 'monthly_fee') {
+        updatedFormData.amount = '';
+        updatedFormData.total_amount = '';
+      }
+
+      setFormData(updatedFormData);
     }
   };
 
@@ -733,7 +756,22 @@ function PaymentsPage() {
               {formData.is_partial ? (
                 <>
                   <div className="form-group">
-                    <label>Montant total (FCFA) *</label>
+                    <label>
+                      Montant total (FCFA) *
+                      {formData.payment_type === 'monthly_fee' && formData.member_id && (
+                        <span style={{
+                          marginLeft: '8px',
+                          fontSize: '12px',
+                          color: '#10b981',
+                          fontWeight: '500',
+                          backgroundColor: '#d1fae5',
+                          padding: '2px 8px',
+                          borderRadius: '4px'
+                        }}>
+                          Auto-rempli
+                        </span>
+                      )}
+                    </label>
                     <input
                       type="number"
                       name="total_amount"
@@ -744,7 +782,17 @@ function PaymentsPage() {
                       step="0.01"
                       max="9999999999.99"
                       placeholder="Ex: 50000"
+                      disabled={formData.payment_type === 'monthly_fee'}
+                      style={{
+                        backgroundColor: formData.payment_type === 'monthly_fee' ? '#f8fafc' : 'white',
+                        cursor: formData.payment_type === 'monthly_fee' ? 'not-allowed' : 'text'
+                      }}
                     />
+                    {formData.payment_type === 'monthly_fee' && (
+                      <small style={{ color: '#64748b', fontSize: '13px', marginTop: '4px', display: 'block' }}>
+                        Le montant est défini lors de l'enregistrement de l'adhérent
+                      </small>
+                    )}
                   </div>
                   <div className="form-group">
                     <label>Montant payé / Avance (FCFA) *</label>
@@ -779,7 +827,22 @@ function PaymentsPage() {
                 </>
               ) : (
                 <div className="form-group">
-                  <label>Montant (FCFA) *</label>
+                  <label>
+                    Montant (FCFA) *
+                    {formData.payment_type === 'monthly_fee' && formData.member_id && (
+                      <span style={{
+                        marginLeft: '8px',
+                        fontSize: '12px',
+                        color: '#10b981',
+                        fontWeight: '500',
+                        backgroundColor: '#d1fae5',
+                        padding: '2px 8px',
+                        borderRadius: '4px'
+                      }}>
+                        Auto-rempli
+                      </span>
+                    )}
+                  </label>
                   <input
                     type="number"
                     name="amount"
@@ -790,7 +853,17 @@ function PaymentsPage() {
                     step="0.01"
                     max="9999999999.99"
                     placeholder="Ex: 50000"
+                    disabled={formData.payment_type === 'monthly_fee'}
+                    style={{
+                      backgroundColor: formData.payment_type === 'monthly_fee' ? '#f8fafc' : 'white',
+                      cursor: formData.payment_type === 'monthly_fee' ? 'not-allowed' : 'text'
+                    }}
                   />
+                  {formData.payment_type === 'monthly_fee' && (
+                    <small style={{ color: '#64748b', fontSize: '13px', marginTop: '4px', display: 'block' }}>
+                      Le montant est défini lors de l'enregistrement de l'adhérent
+                    </small>
+                  )}
                 </div>
               )}
             </div>
